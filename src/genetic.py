@@ -93,7 +93,7 @@ class GeneticAlgorithm:
             self.training_data = self.data
 
             # CORE
-            self.compute_fitness(config.LEARNING_VERBOSE)
+            self.compute_fitness()
             self.next_generation(config.SAVE_BEST_AGENT)
             self.cross_over_2(config.CROSSOVER_PERCENT)
 
@@ -203,8 +203,8 @@ class GeneticAlgorithm:
         print("Error:", str(a.error) + "%",
               "- size(A) =", len(a.obj.A),
               "- size(R) =", a.obj.size())
-        # a.obj.convert_to_AF().print_arg()
-        # a.obj.convert_to_AF().print_attacks()
+        a.obj.convert_to_AF().print_arg()
+        a.obj.convert_to_AF().print_attacks()
 
     def remove_trash(self):
         for i in range(len(self.agents)):
