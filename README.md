@@ -24,4 +24,19 @@ T. Kampik<br>
 </ul>
 
 <h2>Extensions:</h2><br>
+<ul>
+  <li>'g': Grounded
+  <li>'p': Preferred</li>
+</ul>
+
 <h2>Dataset:</h2><br>
+<p>Only in-use dataset are listed below. For more information, please refer to "src/datasets/<name>/*.names.txt" files.</p>
+<ul>
+  <li>#: <name>
+  <li>0: Mushroom</li>
+  <li>1: Voting</li>
+  <li>2: Breast-cancer</li>
+  <li>3: Heart-disease</li>
+  <li>4: Car</li>
+  <li>5: Brest-cancer-wisconsin</li>
+</ul>
