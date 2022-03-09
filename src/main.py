@@ -24,7 +24,7 @@ if __name__ == "__main__":
     # args = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'b1', 'b2', 'b3', 'b4', 'b5']  # large + blank
     # args = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o']  # large
 
-    for run in range(10):
+    for run in range(1):
         # start ----------------------
         args = []
         gen = genetic.GeneticAlgorithm(config.POPULATION)
