@@ -1,0 +1,6 @@
+gill-size=n T
+odor=n gill-size=n
+spore-print-color=h T
+odor=a gill-size=n
+habitat=d odor=n
+ring-number=n T

@@ -1,0 +1,10 @@
+odor=f T
+gill-size=n T
+gill-spacing=w gill-size=n
+stalk-shape=e gill-spacing=w
+spore-print-color=r T
+odor=n gill-size=n
+cap-color=y odor=n
+ring-number=n T
+cap-surface=g T
+stalk-shape=t cap-surface=g
