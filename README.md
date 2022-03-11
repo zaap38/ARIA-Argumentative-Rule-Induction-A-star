@@ -1,12 +1,19 @@
-# GAARI
-Genetic Algorithm for Argumentative Rule Induction.
+# GAARI - Genetic Algorithm for Argumentative Rule Induction
+This project contains early-stage research code for learning argumentation-based representations of logical rules that have been inferred from data.
 
-<h2>Authors:</h2><br>
-B. Alcaraz<br>
-C. Leturc<br>
-T. Kampik<br>
+## Prerequisites
+Install the dependencies by running ``pip install -r requirements.txt``.
 
-<h2>Options:</h2><br>
+## Run
+Run the script by navigating to the ``src`` directory and executing ``main.py`` with the desired options (see below).
+
+Example:
+
+```
+main.py -d 0
+```
+
+## Options
 <ul>
   <li>'-e [export_file]'  # The location of the export files. By default 'output/'.</li>
   <li>'-d [dataset]'  # The index of the dataset used (please refer to the section Dataset).</li>
@@ -23,13 +30,13 @@ T. Kampik<br>
   <li>'--negation'  # Toggle the generation of negated arguments. By default 'False'.</li>
 </ul>
 
-<h2>Extensions:</h2><br>
+## Extensions
 <ul>
   <li>'g': Grounded
   <li>'p': Preferred</li>
 </ul>
 
-<h2>Dataset:</h2><br>
+## Dataset
 <p>Only in-use dataset are listed below. For more information, please refer to "src/datasets/[name]/*.names.txt" files.</p>
 <ul>
   <li>#: [name]
@@ -40,3 +47,8 @@ T. Kampik<br>
   <li>4: Car</li>
   <li>5: Brest-cancer-wisconsin</li>
 </ul>
+
+## Authors
+B. Alcaraz<br>
+C. Leturc<br>
+T. Kampik<br>
