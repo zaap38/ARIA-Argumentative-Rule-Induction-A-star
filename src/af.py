@@ -39,8 +39,8 @@ class EncodedAF:
         attacker = config.TARGET
         base_arg = [config.TARGET]
         if config.GLOBAL_TOP:
-            base_arg = base_arg + config.TOP
-        while attacker in [config.TARGET, config.TOP]:
+            base_arg = base_arg + [config.TOP]
+        while attacker in base_arg:
             # print(self.A)
             attacker = sn.pick(self.A)
         self.add_attack(attacker, sn.pick(base_arg))
