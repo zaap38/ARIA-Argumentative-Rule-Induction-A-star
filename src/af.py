@@ -1,6 +1,7 @@
 import random as rd
 import copy as cp
 import config
+import snippets as sn
 
 
 class Argument:
@@ -29,14 +30,20 @@ class EncodedAF:
                         a == config.TARGET:
                     self.R.append(None)
                 else:
-                    self.R.append(0)
+                    if a == config.TOP and b == config.TARGET:
+                        self.R.append(1)
+                    else:
+                        self.R.append(0)
 
     def random_init(self):
         attacker = config.TARGET
-        while attacker == config.TARGET:
+        base_arg = [config.TARGET]
+        if config.GLOBAL_TOP:
+            base_arg = base_arg + config.TOP
+        while attacker in [config.TARGET, config.TOP]:
             # print(self.A)
-            attacker = self.A[rd.randint(0, len(self.A) - 1)]
-        self.add_attack(attacker, config.TARGET)
+            attacker = sn.pick(self.A)
+        self.add_attack(attacker, sn.pick(base_arg))
 
     def compute_possible_changes(self):
         self.changes = []
@@ -65,9 +72,9 @@ class EncodedAF:
         good = False
 
         while not good:
-            a = self.A[rd.randint(0, len(self.A) - 1)]
-            b = self.A[self.changes[rd.randint(0, len(self.changes) - 1)]]
-            good = self.attack_is_possible((a, b))
+            a = sn.pick(self.A)
+            b = self.A[sn.pick(self.changes)]
+            good = self.attack_is_possible((a, b)) and a != config.TOP
             if config.MAX_R_SIZE is not None and \
                     config.MAX_R_SIZE <= self.size():
                 if not self.is_attacking(a, b):
@@ -142,7 +149,7 @@ class EncodedAF:
 
     def polish(self):
         """
-        Remove non-connex, symmetrical and useless attack relations.
+        Remove non-connect, symmetrical and useless attack relations.
         :return:
         """
         # remove symmetrical attacks
@@ -152,7 +159,7 @@ class EncodedAF:
                     self.remove_attack(a, b)
                     self.remove_attack(b, a)
 
-        # remove useless and non-connex attacks
+        # remove useless and non-connect attacks
         stop = False
         attacking_t = [config.TARGET]
         while not stop:
@@ -200,17 +207,17 @@ class AF:
             self.R.pop(rd.randint(1, len(self.R) - 1))
 
     def random_change(self, possible):
-        a = possible[rd.randint(0, len(possible) - 1)]
+        a = sn.pick(possible)
         while a == config.TARGET:
-            a = possible[rd.randint(0, len(possible) - 1)]
+            a = sn.pick(possible)
         already_in = []
         for r in self.R:
             if r[0] not in already_in:
                 already_in.append(r[0])
         already_in += [config.TARGET]
-        b = already_in[rd.randint(0, len(already_in) - 1)]
+        b = sn.pick(already_in)
         while a == b:
-            b = already_in[rd.randint(0, len(already_in) - 1)]
+            b = sn.pick(already_in)
         if self.exist((a, b)):
             self.R.remove((a, b))
         elif self.exist((b, a)):
@@ -304,7 +311,7 @@ class AF:
         false_predicted = 0
         for step in range(count):
             for i, a in enumerate(self.A):
-                if a.name in data[step][1]:
+                if a.name in data[step][1] or a.name == config.TOP:
                     self.alive(self.A[i])
                 else:
                     self.dead(self.A[i])
@@ -401,7 +408,7 @@ class AF:
     def compute_grounded(self, facts):
         labels = dict()
         for x in self.A:
-            if x.name in facts or x.name == config.TARGET:
+            if x.name in facts or x.name in [config.TARGET, config.TOP]:
                 labels[x.name] = "undecided"
             else:
                 labels[x.name] = "out"
@@ -450,7 +457,7 @@ class AF:
                 args.append(r[1])
         activated_args = []
         for a in args:
-            if a in facts or a == config.TARGET:
+            if a in facts or a in [config.TARGET, config.TOP]:
                 activated_args.append(a)
         for x in activated_args:
             mu[x] = "BLANK"

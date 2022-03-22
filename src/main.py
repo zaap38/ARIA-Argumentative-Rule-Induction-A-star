@@ -66,6 +66,8 @@ if __name__ == "__main__":
                 config.NOISE)
         # ------------
 
+        if config.GLOBAL_TOP:
+            args = [config.TOP] + args
         args = [config.TARGET] + args
         gen.possible = args
 

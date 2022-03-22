@@ -2,7 +2,7 @@ import sys
 import getopt
 
 
-STEPS = 100
+STEPS = 200
 POPULATION = 10
 
 EXTENSION = "g"  # preferred=p ; grounded=g
@@ -11,6 +11,8 @@ INCREASE = False
 INCREASE_STEP = 50
 INCREASE_VALUE = 1
 TARGET = 'T'
+TOP = 'Top'
+GLOBAL_TOP = False
 REDUCE = 30
 FORCE_REDUCE = True
 NEGATION = False
@@ -50,7 +52,7 @@ def init(argv):
     try:
         opts, args = getopt.getopt(argv,
                                    "e:d:r:m:h:x:t:n:i:p:s:",
-                                   ["reduce", "negation"])
+                                   ["reduce", "negation", "topg"])
     except getopt.GetoptError:
         print('main.py'
               '-e <export_file>'
@@ -65,7 +67,8 @@ def init(argv):
               '-p <population_size>'
               '-s <steps>'
               '--reduce'
-              '--negation')
+              '--negation'
+              '--topg')
         sys.exit(2)
 
     for opt, arg in opts:
@@ -108,3 +111,6 @@ def init(argv):
         elif opt == '--negation':
             global NEGATION
             NEGATION = True
+        elif opt == '--topg':
+            global GLOBAL_TOP
+            GLOBAL_TOP = True

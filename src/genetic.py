@@ -4,6 +4,7 @@ import random as rd
 from tqdm import tqdm
 import string
 import config
+import snippets as sn
 
 
 class Agent:
@@ -287,9 +288,7 @@ class GeneticAlgorithm:
                     new_agent_arguments.append(cp.deepcopy(r[1]))
             if not new_agent_arguments:
                 continue
-            rand_arg = new_agent_arguments[rd.randint(0,
-                                                      len(new_agent_arguments)
-                                                      - 1)]
+            rand_arg = sn.pick(new_agent_arguments)
             new_attacks = []
             for r in second_parent.obj.R:
                 if r[1] == rand_arg:
@@ -325,8 +324,8 @@ class GeneticAlgorithm:
                         r not in new_agent.obj.R and \
                         (r[1], r[0]) not in new_agent.obj.R:
                     new_agent.obj.R.append(cp.deepcopy(r))"""
-            # parent_1 = self.agents[rd.randint(0, len(self.agents) - 1)]
-            # parent_2 = self.agents[rd.randint(0, len(self.agents) - 1)]
+            # parent_1 = sn.pick(self.agents)
+            # parent_2 = sn.pick(self.agents)
 
             parent_1 = self.agents[i]
             parent_2 = self.agents[count - i - 1]

@@ -28,6 +28,7 @@ main.py -d 0
   <li>'-s [steps]'  # The count of learning steps.</li>
   <li>'--reduce'  # Toggle the forced reducing. By default already toggled.</li>
   <li>'--negation'  # Toggle the generation of negated arguments. By default 'False'.</li>
+  <li>'--topg'  # Toggle the global Top. By default 'False'.</li>
 </ul>
 
 ## Extensions
