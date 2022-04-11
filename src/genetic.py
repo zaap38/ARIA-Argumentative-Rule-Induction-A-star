@@ -84,7 +84,7 @@ class GeneticAlgorithm:
 
     def run_1(self, max_loop):  # program 1
         """
-        Limit the graph size.
+        Returns the best agent error percent.
         """
 
         self.generate(self.pop_size)
@@ -156,6 +156,8 @@ class GeneticAlgorithm:
         if config.EXPORT:
             self.log["final"]["graph"] = best_agent.obj.convert_to_AF().R
             self.export()
+
+        return best_agent.error
 
     def export(self, loc=config.EXPORT_LOC):
         f = open(loc + "error.csv", "w")

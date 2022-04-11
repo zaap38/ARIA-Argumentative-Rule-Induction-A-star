@@ -55,12 +55,16 @@ class EncodedAF:
     def is_attacker(self, a):
         offset = self.A.index(a) * len(self.A)
         for i in range(len(self.A)):
-            if self.R[offset + i] == 1:
+            if self.R[offset + i] != 0:
                 return True
         return False
 
     def attack_index(self, t):
-        return self.A.index(t[0]) * len(self.A) + self.A.index(t[1])
+        a = t[0]
+        b = t[1]
+        if a != config.TARGET and a != config.TOP and a[0] == 'T':
+            a = a[2:]
+        return self.A.index(a) * len(self.A) + self.A.index(b)
 
     def attack_is_possible(self, t):
         return self.R[self.attack_index(t)] is not None
@@ -74,13 +78,26 @@ class EncodedAF:
         while not good:
             a = sn.pick(self.A)
             b = self.A[sn.pick(self.changes)]
-            good = self.attack_is_possible((a, b)) and a != config.TOP
+            good = self.attack_is_possible((a, b)) and a != config.TOP and a != config.TARGET
             if config.MAX_R_SIZE is not None and \
                     config.MAX_R_SIZE <= self.size():
                 if not self.is_attacking(a, b):
                     good = False
         index = self.attack_index((a, b))
-        self.R[index] = 1 - self.R[index]
+        # TODO: working on local top
+        # self.R[index] = 1 - self.R[index]
+        if config.LOCAL_TOP and a != config.TARGET and a != config.TOP:
+            if self.R[index] == -1:
+                self.R[index] = rd.randint(0, 1)
+            elif self.R[index] == 0:
+                self.R[index] = -1
+                if rd.randint(0, 1) == 1:
+                    self.R[index] = 1
+            elif self.R[index] == 1:
+                self.R[index] = -rd.randint(0, 1)
+
+        else:
+            self.R[index] = 1 - self.R[index]
         index_a = self.A.index(a)
         if index_a not in self.changes:
             self.changes.append(index_a)
@@ -101,11 +118,27 @@ class EncodedAF:
 
         for a in self.A:
             af.A.append(Argument(a))
-
-        for i in range(len(self.R)):
+        # TODO: local top
+        """for i in range(len(self.R)):
             if bool(self.R[i]):
                 attack = self.get_attack(i)
+                af.R.append(attack)"""
+        for i in range(len(self.R)):
+            if self.R[i] == 1:
+                attack = self.get_attack(i)
                 af.R.append(attack)
+
+            elif self.R[i] == -1:
+                a, b = self.get_attack(i)
+                old_a = a
+                a = "T_" + a
+                if not af.exist(a):
+                    af.add_argument(a)
+                    attack_local_top = (old_a, a)
+                    af.R.append(attack_local_top)
+                attack = (a, b)
+                af.R.append(attack)
+
         return af
 
     def get_attack(self, index):
@@ -114,7 +147,7 @@ class EncodedAF:
         return a, b
 
     def is_attacking(self, a, b):
-        return self.R[self.A.index(a) * len(self.A) + self.A.index(b)] == 1
+        return self.R[self.A.index(a) * len(self.A) + self.A.index(b)] != 0
 
     def set_A(self, a):
         self.A = cp.deepcopy(a)
@@ -181,7 +214,7 @@ class EncodedAF:
 
     def remove_attack(self, a, b):
         index = self.attack_index((a, b))
-        if self.R[index] == 1:
+        if self.R[index] != 1:
             self.R[index] = 0
 
 
@@ -408,7 +441,7 @@ class AF:
     def compute_grounded(self, facts):
         labels = dict()
         for x in self.A:
-            if x.name in facts or x.name in [config.TARGET, config.TOP]:
+            if x.name in facts or x.name in [config.TARGET, config.TOP] or x.name[0] == 'T':
                 labels[x.name] = "undecided"
             else:
                 labels[x.name] = "out"
@@ -457,7 +490,7 @@ class AF:
                 args.append(r[1])
         activated_args = []
         for a in args:
-            if a in facts or a in [config.TARGET, config.TOP]:
+            if a in facts or a in [config.TARGET, config.TOP] or a[0] == 'T':
                 activated_args.append(a)
         for x in activated_args:
             mu[x] = "BLANK"
