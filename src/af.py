@@ -27,7 +27,10 @@ class EncodedAF:
                 if a == b or \
                         a == "not-" + b or \
                         b == "not-" + a or \
-                        a == config.TARGET:
+                        a == config.TARGET or \
+                        a == config.TOP or \
+                        (not config.MULTI_VALUE and
+                        self.get_attribute(a) == self.get_attribute(b)):
                     self.R.append(None)
                 else:
                     if a == config.TOP and b == config.TARGET:
@@ -35,11 +38,15 @@ class EncodedAF:
                     else:
                         self.R.append(0)
 
+    def get_attribute(self, arg):
+        return arg.split('=')[0]
+
     def random_init(self):
         attacker = config.TARGET
         base_arg = [config.TARGET]
         if config.GLOBAL_TOP:
             base_arg = base_arg + [config.TOP]
+            self.add_attack(config.TOP, config.TARGET)
         while attacker in base_arg:
             # print(self.A)
             attacker = sn.pick(self.A)
@@ -55,7 +62,7 @@ class EncodedAF:
     def is_attacker(self, a):
         offset = self.A.index(a) * len(self.A)
         for i in range(len(self.A)):
-            if self.R[offset + i] != 0:
+            if self.R[offset + i] not in [0, None]:
                 return True
         return False
 
@@ -84,7 +91,6 @@ class EncodedAF:
                 if not self.is_attacking(a, b):
                     good = False
         index = self.attack_index((a, b))
-        # TODO: working on local top
         # self.R[index] = 1 - self.R[index]
         if config.LOCAL_TOP and a != config.TARGET and a != config.TOP:
             if self.R[index] == -1:
@@ -147,7 +153,8 @@ class EncodedAF:
         return a, b
 
     def is_attacking(self, a, b):
-        return self.R[self.A.index(a) * len(self.A) + self.A.index(b)] != 0
+        return self.R[self.A.index(a) * len(self.A) + self.A.index(b)]\
+               not in [0, None]
 
     def set_A(self, a):
         self.A = cp.deepcopy(a)
@@ -174,7 +181,8 @@ class EncodedAF:
     def reduce_size(self, max_size):
         count = self.size() - max_size
         for i in range(len(self.R)):
-            if self.get_attack(i)[0] != config.TARGET and self.R[i] == 1:
+            if self.get_attack(i)[0] != config.TARGET and self.get_attack(i)[0]\
+                    != config.TOP and self.R[i] in [-1, 1]:
                 self.R[i] = 0
                 count -= 1
                 if count < 0:
@@ -194,7 +202,7 @@ class EncodedAF:
 
         # remove useless and non-connect attacks
         stop = False
-        attacking_t = [config.TARGET]
+        attacking_t = [config.TARGET, config.TOP]
         while not stop:
             stop = True
             for a in self.A:
@@ -214,8 +222,7 @@ class EncodedAF:
 
     def remove_attack(self, a, b):
         index = self.attack_index((a, b))
-        if self.R[index] != 1:
-            self.R[index] = 0
+        self.R[index] = 0
 
 
 class AF:
@@ -316,7 +323,15 @@ class AF:
         if graph_R is None:
             graph_R = self.R
         for r in graph_R:
-            print(r[0], r[1])
+            attacker = r[0]
+            attacked = r[1]
+            if attacker[0] == 'T' and attacker != config.TOP:
+                attacker = attacker[2:]
+                string = attacker + " " + r[1] + " +"
+            else:
+                string = attacker + " " + r[1]
+            if attacked[0] != 'T' or attacked in [config.TOP, config.TARGET]:
+                print(string)
 
     def add(self, element):
         added = False

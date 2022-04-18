@@ -5,6 +5,7 @@ from tqdm import tqdm
 import string
 import config
 import snippets as sn
+import math
 
 
 class Agent:
@@ -39,6 +40,7 @@ class Agent:
         else:
             self.fitness += 1
         self.error = 100 * wrong / data_size
+        return self.error
 
     def random_init(self, possible):
         self.init(possible, [])
@@ -67,10 +69,15 @@ class GeneticAlgorithm:
         self.possible = None
         self.pop_size = pop_size
         self.verbose = False
-        self.last_best = None
         self.best_error = 0
         self.no_change_count = 0
         self.reduce = False
+        self.heat = config.HEAT
+        self.best_error_bis = 100
+        self.last_best = None
+        self.very_best = 100
+        self.seq = 0  # consecutive times where delta E < config.EPSILON_E
+        self.delta_e = 0
 
         self.log = dict()  # export logs
         self.log["train"] = dict()
@@ -95,6 +102,9 @@ class GeneticAlgorithm:
 
             # CORE
             self.compute_fitness()
+
+            self.sa_update_seq(self.delta_e)
+
             self.next_generation(config.SAVE_BEST_AGENT)
             self.cross_over_2(config.CROSSOVER_PERCENT)
 
@@ -116,6 +126,7 @@ class GeneticAlgorithm:
                 best_agent = cp.deepcopy(self.agents[0])
                 print("\nError:", str(best_agent.error) + "%",
                       "- Fitness:", self.agents[0].fitness,
+                      "- Heat:", self.heat,
                       "- size(R) =", str(best_agent.obj.size()) +
                       "/" + str(config.MAX_R_SIZE))
                 print(best_agent.obj.convert_to_AF().R)
@@ -260,6 +271,7 @@ class GeneticAlgorithm:
         best_agent = cp.deepcopy(self.agents[0])
         for i in range(len(self.agents)):  # skip mutation of agent 0 (best)
             self.agents[i].mutate(self.possible, rd.randint(1, intensity))
+            # self.agents[i].obj.convert_to_AF().print_attacks()
         if save_best_agent:
             self.agents[0] = best_agent
 
@@ -351,28 +363,56 @@ class GeneticAlgorithm:
         self.agents = sorted(self.agents, key=lambda x: x.fitness)
         best_agent = cp.deepcopy(self.agents[0])
         for i in range(count):
-            rand_value = rd.randint(0, max_value - 1)
-            cpt = 0
-            rand_value -= 2 * count - cpt - 1
-            while rand_value > 0:
-                cpt += 1
-                rand_value -= (count - cpt - 1)
-            new_agents.append(cp.deepcopy(self.agents[cpt]))
-            # print("Add", cpt)
+            if config.SA and self.sa_select():
+                new_agents.append(cp.deepcopy(sn.pick(self.agents)))
+            else:
+                rand_value = rd.randint(0, max_value - 1)
+                cpt = 0
+                rand_value -= 2 * count - cpt - 1
+                while rand_value > 0:
+                    cpt += 1
+                    rand_value -= (count - cpt - 1)
+                new_agents.append(cp.deepcopy(self.agents[cpt]))
+                # print("Add", cpt)
         self.agents = new_agents
         if save_best_agent:
             self.agents[0] = best_agent
 
     def compute_fitness(self, verbose=False):
+        best_e = None
         for i in range(len(self.agents)):
-            self.agents[i].compute_fitness(self.training_data, self.reduce, verbose)
+            value = self.agents[i].compute_fitness(self.training_data,
+                                                   self.reduce,
+                                                   verbose)
+            if best_e is None or value < best_e:
+                best_e = value
             verbose = False
+        self.last_best = self.best_error_bis
+        self.delta_e = self.last_best - best_e
+        self.best_error_bis = min(best_e, self.best_error_bis)
+        # print(self.delta_e, best_e, self.last_best)
 
     def unique_test(self, args, attacks, data):
         agent = Agent()
         agent.init(args, attacks)
         agent.compute_fitness(data)
         print("Error:", agent.error)
+
+    def sa_update_seq(self, delta_e):
+        if delta_e <= config.EPSILON_E:
+            self.seq += 1
+        else:
+            self.seq = 0
+        self.sa_update_heat()
+
+    def sa_update_heat(self):
+        if self.seq >= config.MAX_SEQ:
+            self.heat = self.heat * config.LAMBDA
+            if self.heat < 1:
+                self.heat = 0
+
+    def sa_select(self):
+        return self.heat >= 1 and rd.randint(0, 99) < self.heat
 
 
 def is_blank(node_name):

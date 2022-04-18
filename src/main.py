@@ -25,8 +25,12 @@ if __name__ == "__main__":
     # args = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o']  # large
 
     accuracy = []
+    start_time = time.time()
 
-    for run in range(1):
+    nb_run = 1
+
+    for run in range(nb_run):
+        print("Run:", str(run + 1) + "/" + str(nb_run))
         # start ----------------------
         args = []
         gen = genetic.GeneticAlgorithm(config.POPULATION)
@@ -74,14 +78,13 @@ if __name__ == "__main__":
         gen.possible = args
 
         # ----------------
-        start_time = time.time()
 
         accuracy.append(gen.run_1(config.STEPS))
 
-        seconds = time.time() - start_time
-        minutes = int(seconds / 60)
-        seconds = int(seconds % 60)
-        # print("Time:", minutes, "m", seconds, "s")
+    seconds = time.time() - start_time
+    minutes = int(seconds / 60)
+    seconds = int(seconds % 60)
+    print("Time:", minutes, "m", seconds, "s")
 
     s = 0
     print(len(accuracy), "values")

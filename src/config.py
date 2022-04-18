@@ -2,28 +2,47 @@ import sys
 import getopt
 
 
-STEPS = 50
+# core params ------------------------------------------------------------------
+
+STEPS = 100
 POPULATION = 10
 
 EXTENSION = "g"  # preferred=p ; grounded=g
-MAX_R_SIZE = None
-INCREASE = False
+
+TARGET = 'T'
+
+# variant params ---------------------------------------------------------------
+MAX_R_SIZE = None  # max attack relation count in the graph
+INCREASE = False  # progressively increases the limit
 INCREASE_STEP = 50
 INCREASE_VALUE = 1
-TARGET = 'T'
-TOP = 'Top'
-GLOBAL_TOP = False
-LOCAL_TOP = False
-REDUCE = 30
-FORCE_REDUCE = True
-NEGATION = False
 
-MUTATIONS_INTENSITY = 4
-HEAVY_MUTATIONS_INTENSITY = 10
+TOP = 'Top'
+GLOBAL_TOP = True  # Top argument attacking target (Top -> T)
+LOCAL_TOP = False  # Top argument for each argument (arg -> t_arg)
+
+MULTI_VALUE = False  # handled multi-valued attributes, but less efficient
+
+REDUCE = 30
+FORCE_REDUCE = True  # try to reduce the size of the graph
+
+NEGATION = False  # depreciated, use LOCAL_TOP instead
+
+SA = True  # Simulating Annealing - affect the selection rule
+HEAT = 100
+LAMBDA = 0.95
+EPSILON_E = 1
+MAX_SEQ = 5
+
+
+# Genetic Algorithm params -----------------------------------------------------
+MUTATIONS_INTENSITY = 1  # default 4
+HEAVY_MUTATIONS_INTENSITY = 0  # default 10
 HEAVY_MUTATIONS_PERCENT = 10
 CROSSOVER_PERCENT = 10
-SAVE_BEST_AGENT = True
+SAVE_BEST_AGENT = True  # default True
 
+# dataset params ---------------------------------------------------------------
 # 0: mushroom
 # 1: voting
 # 2: breast-cancer
@@ -32,13 +51,15 @@ SAVE_BEST_AGENT = True
 # 5: breast-cancer-wisconsin
 # 6: balloons
 # 7: tic-tac-toe
-DATASET = 5
+DATASET = 4
 TRAIN_DATA_RATIO = 0.7
 TEST_DATA_SIZE = 10_000
 BALANCE = 0.3
 NOISE = 0  # percent -> 10%, 20%, ...
 NUMERICAL = 10  # numerical attributes separations
 IGNORE_UNKNOWN = True
+
+# verbose params ---------------------------------------------------------------
 
 TRAIN_DATA_VERBOSE = False
 TEST_DATA_VERBOSE = False
