@@ -69,8 +69,8 @@ class EncodedAF:
     def attack_index(self, t):
         a = t[0]
         b = t[1]
-        if a != config.TARGET and a != config.TOP and a[0] == 'T':
-            a = a[2:]
+        if a != config.TARGET and a != config.TOP and is_top(a):
+            a = a[len(config.TOP) + 1:]
         return self.A.index(a) * len(self.A) + self.A.index(b)
 
     def attack_is_possible(self, t):
@@ -92,7 +92,7 @@ class EncodedAF:
                     good = False
         index = self.attack_index((a, b))
         # self.R[index] = 1 - self.R[index]
-        if config.LOCAL_TOP and a != config.TARGET and a != config.TOP:
+        if (config.LOCAL_TOP or is_and(b) or is_and(a)) and a != config.TARGET and a != config.TOP:
             if self.R[index] == -1:
                 self.R[index] = rd.randint(0, 1)
             elif self.R[index] == 0:
@@ -137,7 +137,7 @@ class EncodedAF:
             elif self.R[i] == -1:
                 a, b = self.get_attack(i)
                 old_a = a
-                a = "T_" + a
+                a = config.TOP + "_" + a
                 if not af.exist(a):
                     af.add_argument(a)
                     attack_local_top = (old_a, a)
@@ -325,12 +325,12 @@ class AF:
         for r in graph_R:
             attacker = r[0]
             attacked = r[1]
-            if attacker[0] == 'T' and attacker != config.TOP:
-                attacker = attacker[2:]
+            if is_top(attacker):
+                attacker = attacker[len(config.TOP) + 1:]
                 string = attacker + " " + r[1] + " +"
             else:
                 string = attacker + " " + r[1]
-            if attacked[0] != 'T' or attacked in [config.TOP, config.TARGET]:
+            if not is_top(attacked) or attacked in [config.TOP, config.TARGET]:
                 print(string)
 
     def add(self, element):
@@ -388,10 +388,10 @@ class AF:
         if verbose == 3:
             print("---------")
             print("True accuracy :", str(true_predicted) + "/" + str(true_count)
-                  + " (" + str(true_predicted * 100 // true_count) + "%)")
+                  + " (" + str(true_predicted * 100 // max(true_count, 1)) + "%)")
             print("False accuracy:", str(false_predicted) + "/"
                   + str(false_count)
-                  + " (" + str(false_predicted * 100 // false_count) + "%)")
+                  + " (" + str(false_predicted * 100 // max(false_count, 1)) + "%)")
 
         return dist
 
@@ -456,7 +456,8 @@ class AF:
     def compute_grounded(self, facts):
         labels = dict()
         for x in self.A:
-            if x.name in facts or x.name in [config.TARGET, config.TOP] or x.name[0] == 'T':
+            if x.name in facts or x.name in [config.TARGET, config.TOP] or \
+                    is_top(x.name) or is_and(x.name):
                 labels[x.name] = "undecided"
             else:
                 labels[x.name] = "out"
@@ -505,7 +506,7 @@ class AF:
                 args.append(r[1])
         activated_args = []
         for a in args:
-            if a in facts or a in [config.TARGET, config.TOP] or a[0] == 'T':
+            if a in facts or a in [config.TARGET, config.TOP] or is_top(a):
                 activated_args.append(a)
         for x in activated_args:
             mu[x] = "BLANK"
@@ -595,3 +596,11 @@ class AF:
                         final.append(r)
 
         return final
+
+
+def is_top(arg):
+    return arg.find(config.TOP) == 0 and arg != config.TOP
+
+def is_and(arg):
+    return arg.find("And_") == 0
+

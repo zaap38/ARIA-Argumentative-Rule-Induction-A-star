@@ -1,0 +1,14 @@
+This is an implementation of C4.5 algorithm
+(http://en.wikipedia.org/wiki/C4.5_algorithm).
+
+Data table has folowing format:
+{
+    "<column name>': [<column values>],
+    "<column name>': [<column values>],
+    ...
+}
+
+
+The main functions are located in file mine.py:
+- "mine_c45" is an implementation of the C4.5 algorithm. To run the algorithm you need to pass a table in the format described above;
+- "tree_to_rules" is a function for generate rules from decision tree.

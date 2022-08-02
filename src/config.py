@@ -4,7 +4,7 @@ import getopt
 
 # core params ------------------------------------------------------------------
 
-STEPS = 100
+STEPS = 200
 POPULATION = 10
 
 EXTENSION = "g"  # preferred=p ; grounded=g
@@ -13,13 +13,14 @@ TARGET = 'T'
 
 # variant params ---------------------------------------------------------------
 MAX_R_SIZE = None  # max attack relation count in the graph
-INCREASE = False  # progressively increases the limit
+INCREASE = True  # progressively increases the limit
 INCREASE_STEP = 50
 INCREASE_VALUE = 1
 
 TOP = 'Top'
 GLOBAL_TOP = True  # Top argument attacking target (Top -> T)
 LOCAL_TOP = False  # Top argument for each argument (arg -> t_arg)
+AND = False  # Add "And" nodes
 
 MULTI_VALUE = False  # handled multi-valued attributes, but less efficient
 
@@ -28,11 +29,13 @@ FORCE_REDUCE = True  # try to reduce the size of the graph
 
 NEGATION = False  # depreciated, use LOCAL_TOP instead
 
-SA = True  # Simulating Annealing - affect the selection rule
+SA = False  # Simulating Annealing - affect the selection rule
 HEAT = 100
 LAMBDA = 0.95
 EPSILON_E = 1
 MAX_SEQ = 5
+
+SELECT = True
 
 
 # Genetic Algorithm params -----------------------------------------------------
@@ -51,7 +54,9 @@ SAVE_BEST_AGENT = True  # default True
 # 5: breast-cancer-wisconsin
 # 6: balloons
 # 7: tic-tac-toe
-DATASET = 4
+# 8: monks-1
+# 9: adult  # wip
+DATASET = 1
 TRAIN_DATA_RATIO = 0.7
 TEST_DATA_SIZE = 10_000
 BALANCE = 0.3
@@ -61,8 +66,8 @@ IGNORE_UNKNOWN = True
 
 # verbose params ---------------------------------------------------------------
 
-TRAIN_DATA_VERBOSE = False
-TEST_DATA_VERBOSE = False
+TRAIN_DATA_VERBOSE = True
+TEST_DATA_VERBOSE = True
 LEARNING_VERBOSE = 1
 FINAL_VERBOSE = 3
 EXPORT = True
@@ -74,7 +79,7 @@ def init(argv):
     try:
         opts, args = getopt.getopt(argv,
                                    "e:d:r:m:h:x:t:n:i:p:s:",
-                                   ["reduce", "negation", "topg", "topl"])
+                                   ["reduce", "negation", "topg", "topl", "sa"])
     except getopt.GetoptError:
         print('main.py'
               '-e <export_file>'
@@ -91,7 +96,8 @@ def init(argv):
               '--reduce'
               '--negation'
               '--topg'
-              '--topl')
+              '--topl'
+              '--sa')
         sys.exit(2)
 
     for opt, arg in opts:
@@ -140,3 +146,6 @@ def init(argv):
         elif opt == '--topl':
             global LOCAL_TOP
             LOCAL_TOP = True
+        elif opt == '--sa':
+            global SA
+            SA = True

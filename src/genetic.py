@@ -21,6 +21,7 @@ class Agent:
         self.obj.compute_possible_changes()
         for _ in range(intensity):
             self.obj.random_change()
+        # if rd.randint(0, 20) == 0:
         self.obj.polish()
 
     def compute_fitness(self, data, reduce=False, verbose=0):
@@ -66,13 +67,16 @@ class GeneticAlgorithm:
         self.data = None
         self.training_data = None
         self.test_data = None
+        self.fake_test = None
         self.possible = None
         self.pop_size = pop_size
         self.verbose = False
+        self.best_error_train = 0
+        self.best_error_fake = 0
         self.best_error = 0
         self.no_change_count = 0
         self.reduce = False
-        self.heat = config.HEAT
+        self.heat = config.HEAT * int(config.SA)  # 0 if not config.SA
         self.best_error_bis = 100
         self.last_best = None
         self.very_best = 100
@@ -124,14 +128,14 @@ class GeneticAlgorithm:
             # PRINT
             if step % 10 == 0 and config.LEARNING_VERBOSE > 0:
                 best_agent = cp.deepcopy(self.agents[0])
-                print("\nError:", str(best_agent.error) + "%",
+                print("\nError:", str(round(best_agent.error, 3)) + "%",
                       "- Fitness:", self.agents[0].fitness,
-                      "- Heat:", self.heat,
+                      "- Heat:", round(self.heat, 2),
                       "- size(R) =", str(best_agent.obj.size()) +
                       "/" + str(config.MAX_R_SIZE))
                 print(best_agent.obj.convert_to_AF().R)
                 best_agent.compute_fitness(self.test_data)
-                print("True Data Err.:", best_agent.error)
+                print("True Data Err.:", round(best_agent.error, 3))
 
             if config.EXPORT:
                 best_agent = cp.deepcopy(self.agents[0])
@@ -159,16 +163,20 @@ class GeneticAlgorithm:
             if config.MAX_R_SIZE is not None:
                 self.remove_excedent(config.MAX_R_SIZE)
 
-        best_agent = self.agents[0]
+        best_agent = cp.deepcopy(self.agents[0])
         # best_agent = self.rename_blank(best_agent)
 
+        self.best_error_train = best_agent.error
+        if config.SELECT:
+            best_agent.compute_fitness(self.fake_test)
+            self.best_error_fake = best_agent.error
         self.print_agent(best_agent, config.FINAL_VERBOSE)
 
         if config.EXPORT:
             self.log["final"]["graph"] = best_agent.obj.convert_to_AF().R
             self.export()
 
-        return best_agent.error
+        return best_agent.error, self.best_error_train, self.best_error_fake, best_agent.obj.size()
 
     def export(self, loc=config.EXPORT_LOC):
         f = open(loc + "error.csv", "w")
@@ -273,7 +281,7 @@ class GeneticAlgorithm:
             self.agents[i].mutate(self.possible, rd.randint(1, intensity))
             # self.agents[i].obj.convert_to_AF().print_attacks()
         if save_best_agent:
-            self.agents[0] = best_agent
+            self.agents[0] = cp.deepcopy(best_agent)
 
     def heavy_mutate(self, percent=10, intensity=5, save_best_agent=False):
         count = len(self.agents) // percent
@@ -286,7 +294,7 @@ class GeneticAlgorithm:
                 agent.mutate(self.possible)
             self.agents[rand_index] = cp.deepcopy(agent)
         if save_best_agent:
-            self.agents[0] = best_agent
+            self.agents[0] = cp.deepcopy(best_agent)
 
     def cross_over(self, percent=10):
         count = 2 * (len(self.agents) // percent)
@@ -376,7 +384,7 @@ class GeneticAlgorithm:
                 # print("Add", cpt)
         self.agents = new_agents
         if save_best_agent:
-            self.agents[0] = best_agent
+            self.agents[0] = cp.deepcopy(best_agent)
 
     def compute_fitness(self, verbose=False):
         best_e = None

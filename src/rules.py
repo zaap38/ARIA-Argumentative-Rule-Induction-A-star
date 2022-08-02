@@ -53,7 +53,7 @@ class Rules:
     def formula_8(self):
         return ((self.a['a'] and self.a['b']) or not self.a['c']) and (
                 not (self.a['e'] and self.a['d']) and not self.a['f']) or \
-               (self.a['a'] and self.a['g'] and not self.a['h']) and\
+               (self.a['a'] and self.a['g'] and not self.a['h']) and \
                (self.a['i'] or self.a['j'])
 
     def prison_kill(self):
@@ -68,7 +68,7 @@ class Rules:
         """
         return (self.a['a'] and not self.a['f']) and \
                (not self.a['b'] or self.a['d']) and \
-            self.a['c'] and not self.a['e']
+               self.a['c'] and not self.a['e']
 
     def car_break(self):
         """
@@ -83,10 +83,10 @@ class Rules:
         h: it is too late to break (too close)
         """
         return self.a['a'] and (not self.a['b'] or self.a['c']) and \
-            (not self.a['d'] or self.a['e']) and \
-            (not self.a['f']) and \
-            (not self.a['g']) and \
-            (not self.a['h'])
+               (not self.a['d'] or self.a['e']) and \
+               (not self.a['f']) and \
+               (not self.a['g']) and \
+               (not self.a['h'])
 
     def image_classifier(self):
         """
@@ -102,10 +102,10 @@ class Rules:
         i: sun is making eyes look the wrong color
         j: it eats bees
         """
-        return self.a['a'] and not self.a['b'] and not self.a['d'] and\
-            self.a['e'] and self.a['f'] and self.a['g'] and\
-            (not self.a['h'] or self.a['i']) and\
-            not (self.a['j'] and self.a['c'])
+        return self.a['a'] and not self.a['b'] and not self.a['d'] and \
+               self.a['e'] and self.a['f'] and self.a['g'] and \
+               (not self.a['h'] or self.a['i']) and \
+               not (self.a['j'] and self.a['c'])
 
     def xor(self):
         return (self.a['a'] and not self.a['b']) \
@@ -219,11 +219,13 @@ class Rules:
             step += 1
             value = line.split(sep)
             value[-1] = value[-1].replace('\n', '')
-
-            for index in ignore:
-                value.pop(index)
-                if index < l_index:
-                    l_index -= 1
+            if value[0] == "":
+                value.pop(0)
+            new_value = []
+            for i, v in enumerate(value):
+                if i not in ignore:
+                    new_value.append(cp.deepcopy(v))
+            value = new_value
             label = value.pop(l_index)
 
             for i, v in enumerate(value):
@@ -267,12 +269,12 @@ class Rules:
                         value = float(chain[-1])
                         new_value = bounds[att][0]
                         add = (bounds[att][1] - bounds[att][0]) \
-                            / config.NUMERICAL
+                              / config.NUMERICAL
                         old_k = float(new_k[i].split('=')[-1])
                         while old_k > new_value + add:
                             new_value += add
-                        new_k[i] = att_name + str(round(new_value, 4)) + "-"\
-                            + str(round(new_value + add, 4))
+                        new_k[i] = att_name + str(round(new_value, 4)) + "-" \
+                                   + str(round(new_value + add, 4))
                 data[tuple(new_k)] = old[k]
 
             args.clear()
@@ -283,6 +285,11 @@ class Rules:
                         if not config.IGNORE_UNKNOWN or \
                                 k[i].split('=')[-1] != '?':
                             args.append(k[i])
+
+        if config.AND:
+            args.append("And_1")
+            args.append("And_2")
+            args.append("And_3")
 
         if not config.NEGATION:
             return data, args
@@ -320,7 +327,7 @@ class Rules:
             input_attr = list(k)
             input_attr.pop(-1)
             if (rd.randint(0, 99) < probability and
-                    len(dataset) <= ratio * len(data)) or \
+                len(dataset) <= ratio * len(data)) or \
                     len(test_data) > (1 - ratio) * len(data):
                 if rd.randint(0, 99) < noise_percent:
                     label_value = not label_value
@@ -346,6 +353,40 @@ class Rules:
         dataset, test_data, true_count, noise_count = self \
             .generate_dataset(ratio,
                               data,
+                              label,
+                              noise,
+                              balance)
+        print("Args =", args)
+
+        fake_test = []
+        if config.SELECT:
+            tmp_data = cp.deepcopy(dataset)
+            rd.shuffle(tmp_data)
+            split = int(0.7 * len(tmp_data))
+            dataset = tmp_data[:split]
+            fake_test = tmp_data[split:]
+
+        return dataset, test_data, true_count, noise_count, args, fake_test
+
+    def load_both(self, f_train, f_test, attributes_names, num, ignore,
+                  l_index, label, noise, balance, sep=','):
+        ignore = sorted(ignore, reverse=True)
+
+        data_train, args = self.attributes_to_arg(f_train, attributes_names, num, ignore,
+                                            l_index, sep)
+        data_test, args = self.attributes_to_arg(f_test, attributes_names,
+                                                  num, ignore,
+                                                  l_index, sep)
+
+        dataset, _, true_count, noise_count = self \
+            .generate_dataset(1,
+                              data_train,
+                              label,
+                              noise,
+                              balance)
+        test_data, _, true_count, noise_count = self \
+            .generate_dataset(1,
+                              data_test,
                               label,
                               noise,
                               balance)
@@ -396,7 +437,7 @@ class Rules:
         ignore = []
         f = open("datasets/mushroom/agaricus-lepiota.data.txt")
 
-        dataset, test_data, true_count, noise_count, args = self.load(
+        dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
             l_index, ratio, label_name, noise_percent, balance)
 
@@ -408,7 +449,7 @@ class Rules:
                 true_count += int(d[-1])
             self.print_dataset_info(test_data, true_count, args, 0)
 
-        return dataset, test_data, args
+        return dataset, test_data, args, fake_test
 
     def load_dataset_voting(self, ratio=0.7, noise_percent=0, balance=False):
         # True == democrat, False == republican
@@ -435,7 +476,7 @@ class Rules:
         ignore = []
         f = open("datasets/voting/house-votes-84.data.txt")
 
-        dataset, test_data, true_count, noise_count, args = self.load(
+        dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
             l_index, ratio, label_name, noise_percent, balance)
 
@@ -447,9 +488,10 @@ class Rules:
                 true_count += int(d[-1])
             self.print_dataset_info(test_data, true_count, args, 0)
 
-        return dataset, test_data, args
+        return dataset, test_data, args, fake_test
 
-    def load_dataset_breast_cancer(self, ratio=0.7, noise_percent=0, balance=False):
+    def load_dataset_breast_cancer(self, ratio=0.7, noise_percent=0,
+                                   balance=False):
         # True == recurrence-events, False == no-recurrence-events
         # train = 70%
         label_name = "recurrence-events"
@@ -467,7 +509,7 @@ class Rules:
         ignore = []
         f = open("datasets/breast-cancer/breast-cancer.data.txt")
 
-        dataset, test_data, true_count, noise_count, args = self.load(
+        dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
             l_index, ratio, label_name, noise_percent, balance)
 
@@ -479,9 +521,10 @@ class Rules:
                 true_count += int(d[-1])
             self.print_dataset_info(test_data, true_count, args, 0)
 
-        return dataset, test_data, args
+        return dataset, test_data, args, fake_test
 
-    def load_dataset_heart_disease(self, ratio=0.7, noise_percent=0, balance=False):
+    def load_dataset_heart_disease(self, ratio=0.7, noise_percent=0,
+                                   balance=False):
         # True == 0 (no disease), False == 1, 2, 3
         # train = 70%
         label_name = "0"
@@ -507,7 +550,7 @@ class Rules:
         ignore = []
         f = open("datasets/heart-disease/processed.cleveland.data.txt")
 
-        dataset, test_data, true_count, noise_count, args = self.load(
+        dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
             l_index, ratio, label_name, noise_percent, balance)
 
@@ -519,7 +562,7 @@ class Rules:
                 true_count += int(d[-1])
             self.print_dataset_info(test_data, true_count, args, 0)
 
-        return dataset, test_data, args
+        return dataset, test_data, args, fake_test
 
     def load_dataset_car(self, ratio=0.7, noise_percent=0, balance=False):
         # True == acc (acceptable), False == unacc, good, vgood
@@ -536,7 +579,7 @@ class Rules:
         ignore = []
         f = open("datasets/car/car.data.txt")
 
-        dataset, test_data, true_count, noise_count, args = self.load(
+        dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
             l_index, ratio, label_name, noise_percent, balance)
 
@@ -548,12 +591,13 @@ class Rules:
                 true_count += int(d[-1])
             self.print_dataset_info(test_data, true_count, args, 0)
 
-        return dataset, test_data, args
+        return dataset, test_data, args, fake_test
 
-    def load_dataset_breast_cancer_wisconsin(self, ratio=0.7, noise_percent=0, balance=False):
+    def load_dataset_breast_cancer_wisconsin(self, ratio=0.7, noise_percent=0,
+                                             balance=False):
         # True == 4 (malignant), False == 2 (benign)
         # train = 70%
-        label_name = "4"
+        label_name = "2"
         l_index = -1
         attributes_names = ["clump-thickness",
                             "uniformity-of-cell-size",
@@ -565,18 +609,19 @@ class Rules:
                             "normal-nucleoli",
                             "mitoses"]
         num = ["clump-thickness",
-                            "uniformity-of-cell-size",
-                            "uniformity-of-cell-shape",
-                            "marginal-adhesion",
-                            "single-epithelial-cell-size",
-                            "bare-nuclei",
-                            "bland-chromatin",
-                            "normal-nucleoli",
-                            "mitoses"]
+               "uniformity-of-cell-size",
+               "uniformity-of-cell-shape",
+               "marginal-adhesion",
+               "single-epithelial-cell-size",
+               "bare-nuclei",
+               "bland-chromatin",
+               "normal-nucleoli",
+               "mitoses"]
         ignore = [0]
-        f = open("datasets/breast-cancer-wisconsin/breast-cancer-wisconsin.data.txt")
+        f = open(
+            "datasets/breast-cancer-wisconsin/breast-cancer-wisconsin.data.txt")
 
-        dataset, test_data, true_count, noise_count, args = self.load(
+        dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
             l_index, ratio, label_name, noise_percent, balance)
 
@@ -588,7 +633,7 @@ class Rules:
                 true_count += int(d[-1])
             self.print_dataset_info(test_data, true_count, args, 0)
 
-        return dataset, test_data, args
+        return dataset, test_data, args, fake_test
 
     def load_dataset_balloons(self, ratio=0.7, noise_percent=0, balance=False):
         # True == T, False == F
@@ -603,7 +648,7 @@ class Rules:
         ignore = []
         f = open("datasets/balloons/yellow-small+adult-stretch.data.txt")
 
-        dataset, test_data, true_count, noise_count, args = self.load(
+        dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
             l_index, ratio, label_name, noise_percent, balance)
 
@@ -615,9 +660,10 @@ class Rules:
                 true_count += int(d[-1])
             self.print_dataset_info(test_data, true_count, args, 0)
 
-        return dataset, test_data, args
+        return dataset, test_data, args, fake_test
 
-    def load_dataset_tic_tac_toe(self, ratio=0.7, noise_percent=0, balance=False):
+    def load_dataset_tic_tac_toe(self, ratio=0.7, noise_percent=0,
+                                 balance=False):
         # True == negative (x player can't win), False == positive
         # train = 70%
         label_name = "negative"
@@ -635,7 +681,7 @@ class Rules:
         ignore = []
         f = open("datasets/tic-tac-toe/tic-tac-toe.data.txt")
 
-        dataset, test_data, true_count, noise_count, args = self.load(
+        dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
             l_index, ratio, label_name, noise_percent, balance)
 
@@ -647,4 +693,68 @@ class Rules:
                 true_count += int(d[-1])
             self.print_dataset_info(test_data, true_count, args, 0)
 
+        return dataset, test_data, args, fake_test
+
+    def load_dataset_monk_1(self, ratio=0.7, noise_percent=0, balance=False):
+        # True == (a1 == a2) or (a5 == 1)
+        # train = 70%
+        label_name = "1"
+        l_index = 0
+        attributes_names = ["a1",
+                            "a2",
+                            "a3",
+                            "a4",
+                            "a5",
+                            "a6"]
+        num = []
+        ignore = [7]
+        sep = ' '
+        f_train = open("datasets/monks-1/monks-1.train.txt")
+        f_test = open("datasets/monks-1/monks-1.test.txt")
+
+        dataset, test_data, true_count, noise_count, args = self.load_both(
+            f_train, f_test, attributes_names, num, ignore,
+            l_index, label_name, noise_percent, balance, sep)
+
+        if config.TEST_DATA_VERBOSE:
+            self.print_dataset_info(dataset, true_count, args, noise_count)
+        if config.TRAIN_DATA_VERBOSE:
+            true_count = 0
+            for d in test_data:
+                true_count += int(d[-1])
+            self.print_dataset_info(test_data, true_count, args, 0)
+
         return dataset, test_data, args
+
+    def load_dataset_adult(self, ratio=0.1, noise_percent=0, balance=False):
+        # True == T, False == F
+        # train = 100%
+        label_name = ">50K"
+        l_index = -1
+        attributes_names = ["age",
+                            "workclass",
+                            "education",
+                            "marital-status",
+                            "occupation",
+                            "relationship",
+                            "race",
+                            "sex",
+                            "hours-per-week",
+                            "native-country"]
+        num = ["age", "hours-per-week"]
+        ignore = [2, 4, 10, 11]
+        f = open("datasets/adult/adult_small.data.txt")
+
+        dataset, test_data, true_count, noise_count, args, fake_test = self.load(
+            f, attributes_names, num, ignore,
+            l_index, ratio, label_name, noise_percent, balance)
+
+        if config.TEST_DATA_VERBOSE:
+            self.print_dataset_info(dataset, true_count, args, noise_count)
+        if config.TRAIN_DATA_VERBOSE:
+            true_count = 0
+            for d in test_data:
+                true_count += int(d[-1])
+            self.print_dataset_info(test_data, true_count, args, 0)
+
+        return dataset, test_data, args, fake_test
