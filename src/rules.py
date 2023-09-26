@@ -443,7 +443,7 @@ class Rules:
                             "habitat"]
         num = []
         ignore = []
-        f = open("./datasets/mushroom/agaricus-lepiota.data.txt")
+        f = open(config.PATH + "/mushroom/agaricus-lepiota.data.txt")
 
         dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
@@ -482,7 +482,7 @@ class Rules:
                             "export-administration-act-south-africa"]
         num = []
         ignore = []
-        f = open("./datasets/voting/house-votes-84.data.txt")
+        f = open(config.PATH + "/voting/house-votes-84.data.txt")
 
         dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
@@ -515,7 +515,7 @@ class Rules:
                             "irradiat"]
         num = []
         ignore = []
-        f = open("./datasets/breast-cancer/breast-cancer.data.txt")
+        f = open(config.PATH + "/breast-cancer/breast-cancer.data.txt")
 
         dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
@@ -556,7 +556,7 @@ class Rules:
                "thalach",
                "oldpeak"]
         ignore = []
-        f = open("./datasets/heart-disease/processed.cleveland.data.txt")
+        f = open(config.PATH + "/heart-disease/processed.cleveland.data.txt")
 
         dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
@@ -585,7 +585,7 @@ class Rules:
                             "safety"]
         num = []
         ignore = []
-        f = open("./datasets/car/car.data.txt")
+        f = open(config.PATH + "/car/car.data.txt")
 
         dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
@@ -627,7 +627,7 @@ class Rules:
                "mitoses"]
         ignore = [0]
         f = open(
-            "./datasets/breast-cancer-wisconsin/breast-cancer-wisconsin.data.txt")
+            config.PATH + "/breast-cancer-wisconsin/breast-cancer-wisconsin.data.txt")
 
         dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
@@ -654,7 +654,7 @@ class Rules:
                             "age"]
         num = []
         ignore = []
-        f = open("./datasets/balloons/yellow-small+adult-stretch.data.txt")
+        f = open(config.PATH + "/balloons/yellow-small+adult-stretch.data.txt")
 
         dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
@@ -687,7 +687,7 @@ class Rules:
                             "bottom-right-square"]
         num = []
         ignore = []
-        f = open("./datasets/tic-tac-toe/tic-tac-toe.data.txt")
+        f = open(config.PATH + "/tic-tac-toe/tic-tac-toe.data.txt")
 
         dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
@@ -717,8 +717,8 @@ class Rules:
         num = []
         ignore = [7]
         sep = ' '
-        f_train = open("./datasets/monks-1/monks-1.train.txt")
-        f_test = open("./datasets/monks-1/monks-1.test.txt")
+        f_train = open(config.PATH + "/monks-1/monks-1.train.txt")
+        f_test = open(config.PATH + "/monks-1/monks-1.test.txt")
 
         dataset, test_data, true_count, noise_count, args = self.load_both(
             f_train, f_test, attributes_names, num, ignore,
@@ -751,7 +751,6 @@ class Rules:
                             "native-country"]
         num = ["age", "hours-per-week"]
         ignore = [2, 4, 10, 11]
-        f = open("./datasets/adult/adult_small.data.txt")
         f = open(config.PATH + "/adult/adult_small.data.txt")
 
         dataset, test_data, true_count, noise_count, args, fake_test = self.load(

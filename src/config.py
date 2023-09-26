@@ -5,14 +5,14 @@ import getopt
 # core params ------------------------------------------------------------------
 
 STEPS = 200
-POPULATION = 50
+POPULATION = 10
 
 EXTENSION = "g"  # preferred=p ; grounded=g
 
 TARGET = 'T'
 
 # variant params ---------------------------------------------------------------
-MAX_R_SIZE = 10  # max attack relation count in the graph
+MAX_R_SIZE = 16  # max attack relation count in the graph
 INCREASE = False  # progressively increases the limit
 INCREASE_STEP = 50
 INCREASE_VALUE = 1
@@ -26,7 +26,8 @@ MULTI_VALUE = False  # handled multi-valued attributes, but less efficient
 
 REDUCE = 30
 FORCE_REDUCE = True  # try to reduce the size of the graph
-PERCENT = 20  # quantity of training data used each step
+STRONGER = False  # increases the mutation intensity if stuck for a long time
+NO_OVERFIT = True
 
 NEGATION = False  # depreciated, use LOCAL_TOP instead
 
@@ -43,7 +44,7 @@ SELECT = False
 MUTATIONS_INTENSITY = 2  # default 4
 HEAVY_MUTATIONS_INTENSITY = 0  # default 10
 HEAVY_MUTATIONS_PERCENT = 10
-CROSSOVER_PERCENT = 100  # 10
+CROSSOVER_PERCENT = 100
 SAVE_BEST_AGENT = True  # default True
 
 # dataset params ---------------------------------------------------------------
@@ -74,7 +75,7 @@ TRAIN_DATA_VERBOSE = True
 TEST_DATA_VERBOSE = True
 LEARNING_VERBOSE = 1
 FINAL_VERBOSE = 3
-EXPORT = False
+EXPORT = True
 EXPORT_LOC = "output/"
 
 

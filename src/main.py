@@ -36,7 +36,6 @@ if __name__ == "__main__":
 
     start_time = time.time()
 
-    nb_run = 10
     nb_run = 1
 
     for run in range(nb_run):
@@ -100,9 +99,9 @@ if __name__ == "__main__":
                 config.TRAIN_DATA_RATIO, config.NOISE, True)
         # ------------
 
-        """if config.GLOBAL_TOP:
+        if config.GLOBAL_TOP:
             args = [config.TOP] + args
-        args = [config.TARGET] + args"""
+        args = [config.TARGET] + args
         gen.possible = args
 
         # ----------------
