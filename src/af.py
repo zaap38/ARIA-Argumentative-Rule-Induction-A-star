@@ -357,6 +357,7 @@ class AF:
         false_count = 0
         true_predicted = 0
         false_predicted = 0
+
         for step in range(count):
             for i, a in enumerate(self.A):
                 if a.name in data[step][1] or a.name == config.TOP:
@@ -385,6 +386,7 @@ class AF:
                     print("Extension:", extension)
                     print("Expected:", data[step][2],
                           "Got:", value)
+
         if verbose == 3:
             print("---------")
             print("True accuracy :", str(true_predicted) + "/" + str(true_count)

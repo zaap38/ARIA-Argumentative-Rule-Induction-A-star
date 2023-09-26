@@ -14,21 +14,23 @@ class Agent:
 
         self.error = 0
         self.fitness = 0
+        self.old_fitness = 0
 
         self.obj = None
 
     def mutate(self, possible, intensity=1):
         self.obj.compute_possible_changes()
-        for _ in range(intensity):
+        for _ in range(rd.randint(1, intensity)):
             self.obj.random_change()
         # if rd.randint(0, 20) == 0:
-        self.obj.polish()
+        # self.obj.polish()
 
     def compute_fitness(self, data, reduce=False, verbose=0):
         # Verbose:
         # 0 - nothing
         # 1 - errors only
         # 2 - all
+        self.old_fitness = self.fitness
         data_size = len(data)
         if data_size == 0:
             self.error = None
@@ -41,6 +43,11 @@ class Agent:
         else:
             self.fitness += 1
         self.error = 100 * wrong / data_size
+
+        delta = abs(self.fitness - self.old_fitness)
+        if delta < 5 and delta >= 1:
+            self.fitness = self.fitness + 1000
+
         return self.error
 
     def random_init(self, possible):
@@ -110,8 +117,21 @@ class GeneticAlgorithm:
             self.sa_update_seq(self.delta_e)
 
             self.next_generation(config.SAVE_BEST_AGENT)
-            self.cross_over_2(config.CROSSOVER_PERCENT)
+            self.cross_over_2(config.CROSSOVER_PERCENT, config.SAVE_BEST_AGENT)
 
+            if config.STRONGER:
+                if self.best_error is not None and \
+                        self.best_error == self.agents[0].error:
+                    self.no_change_count += 1
+                    if self.no_change_count > 20:
+                        self.no_change_count = 0
+                        if config.MUTATIONS_INTENSITY < 16:
+                            config.MUTATIONS_INTENSITY = config.MUTATIONS_INTENSITY + 1
+                            config.HEAVY_MUTATIONS_INTENSITY = config.HEAVY_MUTATIONS_INTENSITY + 1
+                else:
+                    config.MUTATIONS_INTENSITY = 2
+                    config.HEAVY_MUTATIONS_INTENSITY = 4
+                            
             # TOGGLE REDUCE
             if config.MAX_R_SIZE is None or config.FORCE_REDUCE:
                 if self.best_error is not None and \
@@ -135,6 +155,7 @@ class GeneticAlgorithm:
                       "/" + str(config.MAX_R_SIZE))
                 print(best_agent.obj.convert_to_AF().R)
                 best_agent.compute_fitness(self.test_data)
+                # print("Mutations:", config.MUTATIONS_INTENSITY)
                 print("True Data Err.:", round(best_agent.error, 3))
 
             if config.EXPORT:
@@ -296,7 +317,7 @@ class GeneticAlgorithm:
         if save_best_agent:
             self.agents[0] = cp.deepcopy(best_agent)
 
-    def cross_over(self, percent=10):
+    def cross_over(self, percent=10, save_best_agent=False):
         count = 2 * (len(self.agents) // percent)
         if count % 2 != 0:
             count -= 1
@@ -330,7 +351,9 @@ class GeneticAlgorithm:
         for i, a in enumerate(new_agents):
             self.agents[- i - 1] = cp.deepcopy(a)
 
-    def cross_over_2(self, percent=10):
+    def cross_over_2(self, percent=10, save_best_agent=False):
+        if save_best_agent:
+            best_agent = cp.deepcopy(self.agents[0])
         count = 2 * (len(self.agents) // percent)
         count -= count % 2
         new_agents = []
@@ -358,6 +381,9 @@ class GeneticAlgorithm:
 
         for i, a in enumerate(new_agents):
             self.agents[- i - 1] = cp.deepcopy(a)
+
+        if save_best_agent:
+            self.agents[0] = cp.deepcopy(best_agent)
 
     def remove_excedent(self, max_R_size):
         for i in range(len(self.agents)):

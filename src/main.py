@@ -3,6 +3,7 @@ import genetic
 import time
 import config
 import sys
+import random as rd
 from tqdm import tqdm
 
 if __name__ == "__main__":
@@ -35,9 +36,13 @@ if __name__ == "__main__":
 
     start_time = time.time()
 
-    nb_run = 20
+    nb_run = 1
 
     for run in range(nb_run):
+        if config.SEED is not None:
+            #rd.seed(run + config.SEED)
+            pass
+
         print("Run:", str(run + 1) + "/" + str(nb_run))
         # start ----------------------
         args = []
@@ -88,6 +93,10 @@ if __name__ == "__main__":
             gen.data, gen.test_data, args, gen.fake_test = r.load_dataset_adult(
                 config.TRAIN_DATA_RATIO,
                 config.NOISE)
+
+        elif config.DATASET == 10:  # marco-law
+            gen.data, gen.test_data, args, gen.fake_test = r.load_dataset_law(
+                config.TRAIN_DATA_RATIO, config.NOISE, True)
         # ------------
 
         if config.GLOBAL_TOP:
@@ -118,10 +127,11 @@ if __name__ == "__main__":
     select_v = 0
     print(len(accuracy), "values: Test - Train - Fake - Diff")
     for index in range(nb_run):
-        print(index, ":", round(accuracy["test"][index], 2),
-              round(accuracy["train"][index], 2),
-              round(accuracy["fake"][index], 2),
-              round(accuracy["diff"][index], 2))
+        print(round(100 - accuracy["test"][index], 2))
+        """print(index, ":", round(accuracy["test"][index], 2),
+        round(accuracy["train"][index], 2),
+        round(accuracy["fake"][index], 2),
+        round(accuracy["diff"][index], 2))"""
         s += accuracy["test"][index]
         min_v = min(min_v, accuracy["test"][index])
         max_v = max(max_v, accuracy["test"][index])

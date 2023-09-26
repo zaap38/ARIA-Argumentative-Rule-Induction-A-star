@@ -326,7 +326,7 @@ class Rules:
                 label_value = data[k] in label_name
             input_attr = list(k)
             input_attr.pop(-1)
-            if (rd.randint(0, 99) < probability and
+            """if (rd.randint(0, 99) < probability and
                 len(dataset) <= ratio * len(data)) or \
                     len(test_data) > (1 - ratio) * len(data):
                 if rd.randint(0, 99) < noise_percent:
@@ -335,7 +335,15 @@ class Rules:
                 true_count += int(label_value)
                 dataset.append((c, input_attr, label_value))
             else:
+                test_data.append((c, input_attr, label_value))"""
+
+            # new
+            if not (rd.randint(1, 100) <= 100 * (1 - ratio)):
+                true_count += int(label_value)
+                dataset.append((c, input_attr, label_value))
+            else:
                 test_data.append((c, input_attr, label_value))
+            #----------------
 
         if balance:
             dataset, true_count = self.balancing(dataset, true_count)
@@ -435,7 +443,7 @@ class Rules:
                             "habitat"]
         num = []
         ignore = []
-        f = open("datasets/mushroom/agaricus-lepiota.data.txt")
+        f = open(config.PATH + "/mushroom/agaricus-lepiota.data.txt")
 
         dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
@@ -474,7 +482,7 @@ class Rules:
                             "export-administration-act-south-africa"]
         num = []
         ignore = []
-        f = open("datasets/voting/house-votes-84.data.txt")
+        f = open(config.PATH + "/voting/house-votes-84.data.txt")
 
         dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
@@ -507,7 +515,7 @@ class Rules:
                             "irradiat"]
         num = []
         ignore = []
-        f = open("datasets/breast-cancer/breast-cancer.data.txt")
+        f = open(config.PATH + "/breast-cancer/breast-cancer.data.txt")
 
         dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
@@ -548,7 +556,7 @@ class Rules:
                "thalach",
                "oldpeak"]
         ignore = []
-        f = open("datasets/heart-disease/processed.cleveland.data.txt")
+        f = open(config.PATH + "/heart-disease/processed.cleveland.data.txt")
 
         dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
@@ -577,7 +585,7 @@ class Rules:
                             "safety"]
         num = []
         ignore = []
-        f = open("datasets/car/car.data.txt")
+        f = open(config.PATH + "/car/car.data.txt")
 
         dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
@@ -619,7 +627,7 @@ class Rules:
                "mitoses"]
         ignore = [0]
         f = open(
-            "datasets/breast-cancer-wisconsin/breast-cancer-wisconsin.data.txt")
+            config.PATH + "/breast-cancer-wisconsin/breast-cancer-wisconsin.data.txt")
 
         dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
@@ -646,7 +654,7 @@ class Rules:
                             "age"]
         num = []
         ignore = []
-        f = open("datasets/balloons/yellow-small+adult-stretch.data.txt")
+        f = open(config.PATH + "/balloons/yellow-small+adult-stretch.data.txt")
 
         dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
@@ -679,7 +687,7 @@ class Rules:
                             "bottom-right-square"]
         num = []
         ignore = []
-        f = open("datasets/tic-tac-toe/tic-tac-toe.data.txt")
+        f = open(config.PATH + "/tic-tac-toe/tic-tac-toe.data.txt")
 
         dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,
@@ -709,8 +717,8 @@ class Rules:
         num = []
         ignore = [7]
         sep = ' '
-        f_train = open("datasets/monks-1/monks-1.train.txt")
-        f_test = open("datasets/monks-1/monks-1.test.txt")
+        f_train = open(config.PATH + "/monks-1/monks-1.train.txt")
+        f_test = open(config.PATH + "/monks-1/monks-1.test.txt")
 
         dataset, test_data, true_count, noise_count, args = self.load_both(
             f_train, f_test, attributes_names, num, ignore,
@@ -743,7 +751,48 @@ class Rules:
                             "native-country"]
         num = ["age", "hours-per-week"]
         ignore = [2, 4, 10, 11]
-        f = open("datasets/adult/adult_small.data.txt")
+        f = open(config.PATH + "/adult/adult_small.data.txt")
+
+        dataset, test_data, true_count, noise_count, args, fake_test = self.load(
+            f, attributes_names, num, ignore,
+            l_index, ratio, label_name, noise_percent, balance)
+
+        if config.TEST_DATA_VERBOSE:
+            self.print_dataset_info(dataset, true_count, args, noise_count)
+        if config.TRAIN_DATA_VERBOSE:
+            true_count = 0
+            for d in test_data:
+                true_count += int(d[-1])
+            self.print_dataset_info(test_data, true_count, args, 0)
+
+        return dataset, test_data, args, fake_test
+
+    def load_dataset_law(self, ratio=0.7, noise_percent=0, balance=False):
+        # True == released, False == not-released
+        # train = 70%
+        label_name = ["released"]
+        l_index = -1
+        attributes_names = ["expiry",
+                            "suspension",
+                            "nullity",
+                            "connections",
+                            "regression",
+                            "wiretaps",
+                            "complexity",
+                            "desumability",
+                            "victim-speak",
+                            "flag-deli",
+                            "prosecution-doc",
+                            "c_sexual-crime",
+                            "c_property",
+                            "c_public-safety",
+                            "c_gov",
+                            "c_special",
+                            "c_organization",
+                            "c_drug"]
+        num = []
+        ignore = []
+        f = open(config.PATH + "/marco-law/attributesorangeIT_2.csv")
 
         dataset, test_data, true_count, noise_count, args, fake_test = self.load(
             f, attributes_names, num, ignore,

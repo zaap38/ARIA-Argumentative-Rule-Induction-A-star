@@ -12,8 +12,8 @@ EXTENSION = "g"  # preferred=p ; grounded=g
 TARGET = 'T'
 
 # variant params ---------------------------------------------------------------
-MAX_R_SIZE = None  # max attack relation count in the graph
-INCREASE = True  # progressively increases the limit
+MAX_R_SIZE = 10  # max attack relation count in the graph
+INCREASE = False  # progressively increases the limit
 INCREASE_STEP = 50
 INCREASE_VALUE = 1
 
@@ -26,6 +26,8 @@ MULTI_VALUE = False  # handled multi-valued attributes, but less efficient
 
 REDUCE = 30
 FORCE_REDUCE = True  # try to reduce the size of the graph
+STRONGER = False  # increases the mutation intensity if stuck for a long time
+NO_OVERFIT = True
 
 NEGATION = False  # depreciated, use LOCAL_TOP instead
 
@@ -35,14 +37,14 @@ LAMBDA = 0.95
 EPSILON_E = 1
 MAX_SEQ = 5
 
-SELECT = True
+SELECT = False
 
 
 # Genetic Algorithm params -----------------------------------------------------
-MUTATIONS_INTENSITY = 1  # default 4
+MUTATIONS_INTENSITY = 2  # default 4
 HEAVY_MUTATIONS_INTENSITY = 0  # default 10
 HEAVY_MUTATIONS_PERCENT = 10
-CROSSOVER_PERCENT = 10
+CROSSOVER_PERCENT = 100
 SAVE_BEST_AGENT = True  # default True
 
 # dataset params ---------------------------------------------------------------
@@ -56,13 +58,16 @@ SAVE_BEST_AGENT = True  # default True
 # 7: tic-tac-toe
 # 8: monks-1
 # 9: adult  # wip
-DATASET = 1
+# 10: marco law dataset
+DATASET = 4
 TRAIN_DATA_RATIO = 0.7
 TEST_DATA_SIZE = 10_000
 BALANCE = 0.3
 NOISE = 0  # percent -> 10%, 20%, ...
 NUMERICAL = 10  # numerical attributes separations
 IGNORE_UNKNOWN = True
+SEED = None
+PATH = "./src/datasets"
 
 # verbose params ---------------------------------------------------------------
 
@@ -79,7 +84,7 @@ def init(argv):
     try:
         opts, args = getopt.getopt(argv,
                                    "e:d:r:m:h:x:t:n:i:p:s:",
-                                   ["reduce", "negation", "topg", "topl", "sa"])
+                                   ["reduce", "negation", "topg", "topl", "sa", "path"])
     except getopt.GetoptError:
         print('main.py'
               '-e <export_file>'
@@ -97,7 +102,8 @@ def init(argv):
               '--negation'
               '--topg'
               '--topl'
-              '--sa')
+              '--sa'
+              '--path <dataset_root_path>')
         sys.exit(2)
 
     for opt, arg in opts:
@@ -149,3 +155,6 @@ def init(argv):
         elif opt == '--sa':
             global SA
             SA = True
+        elif opt == '--path':
+            global PATH
+            PATH = arg
