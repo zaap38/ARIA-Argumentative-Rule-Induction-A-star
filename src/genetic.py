@@ -66,7 +66,8 @@ class Agent:
         self.obj.remove_trash()
 
     def draw(self):
-        self.obj.draw()
+        if config.DRAW:
+            self.obj.draw()
 
 
 class GeneticAlgorithm:
@@ -118,8 +119,12 @@ class GeneticAlgorithm:
             self.compute_fitness()
 
             self.sa_update_seq(self.delta_e)
+            if self.seq > 40:
+                self.heat = 100
+                self.seq = 0
 
-            self.next_generation(config.SAVE_BEST_AGENT)
+            self.next_generation(config.SAVE_BEST_AGENT)  # rank based
+            # self.next_generation_2(config.SAVE_BEST_AGENT)  # fitness based
             self.cross_over_2(config.CROSSOVER_PERCENT, config.SAVE_BEST_AGENT)
 
             if config.STRONGER:
@@ -410,6 +415,33 @@ class GeneticAlgorithm:
                 while rand_value > 0:
                     cpt += 1
                     rand_value -= (count - cpt - 1)
+                new_agents.append(cp.deepcopy(self.agents[cpt]))
+                # print("Add", cpt)
+        self.agents = new_agents
+        if save_best_agent:
+            self.agents[0] = cp.deepcopy(best_agent)
+
+    def next_generation_2(self, save_best_agent):
+        max_value = (len(self.agents) * (len(self.agents) + 1)) // 2
+        count = len(self.agents)
+        new_agents = []
+        self.agents = sorted(self.agents, key=lambda x: x.fitness)
+        best_agent = cp.deepcopy(self.agents[0])
+        max_value = 0
+        for a in self.agents:
+            max_value += a.fitness
+        max_value = math.floor(max_value)
+        for i in range(count):
+            if config.SA and self.sa_select():
+                new_agents.append(cp.deepcopy(sn.pick(self.agents)))
+            else:
+                rand_value = rd.randint(0, max_value)
+                cpt = 0
+                while rand_value > 0:
+                    cpt += 1
+                    if cpt >= len(self.agents):
+                        cpt -= 1
+                    rand_value -= self.agents[cpt].fitness  # (count - cpt - 1)
                 new_agents.append(cp.deepcopy(self.agents[cpt]))
                 # print("Add", cpt)
         self.agents = new_agents

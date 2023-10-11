@@ -19,7 +19,7 @@ INCREASE_VALUE = 1
 
 TOP = 'Top'
 GLOBAL_TOP = True  # Top argument attacking target (Top -> T)
-LOCAL_TOP = False  # Top argument for each argument (arg -> t_arg)
+LOCAL_TOP = True  # Top argument for each argument (arg -> t_arg)
 AND = False  # Add "And" nodes
 
 MULTI_VALUE = False  # handled multi-valued attributes, but less efficient
@@ -31,9 +31,9 @@ NO_OVERFIT = True
 
 NEGATION = False  # depreciated, use LOCAL_TOP instead
 
-SA = False  # Simulating Annealing - affect the selection rule
-HEAT = 100
-LAMBDA = 0.95
+SA = True  # Simulating Annealing - affect the selection rule
+HEAT = 0
+LAMBDA = 0.9
 EPSILON_E = 1
 MAX_SEQ = 5
 
@@ -42,8 +42,8 @@ SELECT = False
 
 # Genetic Algorithm params -----------------------------------------------------
 MUTATIONS_INTENSITY = 2  # default 4
-HEAVY_MUTATIONS_INTENSITY = 0  # default 10
-HEAVY_MUTATIONS_PERCENT = 10
+HEAVY_MUTATIONS_INTENSITY = 4  # default 10
+HEAVY_MUTATIONS_PERCENT = 20
 CROSSOVER_PERCENT = 100
 SAVE_BEST_AGENT = True  # default True
 
@@ -59,7 +59,7 @@ SAVE_BEST_AGENT = True  # default True
 # 8: monks-1
 # 9: adult  # wip
 # 10: marco law dataset
-DATASET = 3
+DATASET = 5
 TRAIN_DATA_RATIO = 0.7
 TEST_DATA_SIZE = 10_000
 BALANCE = 0.3
@@ -76,6 +76,7 @@ TEST_DATA_VERBOSE = True
 LEARNING_VERBOSE = 1
 FINAL_VERBOSE = 3
 PRINT_STEP = 10
+DRAW = False
 EXPORT = True
 EXPORT_LOC = "output/"
 

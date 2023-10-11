@@ -253,7 +253,7 @@ class AF:
         nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=2000, font_size=12, font_weight='bold', arrowsize=30, width=5)
         plt.title('Best Agent Graph')
         plt.show(block=False)
-        plt.pause(1)
+        plt.pause(0.1)
         #plt.close()
 
     def add_argument(self, name):
