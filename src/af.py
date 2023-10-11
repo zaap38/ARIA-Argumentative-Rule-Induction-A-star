@@ -2,6 +2,8 @@ import random as rd
 import copy as cp
 import config
 import snippets as sn
+import networkx as nx
+import matplotlib.pyplot as plt
 
 
 class Argument:
@@ -224,12 +226,35 @@ class EncodedAF:
         index = self.attack_index((a, b))
         self.R[index] = 0
 
+    def draw(self):
+        self.convert_to_AF().draw()
+
 
 class AF:
 
     def __init__(self):
         self.A = []
         self.R = []  # (arg_name, arg_name)
+
+    def draw(self):
+        G = nx.DiGraph()
+        active_nodes = []
+        for r in self.R:
+            if r[0] not in active_nodes:
+                active_nodes.append(r[0])
+            if r[1] not in active_nodes:
+                active_nodes.append(r[1])
+        G.add_nodes_from(active_nodes)
+        G.add_edges_from(self.R)
+        if plt.get_fignums():
+            # plt.clf()
+            plt.close()
+        pos = nx.planar_layout(G)
+        nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=2000, font_size=12, font_weight='bold', arrowsize=30, width=5)
+        plt.title('Best Agent Graph')
+        plt.show(block=False)
+        plt.pause(1)
+        #plt.close()
 
     def add_argument(self, name):
         a = Argument(name)

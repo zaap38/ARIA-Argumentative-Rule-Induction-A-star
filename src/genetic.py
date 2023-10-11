@@ -45,8 +45,8 @@ class Agent:
         self.error = 100 * wrong / data_size
 
         delta = abs(self.fitness - self.old_fitness)
-        if delta < 5 and delta >= 1:
-            self.fitness = self.fitness + 1000
+        """if delta < 5 and delta >= 1:
+            self.fitness = self.fitness + 1000"""
 
         return self.error
 
@@ -64,6 +64,9 @@ class Agent:
 
     def remove_trash(self):
         self.obj.remove_trash()
+
+    def draw(self):
+        self.obj.draw()
 
 
 class GeneticAlgorithm:
@@ -146,7 +149,7 @@ class GeneticAlgorithm:
                     self.best_error = self.agents[0].error
 
             # PRINT
-            if step % 10 == 0 and config.LEARNING_VERBOSE > 0:
+            if step % config.PRINT_STEP == 0 and config.LEARNING_VERBOSE > 0:
                 best_agent = cp.deepcopy(self.agents[0])
                 print("\nError:", str(round(best_agent.error, 3)) + "%",
                       "- Fitness:", self.agents[0].fitness,
@@ -154,6 +157,7 @@ class GeneticAlgorithm:
                       "- size(R) =", str(best_agent.obj.size()) +
                       "/" + str(config.MAX_R_SIZE))
                 print(best_agent.obj.convert_to_AF().R)
+                best_agent.draw()
                 best_agent.compute_fitness(self.test_data)
                 # print("Mutations:", config.MUTATIONS_INTENSITY)
                 print("True Data Err.:", round(best_agent.error, 3))

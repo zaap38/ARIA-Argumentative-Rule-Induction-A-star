@@ -4,7 +4,7 @@ import getopt
 
 # core params ------------------------------------------------------------------
 
-STEPS = 200
+STEPS = 600
 POPULATION = 10
 
 EXTENSION = "g"  # preferred=p ; grounded=g
@@ -12,7 +12,7 @@ EXTENSION = "g"  # preferred=p ; grounded=g
 TARGET = 'T'
 
 # variant params ---------------------------------------------------------------
-MAX_R_SIZE = 16  # max attack relation count in the graph
+MAX_R_SIZE = 20  # max attack relation count in the graph
 INCREASE = False  # progressively increases the limit
 INCREASE_STEP = 50
 INCREASE_VALUE = 1
@@ -59,7 +59,7 @@ SAVE_BEST_AGENT = True  # default True
 # 8: monks-1
 # 9: adult  # wip
 # 10: marco law dataset
-DATASET = 4
+DATASET = 3
 TRAIN_DATA_RATIO = 0.7
 TEST_DATA_SIZE = 10_000
 BALANCE = 0.3
@@ -75,6 +75,7 @@ TRAIN_DATA_VERBOSE = True
 TEST_DATA_VERBOSE = True
 LEARNING_VERBOSE = 1
 FINAL_VERBOSE = 3
+PRINT_STEP = 10
 EXPORT = True
 EXPORT_LOC = "output/"
 
