@@ -61,6 +61,14 @@ class EncodedAF:
                 self.changes.append(i)
         self.changes.append(self.A.index(config.TARGET))
 
+    def get_attackers(self, a):
+        att = []
+        offset = self.A.index(a)
+        for i in range(len(self.A)):
+            if self.R[i * len(self.A) + offset] == 1:
+                att.append(self.A[i])
+        return att
+
     def is_attacker(self, a):
         offset = self.A.index(a) * len(self.A)
         for i in range(len(self.A)):
@@ -120,6 +128,34 @@ class EncodedAF:
             + graph_b.R[len(graph_b.R) // 2:]
         return new
 
+    def recombination_v2(self, graph_a, graph_b):
+        '''
+        Move one branch from one graph to the other.
+        Based on Fan & Toni AA explainability paper.
+        '''
+        new = EncodedAF()
+        new.A = cp.deepcopy(graph_a.A)
+        new.R = cp.deepcopy(graph_a.R)
+        chain = [config.TARGET]
+        if rd.randint(0, 1) == 0:
+            chain = [config.TOP]
+        candidate = None
+        while True:
+            attackers = self.get_attackers(chain[-1])
+            if len(attackers) == 0:
+                break
+            candidate = rd.choice(attackers)
+            if candidate in chain:
+                break
+            chain.append(candidate)
+        attacks = []
+        for i in range(len(chain) - 1):
+            attacks.append((chain[i + 1], chain[i]))
+        for r in attacks:
+            new.R[self.A.index(r[0]) * len(self.A) + self.A.index(r[1])] = \
+                    graph_a.R[self.A.index(r[0]) * len(self.A) + self.A.index(r[1])]
+            new.R[self.A.index(r[1]) * len(self.A) + self.A.index(r[0])] = 0
+
     def convert_to_AF(self):
 
         af = AF()
@@ -149,6 +185,41 @@ class EncodedAF:
 
         return af
 
+    def getPossibleChanges(self, solution):
+        possible = []
+        targets = []
+        for i in range(len(solution)):
+            el = int(solution[i])
+            a, b = self.get_attack(el)
+            if a not in targets:
+                targets.append(a)
+            if b not in targets:
+                targets.append(b)
+        for t in targets:
+            for i, a in enumerate(self.A):
+                index = i * len(self.A) + self.A.index(t)
+                if index not in possible:
+                    possible.append(index)
+        for i, a in enumerate(self.A):
+                index = i * len(self.A) + self.A.index(config.TARGET)
+                if index not in possible:
+                    possible.append(index)
+        return possible
+
+    def toNames(self):
+        names = []
+        for i in range(len(self.R)):
+            if self.R[i] == 1:
+                names.append(self.get_attack(i))
+        return names
+
+    def indexes(self):
+        indexes = []
+        for i in range(len(self.R)):
+            if self.R[i] == 1:
+                indexes.append(i)
+        return indexes
+
     def get_attack(self, index):
         a = self.A[index // len(self.A)]
         b = self.A[index % len(self.A)]
@@ -161,6 +232,49 @@ class EncodedAF:
     def set_A(self, a):
         self.A = cp.deepcopy(a)
 
+    def load_R(self, values):
+        for i in range(len(self.R)):
+            self.R[i] = 1 if i in values else 0
+        """j = 1
+        offset = 0
+        cpt = 1
+        n = len(self.A) - 1
+        n = ((n + 1) * n) // 2  # triangle
+        for i in range(n):
+            index = i
+            if index % len(self.A) == 0:
+                offset += cpt
+                cpt += 1
+            a, b = self.get_attack(index + offset)
+            if index in values:
+                self.add_attack(a, b)
+                self.remove_attack(b, a)
+            elif -index in values:
+                self.add_attack(b, a)
+                self.remove_attack(a, b)
+            else:
+                self.remove_attack(a, b)
+                self.remove_attack(b, a)"""
+        """for i, v in enumerate(values):
+            index = i
+            if index % len(self.A) == 0:
+                offset += cpt
+                cpt += 1
+            # print(len(self.R), len(values), index + offset, i, offset, cpt, len(self.A))
+            a, b = self.get_attack(index + offset)
+            if int(v) == 1: # (a, b)
+                self.add_attack(a, b)
+                self.remove_attack(b, a)
+            elif int(v) == 0: # None
+                self.remove_attack(a, b)
+                self.remove_attack(b, a)
+            elif int(v) == -1: # (b, a)
+                self.add_attack(b, a)
+                self.remove_attack(a, b)
+            #self.R[i] = int(v)
+            if i + 1 >= len(self.A) - 1:
+                j += 1"""
+
     def set_R(self, r):
         for attack in r:
             self.add_attack_tuple(attack)
@@ -172,6 +286,11 @@ class EncodedAF:
         a = t[0]
         b = t[1]
         self.R[self.A.index(a) * len(self.A) + self.A.index(b)] = 1
+
+    def get_argument_by_name(self, name):
+        for i, a in enumerate(self.A):
+            if a.name == name:
+                return self.A[i]
 
     def size(self):
         count = 0
@@ -375,42 +494,46 @@ class AF:
             if a.name == name:
                 return self.A[i]
 
-    def compare_to_data(self, data, ext_choice, verbose=0):
+    def compare_to_data(self, data, ext_choice, percent=config.PERCENT, verbose=0):
         count = len(data)
-        dist = count
+        dist = 0
         true_count = 0
         false_count = 0
         true_predicted = 0
         false_predicted = 0
 
+        cpt = 0
+
         for step in range(count):
-            for i, a in enumerate(self.A):
-                if a.name in data[step][1] or a.name == config.TOP:
-                    self.alive(self.A[i])
-                else:
-                    self.dead(self.A[i])
+            if percent >= rd.random():
+                cpt += 1
+                for i, a in enumerate(self.A):
+                    if a.name in data[step][1] or a.name == config.TOP:
+                        self.alive(self.A[i])
+                    else:
+                        self.dead(self.A[i])
 
-            self.compute_graph(data[step][1], ext_choice)
+                self.compute_graph(data[step][1], ext_choice)
 
-            value = self.get_argument_by_name(config.TARGET).alive
+                value = self.get_argument_by_name(config.TARGET).alive
 
-            true_count += int(data[step][2])
-            true_predicted += int(data[step][2] and value)
-            false_count += 1 - int(data[step][2])
-            false_predicted += int(not data[step][2] and not value)
+                true_count += int(data[step][2])
+                true_predicted += int(data[step][2] and value)
+                false_count += 1 - int(data[step][2])
+                false_predicted += int(not data[step][2] and not value)
 
-            dist -= int(value == data[step][2])
-            if verbose > 0:
-                if verbose == 2 or (verbose == 1 and data[step][2] != value):
-                    extension = []
-                    for a in self.A:
-                        if a.alive:
-                            extension.append(a.name)
-                    print("---------------------------")
-                    print("Facts:", data[step][1])
-                    print("Extension:", extension)
-                    print("Expected:", data[step][2],
-                          "Got:", value)
+                dist -= int(value == data[step][2])
+                if verbose > 0:
+                    if verbose == 2 or (verbose == 1 and data[step][2] != value):
+                        extension = []
+                        for a in self.A:
+                            if a.alive:
+                                extension.append(a.name)
+                        print("---------------------------")
+                        print("Facts:", data[step][1])
+                        print("Extension:", extension)
+                        print("Expected:", data[step][2],
+                            "Got:", value)
 
         if verbose == 3:
             print("---------")
@@ -420,7 +543,7 @@ class AF:
                   + str(false_count)
                   + " (" + str(false_predicted * 100 // max(false_count, 1)) + "%)")
 
-        return dist
+        return dist + cpt, cpt
 
     def update_aliveness(self, grounded):
         for i, a in enumerate(self.A):

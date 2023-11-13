@@ -4,8 +4,8 @@ import getopt
 
 # core params ------------------------------------------------------------------
 
-STEPS = 600
-POPULATION = 10
+STEPS = 20
+POPULATION = 20
 
 EXTENSION = "g"  # preferred=p ; grounded=g
 
@@ -19,7 +19,7 @@ INCREASE_VALUE = 1
 
 TOP = 'Top'
 GLOBAL_TOP = True  # Top argument attacking target (Top -> T)
-LOCAL_TOP = True  # Top argument for each argument (arg -> t_arg)
+LOCAL_TOP = False  # Top argument for each argument (arg -> t_arg)
 AND = False  # Add "And" nodes
 
 MULTI_VALUE = False  # handled multi-valued attributes, but less efficient
@@ -33,7 +33,7 @@ NEGATION = False  # depreciated, use LOCAL_TOP instead
 
 SA = True  # Simulating Annealing - affect the selection rule
 HEAT = 0
-LAMBDA = 0.9
+LAMBDA = 0.95
 EPSILON_E = 1
 MAX_SEQ = 5
 
@@ -41,33 +41,35 @@ SELECT = False
 
 
 # Genetic Algorithm params -----------------------------------------------------
-MUTATIONS_INTENSITY = 2  # default 4
+MUTATIONS_INTENSITY = 8#2  # default 4
 HEAVY_MUTATIONS_INTENSITY = 4  # default 10
 HEAVY_MUTATIONS_PERCENT = 20
 CROSSOVER_PERCENT = 100
 SAVE_BEST_AGENT = True  # default True
+EMA_FITNESS = None  # 0.2  # None to disable
 
 # dataset params ---------------------------------------------------------------
 # 0: mushroom
 # 1: voting
 # 2: breast-cancer
-# 3: heart-disease
-# 4: car (unbalanced)
+# 3: heart-disease #2506: 80.68
+# 4: car (unbalanced) #2506: xx ; #1003: 98.62 ; 1301: 98.11
 # 5: breast-cancer-wisconsin
 # 6: balloons
 # 7: tic-tac-toe
 # 8: monks-1
 # 9: adult  # wip
 # 10: marco law dataset
-DATASET = 5
+DATASET = 3
 TRAIN_DATA_RATIO = 0.7
 TEST_DATA_SIZE = 10_000
 BALANCE = 0.3
 NOISE = 0  # percent -> 10%, 20%, ...
 NUMERICAL = 10  # numerical attributes separations
 IGNORE_UNKNOWN = True
-SEED = None
+SEED = 2506#2506: xx ; #1003: 98.62 ; 1301: 98.11
 PATH = "./src/datasets"
+PERCENT = 1.0  # percentage of used dataset each step of training
 
 # verbose params ---------------------------------------------------------------
 

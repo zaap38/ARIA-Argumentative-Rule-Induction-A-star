@@ -6,6 +6,7 @@ import string
 import config
 import snippets as sn
 import math
+from multiprocessing import Process, Pool
 
 
 class Agent:
@@ -14,6 +15,7 @@ class Agent:
 
         self.error = 0
         self.fitness = 0
+        self.positive_fitness = 0
         self.old_fitness = 0
 
         self.obj = None
@@ -25,7 +27,7 @@ class Agent:
         # if rd.randint(0, 20) == 0:
         self.obj.polish()
 
-    def compute_fitness(self, data, reduce=False, verbose=0):
+    def compute_fitness(self, data, reduce=False, percent=config.PERCENT, verbose=0):
         # Verbose:
         # 0 - nothing
         # 1 - errors only
@@ -35,18 +37,23 @@ class Agent:
         if data_size == 0:
             self.error = None
             return
-        wrong = self.obj.convert_to_AF()\
-            .compare_to_data(data, config.EXTENSION, verbose)
+        wrong, count = self.obj.convert_to_AF()\
+            .compare_to_data(data, config.EXTENSION, percent, verbose)
         self.fitness = wrong
+        self.positive_fitness = data_size - wrong #- self.obj.size() / 1
         if wrong == 0 or reduce:
             self.fitness += self.obj.size() / 1000.0
         else:
             self.fitness += 1
-        self.error = 100 * wrong / data_size
+        # self.error = 100 * wrong / data_size
+        self.error = 100 * wrong / count
 
         delta = abs(self.fitness - self.old_fitness)
         """if delta < 5 and delta >= 1:
             self.fitness = self.fitness + 1000"""
+        if config.EMA_FITNESS is not None:
+            self.fitness = self.fitness * config.EMA_FITNESS + \
+                    (1 - config.EMA_FITNESS) * self.old_fitness
 
         return self.error
 
@@ -57,7 +64,9 @@ class Agent:
         self.obj = af.EncodedAF()
         self.obj.init(a)
         self.obj.random_init()
-        self.obj.set_R(r)
+        #self.obj.set_R(r)
+        self.obj.load_R(r)
+        self.obj.polish()
 
     def reduce_size(self, max_size):
         self.obj.reduce_size(max_size)
@@ -163,7 +172,7 @@ class GeneticAlgorithm:
                       "/" + str(config.MAX_R_SIZE))
                 print(best_agent.obj.convert_to_AF().R)
                 best_agent.draw()
-                best_agent.compute_fitness(self.test_data)
+                best_agent.compute_fitness(self.test_data, False, 1.0)
                 # print("Mutations:", config.MUTATIONS_INTENSITY)
                 print("True Data Err.:", round(best_agent.error, 3))
 
@@ -171,7 +180,7 @@ class GeneticAlgorithm:
                 best_agent = cp.deepcopy(self.agents[0])
                 self.log["train"]["error"]["train"][step] = str(best_agent.error) \
                     .replace('.', ',')
-                best_agent.compute_fitness(self.test_data)
+                best_agent.compute_fitness(self.test_data, False, 1)
                 self.log["train"]["error"]["test"][step] = str(best_agent.error) \
                     .replace('.', ',')
                 self.log["train"]["sizes"][step] = dict()
@@ -249,9 +258,13 @@ class GeneticAlgorithm:
 
         print("Data exported to ", loc)
 
+    def print_agent_light(self, a):
+        print("size(A) =", len(a.obj.A),
+              "- size(R) =", a.obj.size())
+
     def print_agent(self, a, verbose=0):
         print("Agent:---------------------------\n")
-        a.compute_fitness(self.test_data, True, verbose)
+        a.compute_fitness(self.test_data, True, 1.0, verbose)
         print("Error:", str(a.error) + "%",
               "- size(A) =", len(a.obj.A),
               "- size(R) =", a.obj.size())
@@ -363,8 +376,9 @@ class GeneticAlgorithm:
     def cross_over_2(self, percent=10, save_best_agent=False):
         if save_best_agent:
             best_agent = cp.deepcopy(self.agents[0])
-        count = 2 * (len(self.agents) // percent)
+        count = 2 * (len(self.agents) * 0)  # TODO
         count -= count % 2
+        count = len(self.agents)  # quick fix, 100% crossover
         new_agents = []
         for i in range(count // 2):
             """new_agent = cp.deepcopy(self.agents[i])
@@ -384,7 +398,8 @@ class GeneticAlgorithm:
             parent_1 = self.agents[i]
             parent_2 = self.agents[count - i - 1]
             new_agent = cp.deepcopy(parent_1)
-            new_agent.obj.recombination(parent_1.obj, parent_2.obj)
+            # new_agent.obj.recombination(parent_1.obj, parent_2.obj)
+            new_agent.obj.recombination_v2(parent_1.obj, parent_2.obj)
 
             new_agents.append(cp.deepcopy(new_agent))
 
@@ -448,25 +463,68 @@ class GeneticAlgorithm:
         if save_best_agent:
             self.agents[0] = cp.deepcopy(best_agent)
 
+    def compute_individual(self, t):  # used for multithread
+        t[0].compute_fitness(t[1], True)
+        return t[0]
+
     def compute_fitness(self, verbose=False):
         best_e = None
         for i in range(len(self.agents)):
             value = self.agents[i].compute_fitness(self.training_data,
                                                    self.reduce,
+                                                   config.PERCENT,
                                                    verbose)
             if best_e is None or value < best_e:
                 best_e = value
             verbose = False
+        
+        # multithread, useless because of global lock on the interpreter
+        """args = []
+        for i in range(len(self.agents)):
+            args.append((self.agents[i], self.training_data))
+        with Pool(20) as p:
+            self.agents = p.map(self.compute_individual, args)"""
+        """proc = []
+        for i in range(len(self.agents)):
+            proc.append(Process(target=self.compute_individual, args=(self.agents[i], self.training_data)))
+            proc[-1].start()"""
+        """for i in range(len(self.agents)):
+            # proc[i].join()
+            value = self.agents[i].error
+            if best_e is None or value < best_e:
+                best_e = value"""
         self.last_best = self.best_error_bis
         self.delta_e = self.last_best - best_e
         self.best_error_bis = min(best_e, self.best_error_bis)
         # print(self.delta_e, best_e, self.last_best)
 
-    def unique_test(self, args, attacks, data):
+    def minimize(self, args, attacks):
+        agent = Agent()
+        agent.init(args, attacks)
+        agent.obj.polish()
+        return agent.obj.indexes()
+
+    def toNames(self, args, attacks):
+        agent = Agent()
+        agent.init(args, attacks)
+        return agent.obj.toNames()
+
+    def getPossibleChanges(self, args, attacks):
+        agent = Agent()
+        agent.init(args, attacks)
+        return agent.obj.getPossibleChanges(attacks)
+
+    def unique_test(self, args, attacks, data, verbose=False):
         agent = Agent()
         agent.init(args, attacks)
         agent.compute_fitness(data)
-        print("Error:", agent.error)
+        if verbose:
+            self.print_agent_light(agent)
+            print("---Attacks---")
+            agent.obj.convert_to_AF().print_attacks()
+            print("-------------")
+        # print("Error:", agent.error)
+        return agent.positive_fitness
 
     def sa_update_seq(self, delta_e):
         if delta_e <= config.EPSILON_E:

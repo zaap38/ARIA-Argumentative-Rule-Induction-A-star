@@ -5,6 +5,12 @@ import config
 import sys
 import random as rd
 from tqdm import tqdm
+import pygad as pg
+
+
+def fitness_function(ga_instance, solution, solution_index):
+    pass
+
 
 if __name__ == "__main__":
 
