@@ -30,7 +30,11 @@ def fitness_function(ga_instance : pg.GA, solution, solution_index):
 
 def custom_mutation(solution, ga_instance):
     for i in range(len(solution)):
-        possible = gen.GeneticAlgorithm().getPossibleChanges(args, solution[i])
+        sol = cp.deepcopy(CURRENTSOL)
+        for s in solution[i]:
+            if s not in sol:
+                sol.append(s)
+        possible = gen.GeneticAlgorithm().getPossibleChanges(args, sol)
         solution[i][rd.randint(0, len(solution[i]) - 1)] = rd.choice(possible)
         # print(solution[i])
     return solution
@@ -172,7 +176,7 @@ if __name__ == "__main__":
                             mutation_type=mutation_type,
                             mutation_num_genes=addonSize, #// 2,
                             gene_space=domain,
-                            random_seed=seed,
+                            random_seed=seed + runCount,
                             keep_elitism=1,
                             allow_duplicate_genes=False)
 
@@ -188,7 +192,7 @@ if __name__ == "__main__":
                 if s not in CURRENTSOL:
                     CURRENTSOL.append(s)
             print("Best:", solution_fitness)
-            print("Added", len(minSol), "at run", incrementLearningCount, "/", runCount)
+            print("Added", len(minSol), "at run", incrementLearningCount + 1, "/", runCount)
             acc = gen.GeneticAlgorithm().unique_test(args, CURRENTSOL, test_data, True)
             print(acc, "/", len(test_data), "-", round(100 * acc / len(test_data), 2))
 

@@ -67,7 +67,7 @@ BALANCE = 0.3
 NOISE = 0  # percent -> 10%, 20%, ...
 NUMERICAL = 10  # numerical attributes separations
 IGNORE_UNKNOWN = True
-SEED = 2506#2506: xx ; #1003: 98.62 ; 1301: 98.11
+SEED = 2506
 PATH = "./src/datasets"
 PERCENT = 1.0  # percentage of used dataset each step of training
 
