@@ -4,6 +4,7 @@ import config
 import snippets as sn
 import networkx as nx
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 class Argument:
@@ -61,6 +62,60 @@ class EncodedAF:
                 self.changes.append(i)
         self.changes.append(self.A.index(config.TARGET))
 
+    def compute_possible_attacks(self):
+        possible = []
+        for a in self.A:
+            if self.is_attacker(a) or a == config.TARGET:
+                for b in self.A:
+                    # print(b, a)
+                    index = self.attack_index((b, a))
+                    if self.possibleAttackCondition(self.attack_index((b, a))):
+                        possible.append(index)
+        return possible
+    
+    def compute_v2(self):
+        values = np.arange(len(self.R))
+        fun = np.vectorize(self.compute_v2_sub)
+        values = fun(values)
+        values = values[values >= 0]
+        return values
+        
+    def compute_v2_sub(self, value):
+        a, b = self.get_attack(value)
+        if self.is_attacker(b) or b == config.TARGET:
+            if self.possibleAttackCondition(self.attack_index((a, b))):
+                return value
+        return -1
+    
+    def possibleAttackCondition(self, index):
+        a, b = self.get_attack(index)
+        if self.R[index] is None:
+            return False
+        chain = self.getChain(b)
+        chain = [self.get_attribute(x) for x in chain]
+        if self.get_attribute(a) in chain:
+            return False
+        if a in [config.TARGET, config.TOP]:
+            return False
+        if self.is_attacking(b, a):
+            return False
+        if self.is_attacking(a, config.TARGET):
+            return False
+        return True
+    
+    def getChain(self, arg):
+        chain = [arg]
+        index = 0
+        while True:
+            attacked = self.get_attacked(chain[index])
+            index += 1
+            if attacked == []:
+                break
+            for a in attacked:
+                if a not in chain:
+                    chain.append(a)
+        return chain
+
     def get_attackers(self, a):
         att = []
         offset = self.A.index(a)
@@ -68,6 +123,29 @@ class EncodedAF:
             if self.R[i * len(self.A) + offset] == 1:
                 att.append(self.A[i])
         return att
+    
+    def get_attacked(self, a):
+        att = []
+        offset = self.A.index(a) * len(self.A)
+        for i in range(len(self.A)):
+            if self.R[offset + i] == 1:
+                att.append(self.A[i])
+        values = np.arange(len(self.A)) + offset
+        fun = np.vectorize(self.get_attacked_vec)
+        values = fun(values)
+        values = values[values > 0]
+        if len(values) == 0:
+            return []
+        fun2 = np.vectorize(self.index_to_names_vec)
+        values = fun2(values)
+        return values.tolist()
+    
+    def index_to_names_vec(self, index):
+        a, b = self.get_attack(index)
+        return a
+
+    def get_attacked_vec(self, value):
+        return self.R[value] if self.R[value] is not None else -1
 
     def is_attacker(self, a):
         offset = self.A.index(a) * len(self.A)
@@ -160,7 +238,9 @@ class EncodedAF:
 
         af = AF()
 
-        for a in self.A:
+        for i, a in enumerate(self.A):
+            if a == config.TARGET:
+                af.targetIndex = i
             af.A.append(Argument(a))
         # TODO: local top
         """for i in range(len(self.R)):
@@ -168,8 +248,10 @@ class EncodedAF:
                 attack = self.get_attack(i)
                 af.R.append(attack)"""
         for i in range(len(self.R)):
-            if self.R[i] == 1:
+            if self.R[i] is not None and abs(self.R[i]) == 1:
                 attack = self.get_attack(i)
+                """if self.R[i] == -1:
+                    attack = (config.TOP + "_" + attack[0], attack[1])"""
                 af.R.append(attack)
 
             elif self.R[i] == -1:
@@ -188,6 +270,8 @@ class EncodedAF:
     def getPossibleChanges(self, solution):
         possible = []
         targets = []
+
+        # add current soltuion args to the potential targets
         for i in range(len(solution)):
             el = int(solution[i])
             a, b = self.get_attack(el)
@@ -195,11 +279,16 @@ class EncodedAF:
                 targets.append(a)
             if b not in targets:
                 targets.append(b)
+        
+        # check for each member of targets if we can add an
+        # attack from another argument
         for t in targets:
             for i, a in enumerate(self.A):
                 index = i * len(self.A) + self.A.index(t)
                 if index not in possible:
                     possible.append(index)
+        
+        # add attacks to the target node
         for i, a in enumerate(self.A):
                 index = i * len(self.A) + self.A.index(config.TARGET)
                 if index not in possible:
@@ -234,46 +323,12 @@ class EncodedAF:
 
     def load_R(self, values):
         for i in range(len(self.R)):
-            self.R[i] = 1 if i in values else 0
-        """j = 1
-        offset = 0
-        cpt = 1
-        n = len(self.A) - 1
-        n = ((n + 1) * n) // 2  # triangle
-        for i in range(n):
-            index = i
-            if index % len(self.A) == 0:
-                offset += cpt
-                cpt += 1
-            a, b = self.get_attack(index + offset)
-            if index in values:
-                self.add_attack(a, b)
-                self.remove_attack(b, a)
-            elif -index in values:
-                self.add_attack(b, a)
-                self.remove_attack(a, b)
+            if i in values:
+                self.R[i] = 1
+            elif -i in values:
+                self.R[i] = -1
             else:
-                self.remove_attack(a, b)
-                self.remove_attack(b, a)"""
-        """for i, v in enumerate(values):
-            index = i
-            if index % len(self.A) == 0:
-                offset += cpt
-                cpt += 1
-            # print(len(self.R), len(values), index + offset, i, offset, cpt, len(self.A))
-            a, b = self.get_attack(index + offset)
-            if int(v) == 1: # (a, b)
-                self.add_attack(a, b)
-                self.remove_attack(b, a)
-            elif int(v) == 0: # None
-                self.remove_attack(a, b)
-                self.remove_attack(b, a)
-            elif int(v) == -1: # (b, a)
-                self.add_attack(b, a)
-                self.remove_attack(a, b)
-            #self.R[i] = int(v)
-            if i + 1 >= len(self.A) - 1:
-                j += 1"""
+                self.R[i] = 0
 
     def set_R(self, r):
         for attack in r:
@@ -338,7 +393,8 @@ class EncodedAF:
             a, b = self.get_attack(i)
             if a not in attacking_t or b not in attacking_t or \
                     (self.is_attacking(a, config.TARGET) and
-                     b != config.TARGET):
+                     b != config.TARGET) or (self.get_attribute(a) == self.get_attribute(b)
+                                             and not config.MULTI_VALUE):
                 self.remove_attack(a, b)
 
     def remove_attack(self, a, b):
@@ -354,6 +410,7 @@ class AF:
     def __init__(self):
         self.A = []
         self.R = []  # (arg_name, arg_name)
+        self.targetIndex = -1
 
     def draw(self):
         G = nx.DiGraph()
@@ -490,9 +547,7 @@ class AF:
         return added
 
     def get_argument_by_name(self, name):
-        for i, a in enumerate(self.A):
-            if a.name == name:
-                return self.A[i]
+        return next((arg for arg in np.array(self.A) if arg.name == name), None)
 
     def compare_to_data(self, data, ext_choice, percent=config.PERCENT, verbose=0):
         count = len(data)
@@ -503,6 +558,11 @@ class AF:
         false_predicted = 0
 
         cpt = 0
+        details = dict()
+        details["true_count"] = 0
+        details["true_predicted"] = 0
+        details["false_count"] = 0
+        details["false_predicted"] = 0
 
         for step in range(count):
             if percent >= rd.random():
@@ -517,10 +577,10 @@ class AF:
 
                 value = self.get_argument_by_name(config.TARGET).alive
 
-                true_count += int(data[step][2])
-                true_predicted += int(data[step][2] and value)
-                false_count += 1 - int(data[step][2])
-                false_predicted += int(not data[step][2] and not value)
+                details["true_count"] += int(data[step][2])
+                details["true_predicted"] += int(data[step][2] and value)
+                details["false_count"] += 1 - int(data[step][2])
+                details["false_predicted"] += int(not data[step][2] and not value)
 
                 dist -= int(value == data[step][2])
                 if verbose > 0:
@@ -537,20 +597,66 @@ class AF:
 
         if verbose == 3:
             print("---------")
-            print("True accuracy :", str(true_predicted) + "/" + str(true_count)
-                  + " (" + str(true_predicted * 100 // max(true_count, 1)) + "%)")
-            print("False accuracy:", str(false_predicted) + "/"
-                  + str(false_count)
-                  + " (" + str(false_predicted * 100 // max(false_count, 1)) + "%)")
+            print("True accuracy :", str(details["true_predicted"]) + "/" + str(details["true_count"])
+                  + " (" + str(details["true_predicted"] * 100 // max(details["true_count"], 1)) + "%)")
+            print("False accuracy:", str(details["false_predicted"]) + "/"
+                  + str(details["false_count"])
+                  + " (" + str(details["false_predicted"] * 100 // max(details["false_count"], 1)) + "%)")
 
-        return dist + cpt, cpt
+        return dist + cpt, cpt, details
+    
+    def get_dist(self, data, to_check=[]):
+        from astar import Tic
+        tic = Tic("Init", 2, True)
+        count = len(data)
+        dist = count
+        indexes = to_check
+        inc_lines = []
+        if len(indexes) == 0:
+            indexes = range(count)
+        else:
+            dist = len(indexes)
+            
+        tic.tic("fun")
+        fun = np.vectorize(self.check_data, excluded=['data'])
+        values = fun(data=data, step=indexes)
+        tic.tic("inc_lines")
+        inc_lines = np.where(values == 0)[0].tolist()
+        tic.tic("sum")
+        dist -= np.sum(values)
+        return dist, inc_lines
+    
+    def check_data(self, data, step):
+        from astar import Tic
+        tic = Tic("Alive", 8, False)
+        set_alive_vec = np.vectorize(self.set_alive_dead, excluded=['facts'])
+        self.A = set_alive_vec(arg=self.A, facts=data[step][1]).tolist()
+        
+        tic.tic("graph")
+        self.compute_graph(data[step][1], 'g')
+        tic.tic("get arg")
+        value = self.A[self.targetIndex].alive  #self.get_argument_by_name(config.TARGET).alive
+        value = int(value == data[step][2])
+        tic.tic("end")
+        tic.disabled = True
+        return value
+    
+    def set_alive_dead(self, arg, facts):
+        arg.alive = arg.name in [config.TOP] + facts
+        return arg
 
     def update_aliveness(self, grounded):
-        for i, a in enumerate(self.A):
+        """for i, a in enumerate(self.A):
             if a.name in grounded:
                 self.alive(self.A[i])
             else:
-                self.dead(self.A[i])
+                self.dead(self.A[i])"""
+        fun = np.vectorize(self.update_aliveness_vec, excluded=['grounded'])
+        self.A = fun(arg=self.A, grounded=grounded).tolist()
+
+    def update_aliveness_vec(self, arg, grounded):
+        arg.alive = arg.name in grounded
+        return arg
 
     def is_attacked(self, arg):
         name = arg
@@ -582,8 +688,13 @@ class AF:
         return attackers
 
     def compute_graph(self, facts, extension):
+        """from astar import Tic
+        tic = Tic("Extension", 6, True)"""
         extension = self.compute_extension(facts, extension)
+        # tic.tic("Alive")
         self.update_aliveness(extension)
+        # tic.tic("End")
+        # tic.disabled = True
 
     def compute_extension(self, facts, extension):
         if extension == "p":

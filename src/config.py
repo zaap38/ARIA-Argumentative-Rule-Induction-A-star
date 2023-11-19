@@ -4,8 +4,8 @@ import getopt
 
 # core params ------------------------------------------------------------------
 
-STEPS = 20
-POPULATION = 20
+STEPS = 15
+POPULATION = 10
 
 EXTENSION = "g"  # preferred=p ; grounded=g
 
@@ -52,7 +52,7 @@ EMA_FITNESS = None  # 0.2  # None to disable
 # 0: mushroom
 # 1: voting
 # 2: breast-cancer
-# 3: heart-disease #2506: 80.68
+# 3: heart-disease #2506: 78.41 ; 1301: 83.84 ; 9201: 74.73
 # 4: car (unbalanced) #2506: xx ; #1003: 98.62 ; 1301: 98.11
 # 5: breast-cancer-wisconsin
 # 6: balloons
@@ -60,8 +60,9 @@ EMA_FITNESS = None  # 0.2  # None to disable
 # 8: monks-1
 # 9: adult  # wip
 # 10: marco law dataset
-DATASET = 3
-TRAIN_DATA_RATIO = 0.7
+# 11: art
+DATASET = 11
+TRAIN_DATA_RATIO = 0.95#0.7
 TEST_DATA_SIZE = 10_000
 BALANCE = 0.3
 NOISE = 0  # percent -> 10%, 20%, ...

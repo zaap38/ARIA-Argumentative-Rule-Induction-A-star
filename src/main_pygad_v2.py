@@ -24,20 +24,26 @@ def fitness_function(ga_instance : pg.GA, solution, solution_index):
     if ga_instance.generations_completed > 0 and solution_index == config.POPULATION - 1:
         print(ga_instance.generations_completed,
         ": best fitness =", int(max(ga_instance.last_generation_fitness)),
-        "/", len(data), round(100 * max(ga_instance.last_generation_fitness) / len(data) , 2))
+        "/", len(data), "|", round(100 * max(ga_instance.last_generation_fitness) / len(data) , 2), "%")
     return fitness
 
 
-def custom_mutation(solution, ga_instance):
-    for i in range(len(solution)):
+def custom_mutation(solutions, ga_instance):
+    global CURRENTSOL
+    for k, solution in enumerate(solutions):
         sol = cp.deepcopy(CURRENTSOL)
-        for s in solution[i]:
-            if s not in sol:
-                sol.append(s)
-        possible = gen.GeneticAlgorithm().getPossibleChanges(args, sol)
-        solution[i][rd.randint(0, len(solution[i]) - 1)] = rd.choice(possible)
-        # print(solution[i])
-    return solution
+        index = rd.randint(0, len(solution) - 1)
+        for i in range(len(solution)):
+            if solution[i] not in sol and i != index:
+                sol.append(solution[i])
+        for _ in range(len(solution) // 2):
+            possible = gen.GeneticAlgorithm().getPossibleChanges(args, sol)
+            val = rd.choice(possible)
+            while val in solution:
+                val = rd.choice(possible)
+            solution[index] = val
+        solutions[k] = cp.deepcopy(solution)
+    return solutions
 
 
 if __name__ == "__main__":
@@ -46,19 +52,6 @@ if __name__ == "__main__":
     config.init(argv)
 
     r = rules.Rules()
-
-    # config ---------------------
-
-    # args = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']  # medium set
-    # args = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'b1', 'b2']  # medium set + small blank
-    # args = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'b1', 'b2', 'b3', 'b4', 'b5']  # medium set + blank
-    # args = ['a', 'b', 'c', 'd', 'e', 'f']  # facts only set
-    # args = ['a', 'b', 'c', 'd', 'e', 'f', 'b1', 'b2', 'b3', 'b4', 'b5']  # blank node (always fact) but not used in formula
-    # args = ['a', 'b', 'b1', 'b2', 'b3', 'b4', 'b5']  # blank + small
-    # args = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7']  # large + blank
-    # args = ['a', 'b']  # small set
-    # args = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'b1', 'b2', 'b3', 'b4', 'b5']  # large + blank
-    # args = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o']  # large
 
     accuracy = dict()
     accuracy["train"] = []
@@ -71,6 +64,7 @@ if __name__ == "__main__":
     start_time = time.time()
 
     nb_run = 1
+    accuracy = 0
     
     seed = config.SEED
     if seed is None:
@@ -79,64 +73,11 @@ if __name__ == "__main__":
     for run in range(nb_run):
         rd.seed(run + seed)
 
+        CURRENTSOL = []
+
         print("Run:", str(run + 1) + "/" + str(nb_run))
-        # start ----------------------
-        args = []
 
-        data = []
-        test_data = []
-        fake_test = []  # ignored
-
-        # true dataset
-        if config.DATASET == 0:  # mushroom
-            data, test_data, args, fake_test = r.load_dataset_mushroom(
-                config.TRAIN_DATA_RATIO, config.NOISE)
-
-        elif config.DATASET == 1:  # voting
-            data, test_data, args, fake_test = r.load_dataset_voting(
-                config.TRAIN_DATA_RATIO, config.NOISE)
-
-        elif config.DATASET == 2:  # breast-cancer
-            data, test_data, args, fake_test = r.load_dataset_breast_cancer(
-                config.TRAIN_DATA_RATIO, config.NOISE)
-
-        elif config.DATASET == 3:  # heart-disease
-            data, test_data, args, fake_test = r.load_dataset_heart_disease(
-                config.TRAIN_DATA_RATIO, config.NOISE)
-
-        elif config.DATASET == 4:  # car
-            data, test_data, args, fake_test = r.load_dataset_car(
-                config.TRAIN_DATA_RATIO, config.NOISE, True)
-
-        elif config.DATASET == 5:  # breast-cancer-wisconsin
-            data, test_data, args, fake_test = r.load_dataset_breast_cancer_wisconsin(
-                config.TRAIN_DATA_RATIO,
-                config.NOISE)
-
-        elif config.DATASET == 6:  # balloons
-            data, test_data, args, fake_test = r.load_dataset_balloons(
-                config.TRAIN_DATA_RATIO,
-                config.NOISE)
-
-        elif config.DATASET == 7:  # tic-tac-toe
-            data, test_data, args, fake_test = r.load_dataset_tic_tac_toe(
-                config.TRAIN_DATA_RATIO,
-                config.NOISE)
-
-        elif config.DATASET == 8:  # monks-1
-            data, test_data, args = r.load_dataset_monk_1(
-                config.TRAIN_DATA_RATIO,
-                config.NOISE)
-
-        elif config.DATASET == 9:  # adult
-            data, test_data, args, fake_test = r.load_dataset_adult(
-                config.TRAIN_DATA_RATIO,
-                config.NOISE)
-
-        elif config.DATASET == 10:  # marco-law
-            data, test_data, args, fake_test = r.load_dataset_law(
-                config.TRAIN_DATA_RATIO, config.NOISE, True)
-        # ------------
+        data, test_data, args, fake_test = r.load_dataset(config.DATASET)
 
         if config.GLOBAL_TOP:
             args = [config.TOP] + args
@@ -146,23 +87,22 @@ if __name__ == "__main__":
         runCount = 8
 
         for incrementLearningCount in range(runCount):
-            best_fit = 0
             # Initialize the population
-            n = len(args) - 1
-            n = n * n # ((n + 1) * n) // 2  # triangle
+            n = len(args) ** 2
             addonSize = 2
-            num_genes = addonSize #config.MAX_R_SIZE
-            # print(num_genes)
+            num_genes = addonSize
             num_generations=config.STEPS
             crossover_type = "single_point"
             parent_selection_type = "rws"  # "sss"
             num_parents_mating=config.POPULATION // 2
-            keep_parents = 1
+            keep_parents = 0
             domain = dict()
             domain["step"] = 1
             domain["low"] = 0
-            domain["high"] = n + 1  # not included
-            mutation_type = custom_mutation#"random"
+            domain["high"] = n
+            if config.LOCAL_TOP:
+                domain["low"] = -n
+            mutation_type = custom_mutation
             ga_instance = pg.GA(num_generations=num_generations,
                             num_parents_mating=num_parents_mating,
                             fitness_func=fitness_function,
@@ -174,9 +114,9 @@ if __name__ == "__main__":
                             keep_parents=keep_parents,
                             crossover_type=crossover_type,
                             mutation_type=mutation_type,
-                            mutation_num_genes=addonSize, #// 2,
+                            mutation_num_genes=addonSize,
                             gene_space=domain,
-                            random_seed=seed + runCount,
+                            random_seed=seed + incrementLearningCount,
                             keep_elitism=1,
                             allow_duplicate_genes=False)
 
@@ -184,22 +124,33 @@ if __name__ == "__main__":
             ga_instance.run()
 
             solution, solution_fitness, solution_idx = ga_instance.best_solution(ga_instance.last_generation_fitness)
-            minSol = gen.GeneticAlgorithm().minimize(args, solution)
+            #minSol = gen.GeneticAlgorithm().minimize(args, solution)
+            print("Fitnesses:", ga_instance.last_generation_fitness)
+            minSol = cp.deepcopy(solution)
             solution = gen.GeneticAlgorithm().toNames(args, solution)
             minSolNames = gen.GeneticAlgorithm().toNames(args, minSol)
-            print("Reduced:", solution, "->", minSolNames)
+            print(CURRENTSOL)
+            print(solution)
             for s in minSol:
                 if s not in CURRENTSOL:
                     CURRENTSOL.append(s)
-            print("Best:", solution_fitness)
-            print("Added", len(minSol), "at run", incrementLearningCount + 1, "/", runCount)
-            acc = gen.GeneticAlgorithm().unique_test(args, CURRENTSOL, test_data, True)
-            print(acc, "/", len(test_data), "-", round(100 * acc / len(test_data), 2))
+            print("Added", len(minSol), "at run", incrementLearningCount + 1, "/", runCount, "|", solution, "->", minSolNames)
+            acc, details = gen.GeneticAlgorithm().unique_test_verbose(args, CURRENTSOL, test_data, True)
+            print("True:", details["true_predicted"], "/", details["true_count"], "-",
+                  round(100 * details["true_predicted"] / details["true_count"], 2), "%", end=" | ")
+            print("False:", details["false_predicted"], "/", details["false_count"], "-",
+                  round(100 * details["false_predicted"] / details["false_count"], 2), "%", end=" | ")
+            print("Total:", acc, "/", len(test_data), "-", round(100 * acc / len(test_data), 2), "%")
+
+        acc = gen.GeneticAlgorithm().unique_test_verbose(args, CURRENTSOL, test_data, True)[0]
+        accuracy += round(100 * acc / len(test_data), 2)
+
+    print(round(accuracy / nb_run, 2), "%")
 
 
     seconds = time.time() - start_time
     minutes = int(seconds / 60)
-    print("Seconds:", seconds)
+    # print("Seconds:", round(seconds))
     seconds_raw = seconds
     seconds = int(seconds % 60)
     print("Time:", minutes, "m", seconds, "s")

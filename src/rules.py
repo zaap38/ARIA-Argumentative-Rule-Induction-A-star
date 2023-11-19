@@ -11,6 +11,71 @@ class Rules:
         for a in string.ascii_lowercase:
             self.a[a] = False
 
+    def load_dataset(self, dataset_id=config.DATASET, ratio=config.TRAIN_DATA_RATIO, seed=config.SEED):
+        args = []
+
+        data = []
+        test_data = []
+        fake_test = []  # ignored
+
+        rd.seed(seed)
+
+        # true dataset
+        if dataset_id == 0:  # mushroom
+            data, test_data, args, fake_test = self.load_dataset_mushroom(
+                ratio, config.NOISE)
+
+        elif dataset_id == 1:  # voting
+            data, test_data, args, fake_test = self.load_dataset_voting(
+                ratio, config.NOISE)
+
+        elif dataset_id == 2:  # breast-cancer
+            data, test_data, args, fake_test = self.load_dataset_breast_cancer(
+                ratio, config.NOISE)
+
+        elif dataset_id == 3:  # heart-disease
+            data, test_data, args, fake_test = self.load_dataset_heart_disease(
+                ratio, config.NOISE)
+
+        elif dataset_id == 4:  # car
+            data, test_data, args, fake_test = self.load_dataset_car(
+                ratio, config.NOISE, False)
+
+        elif dataset_id == 5:  # breast-cancer-wisconsin
+            data, test_data, args, fake_test = self.load_dataset_breast_cancer_wisconsin(
+                ratio,
+                config.NOISE)
+
+        elif dataset_id == 6:  # balloons
+            data, test_data, args, fake_test = self.load_dataset_balloons(
+                ratio,
+                config.NOISE)
+
+        elif dataset_id == 7:  # tic-tac-toe
+            data, test_data, args, fake_test = self.load_dataset_tic_tac_toe(
+                ratio,
+                config.NOISE)
+
+        elif dataset_id == 8:  # monks-1
+            data, test_data, args = self.load_dataset_monk_1(
+                ratio,
+                config.NOISE)
+
+        elif dataset_id == 9:  # adult
+            data, test_data, args, fake_test = self.load_dataset_adult(
+                ratio,
+                config.NOISE)
+
+        elif dataset_id == 10:  # marco-law
+            data, test_data, args, fake_test = self.load_dataset_law(
+                ratio, config.NOISE, True)
+            
+        elif dataset_id == 11:  # jessica-art
+            data, test_data, args, fake_test = self.load_dataset_art(
+                ratio, config.NOISE, True)
+        
+        return data, test_data, args, fake_test
+
     def random_init_atoms(self):
         for a in string.ascii_lowercase:
             self.a[a] = bool(rd.randint(0, 1))
@@ -807,3 +872,35 @@ class Rules:
             self.print_dataset_info(test_data, true_count, args, 0)
 
         return dataset, test_data, args, fake_test
+    
+    def load_dataset_art(self, ratio=0.7, noise_percent=0, balance=False):
+            # train = 70%
+            label_name = ["1"]  # 1: Yes, 2: No
+            l_index = -1
+            attributes_names = ["gender",
+                                "age",
+                                "education",
+                                "experienced-art",
+                                "feeling-concept-art",
+                                "art-creative",
+                                "valuable",
+                                "most-interesting",
+                                "emotion",
+                                "challenging"]
+            num = []
+            ignore = []
+            f = open(config.PATH + "/art/art_data.txt")
+
+            dataset, test_data, true_count, noise_count, args, fake_test = self.load(
+                f, attributes_names, num, ignore,
+                l_index, ratio, label_name, noise_percent, balance)
+
+            if config.TEST_DATA_VERBOSE:
+                self.print_dataset_info(dataset, true_count, args, noise_count)
+            if config.TRAIN_DATA_VERBOSE:
+                true_count = 0
+                for d in test_data:
+                    true_count += int(d[-1])
+                self.print_dataset_info(test_data, true_count, args, 0)
+
+            return dataset, test_data, args, fake_test

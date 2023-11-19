@@ -18,6 +18,7 @@ class Agent:
         self.positive_fitness = 0
         self.old_fitness = 0
 
+        self.lastRunDetails = dict()
         self.obj = None
 
     def mutate(self, possible, intensity=1):
@@ -37,7 +38,7 @@ class Agent:
         if data_size == 0:
             self.error = None
             return
-        wrong, count = self.obj.convert_to_AF()\
+        wrong, count, self.lastRunDetails = self.obj.convert_to_AF()\
             .compare_to_data(data, config.EXTENSION, percent, verbose)
         self.fitness = wrong
         self.positive_fitness = data_size - wrong #- self.obj.size() / 1
@@ -525,6 +526,17 @@ class GeneticAlgorithm:
             print("-------------")
         # print("Error:", agent.error)
         return agent.positive_fitness
+    
+    def unique_test_verbose(self, args, attacks, data, verbose=False):
+        agent = Agent()
+        agent.init(args, attacks)
+        agent.compute_fitness(data)
+        if verbose:
+            self.print_agent_light(agent)
+            print("---Attacks---")
+            agent.obj.convert_to_AF().print_attacks()
+            print("-------------")
+        return agent.positive_fitness, agent.lastRunDetails
 
     def sa_update_seq(self, delta_e):
         if delta_e <= config.EPSILON_E:
