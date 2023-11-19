@@ -229,6 +229,6 @@ def main():
 
 if __name__ == "__main__":
     tic = Tic("Load dataset")
-    #cProfile.run('main()', sort='cumtime')
-    main()
+    cProfile.run('main()', sort='cumtime')
+    #main()
 
