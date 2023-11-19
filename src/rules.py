@@ -2,6 +2,7 @@ import random as rd
 import string
 import config
 import copy as cp
+import numpy as np
 
 
 class Rules:
@@ -391,6 +392,10 @@ class Rules:
                 label_value = data[k] in label_name
             input_attr = list(k)
             input_attr.pop(-1)
+            if config.GLOBAL_TOP:
+                input_attr.append(config.TOP)
+            input_attr.append(config.TARGET)
+            input_attr = np.array(input_attr)
             """if (rd.randint(0, 99) < probability and
                 len(dataset) <= ratio * len(data)) or \
                     len(test_data) > (1 - ratio) * len(data):
@@ -413,7 +418,7 @@ class Rules:
         if balance:
             dataset, true_count = self.balancing(dataset, true_count)
 
-        return dataset, test_data, true_count, noise_count
+        return np.array(dataset), np.array(test_data), true_count, noise_count
 
     def load(self, f, attributes_names, num, ignore,
              l_index, ratio, label, noise, balance):

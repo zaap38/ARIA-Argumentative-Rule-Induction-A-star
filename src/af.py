@@ -5,6 +5,8 @@ import snippets as sn
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
+from itertools import repeat
+import cProfile
 
 
 class Argument:
@@ -24,7 +26,7 @@ class EncodedAF:
         # access to attack (a, b) -> self.R[index_a * len(self.A) + index_b]
 
     def init(self, arguments):
-        self.A = cp.deepcopy(arguments)
+        self.A = arguments  # cp.deepcopy(arguments)
         for i, a in enumerate(self.A):
             for j, b in enumerate(self.A):
                 if a == b or \
@@ -234,36 +236,29 @@ class EncodedAF:
                     graph_a.R[self.A.index(r[0]) * len(self.A) + self.A.index(r[1])]
             new.R[self.A.index(r[1]) * len(self.A) + self.A.index(r[0])] = 0
 
+    def toArgument(self, name):
+        return Argument(name)
+    
+    def toAttack(self, index):
+        '''
+        Does not handle Local TOP
+        '''
+        if self.R[index] is not None and self.R[index] == 1:
+            return self.get_attack(index)
+        return None
+
     def convert_to_AF(self):
 
         af = AF()
 
-        for i, a in enumerate(self.A):
-            if a == config.TARGET:
-                af.targetIndex = i
-            af.A.append(Argument(a))
+        toArg = np.vectorize(self.toArgument)
+        af.A = toArg(np.array(self.A))
+        af.targetIndex = np.where(np.array(self.A) == config.TARGET)[0][0]
         # TODO: local top
-        """for i in range(len(self.R)):
-            if bool(self.R[i]):
-                attack = self.get_attack(i)
-                af.R.append(attack)"""
-        for i in range(len(self.R)):
-            if self.R[i] is not None and abs(self.R[i]) == 1:
-                attack = self.get_attack(i)
-                """if self.R[i] == -1:
-                    attack = (config.TOP + "_" + attack[0], attack[1])"""
-                af.R.append(attack)
 
-            elif self.R[i] == -1:
-                a, b = self.get_attack(i)
-                old_a = a
-                a = config.TOP + "_" + a
-                if not af.exist(a):
-                    af.add_argument(a)
-                    attack_local_top = (old_a, a)
-                    af.R.append(attack_local_top)
-                attack = (a, b)
-                af.R.append(attack)
+        toAtt = np.vectorize(self.toAttack)
+        af.R = toAtt(np.arange(len(self.R)))
+        af.R = af.R[af.R != None]
 
         return af
 
@@ -319,7 +314,7 @@ class EncodedAF:
                not in [0, None]
 
     def set_A(self, a):
-        self.A = cp.deepcopy(a)
+        self.A = a  # cp.deepcopy(a)
 
     def load_R(self, values):
         for i in range(len(self.R)):
@@ -408,8 +403,8 @@ class EncodedAF:
 class AF:
 
     def __init__(self):
-        self.A = []
-        self.R = []  # (arg_name, arg_name)
+        self.A = np.array([])
+        self.R = np.array([])  # (arg_name, arg_name)
         self.targetIndex = -1
 
     def draw(self):
@@ -604,7 +599,7 @@ class AF:
                   + " (" + str(details["false_predicted"] * 100 // max(details["false_count"], 1)) + "%)")
 
         return dist + cpt, cpt, details
-    
+
     def get_dist(self, data, to_check=[]):
         from astar import Tic
         tic = Tic("Init", 2, True)
@@ -626,36 +621,63 @@ class AF:
         dist -= np.sum(values)
         return dist, inc_lines
     
+    def get_args_in_attacks(self):
+        fun = np.vectorize(self.is_in_attack)
+        values = fun(self.A)
+        values = values[values != -1]
+        return np.unique(values[values != '-1'])
+    
+    def get_args_in_attacks_object(self):
+        fun = np.vectorize(self.is_in_attack_object)
+        values = fun(self.A)
+        values = values[values != -1]
+        return values[values != '-1']
+
+    def is_in_attack_object(self, arg):
+        for r in self.R:
+            if arg.name in r:
+                return arg
+        return -1
+      
+    def is_in_attack(self, arg):
+        for r in self.R:
+            if arg.name in r:
+                return arg.name
+        return -1
+
     def check_data(self, data, step):
         from astar import Tic
-        tic = Tic("Alive", 8, False)
-        set_alive_vec = np.vectorize(self.set_alive_dead, excluded=['facts'])
-        self.A = set_alive_vec(arg=self.A, facts=data[step][1]).tolist()
+        tic = Tic("Alive", 5, True)
         
         tic.tic("graph")
         self.compute_graph(data[step][1], 'g')
-        tic.tic("get arg")
+        tic.tic("end")
         value = self.A[self.targetIndex].alive  #self.get_argument_by_name(config.TARGET).alive
         value = int(value == data[step][2])
-        tic.tic("end")
         tic.disabled = True
         return value
-    
-    def set_alive_dead(self, arg, facts):
-        arg.alive = arg.name in [config.TOP] + facts
+
+    def set_alive_dead(self, arg, facts, filter):
+        #factsAndTop = np.concatenate((facts, np.array([config.TOP])), axis=0)
+        # facts_and_top = np.append(facts, config.TOP)
+        #arg.alive = np.isin(arg.name, factsAndTop)  # arg.name in [config.TOP] + facts
+        if np.in1d(arg.name, filter):
+            arg.alive = np.in1d(arg.name, facts)[0]
         return arg
 
     def update_aliveness(self, grounded):
-        """for i, a in enumerate(self.A):
+        for i, a in enumerate(self.A):
             if a.name in grounded:
                 self.alive(self.A[i])
             else:
-                self.dead(self.A[i])"""
+                self.dead(self.A[i])
+        """grounded_np = grounded#np.array(grounded)
         fun = np.vectorize(self.update_aliveness_vec, excluded=['grounded'])
-        self.A = fun(arg=self.A, grounded=grounded).tolist()
+        fun(arg=self.A, grounded=grounded_np)
+        #print([(a.alive, a.name) for a in self.A])"""
 
     def update_aliveness_vec(self, arg, grounded):
-        arg.alive = arg.name in grounded
+        arg.alive = np.in1d(arg.name, grounded)[0]
         return arg
 
     def is_attacked(self, arg):
@@ -672,10 +694,30 @@ class AF:
         if type(name) == Argument:
             name = name.name
         attacked = []
+        fun = np.vectorize(self.attacking, excluded=['source'])
+        attacked = fun(attack=self.R, source=arg)
+        attacked = attacked[attacked != '-1']
+        return attacked
+    
+    def attacked_by_old(self, arg):
+        name = arg
+        if type(name) == Argument:
+            name = name.name
+        attacked = []
         for r in self.R:
             if r[0] == name:
                 attacked.append(r[1])
         return attacked
+    
+    def attacking(self, attack, source):
+        if attack[0] == source:
+            return attack[1]
+        return '-1'
+
+    def get_attackers_vec(self, attack, arg):
+        if attack[1] == arg:
+            return attack[0]
+        return '-1'
 
     def get_attackers(self, arg):
         name = arg
@@ -689,20 +731,35 @@ class AF:
 
     def compute_graph(self, facts, extension):
         """from astar import Tic
-        tic = Tic("Extension", 6, True)"""
+        tic = Tic("Extension", 6, False)"""
         extension = self.compute_extension(facts, extension)
-        # tic.tic("Alive")
-        self.update_aliveness(extension)
-        # tic.tic("End")
-        # tic.disabled = True
+        #tic.tic("Alive")
+        # self.update_aliveness(extension)
+        """tic.tic("End")
+        tic.disabled = True"""
 
     def compute_extension(self, facts, extension):
-        if extension == "p":
-            return self.compute_preferred(facts)
-        elif extension == "g":
+        if extension == "g":
             return self.compute_grounded(facts)
+        elif extension == "p":
+            return self.compute_preferred(facts)
 
     def grounded_loop_condition(self, d):
+        for k in d.keys():
+            if d[k] == "undecided":
+                valid = True
+                # attackers = self.get_attackers(k)
+                fun = np.vectorize(self.get_attackers_vec, excluded=['arg'])
+                attackers = fun(attack=self.R, arg=k)
+                attackers = attackers[attackers != '-1']
+                for a in attackers:
+                    if d[a] != "out":
+                        valid = False
+                        break
+                if valid:
+                    return k
+                
+    def grounded_loop_condition_old(self, d):
         for k in d.keys():
             if d[k] == "undecided":
                 valid = True
@@ -714,27 +771,65 @@ class AF:
                 if valid:
                     return k
 
+    def init_label(self, arg, labels):
+        labels[arg.name] = "undecided" if arg.alive else "out"
+
+    def set_label_out_vec(self, arg, labels):
+        labels[arg] = "out"
+
     def compute_grounded(self, facts):
+        """labels = dict()
+        from astar import Tic
+        tic = Tic("Init", 8, True)
+        miniA = self.get_args_in_attacks_object()
+        for a in self.A:
+            labels[a.name] = "out"
+        if miniA[0] != []:
+            for x in miniA:
+                if x.name in facts:
+                    labels[x.name] = "undecided"
+        tic.tic("End")
+        x = self.grounded_loop_condition(labels)
+        while x is not None:
+            t2 = Tic("Attacked by", 8, True)
+            labels[x] = "in"
+            attacked = np.array(self.attacked_by(x))
+            t2.tic("loop z")
+            labels.update(zip(attacked, repeat("out", len(attacked))))
+            t2.tic("condition")
+            x = self.grounded_loop_condition(labels)
+            t2.tic("end")
+
+        grounded = []
+        # print("vvv")
+        for x in labels.keys():
+            # print(self.nodes[x].name, "is", labels[x])
+            #print(x, labels[x])
+            if labels[x] == "in":
+                grounded.append(x)
+        tic.tic("compute")
+        return grounded"""
         labels = dict()
         for x in self.A:
-            if x.name in facts or x.name in [config.TARGET, config.TOP] or \
-                    is_top(x.name) or is_and(x.name):
+            if x.name in facts or x.name in [config.TARGET, config.TOP]:
                 labels[x.name] = "undecided"
             else:
                 labels[x.name] = "out"
-        x = self.grounded_loop_condition(labels)
+        x = self.grounded_loop_condition_old(labels)
         while x is not None:
             labels[x] = "in"
-            attacked = self.attacked_by(x)
+            attacked = self.attacked_by_old(x)
             for z in attacked:
                 labels[z] = "out"
-            x = self.grounded_loop_condition(labels)
+            x = self.grounded_loop_condition_old(labels)
 
         grounded = []
         for x in labels.keys():
             # print(self.nodes[x].name, "is", labels[x])
             if labels[x] == "in":
                 grounded.append(x)
+        self.A[self.targetIndex].alive = True if config.TARGET in grounded else False
+        #print(facts, grounded, self.R)
         return grounded
 
     def for_all_eq(self, d, value, not_eq=False):
