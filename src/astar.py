@@ -6,6 +6,7 @@ import random as rd
 from tqdm import tqdm
 from time import time
 import numpy as np
+import cProfile
 
 
 class Tic:
@@ -58,9 +59,11 @@ class Node:
             for i in range(len(data)):
                 if i not in self.to_check:
                     complementary.append(i)
+            tic.tic("Comp dist")
             dist, inc = self.obj.convert_to_AF().get_dist(data, complementary)
             self.distance += dist
             self.incorrect_lines += inc
+            tic.tic("end")
         tic.disabled = True
         # print(len(self.incorrect_lines), len(data))
 
@@ -104,15 +107,16 @@ class AStar:
         possible = node.obj.compute_v2().tolist()
 
         for p in tqdm(possible):
-        #for p in possible:
+        # for p in possible:
             new_R = cp.deepcopy(node.obj.R)
             new_R[p] = 1
             #if not self.exist(new_R):
-            # tic.disabled = False
+            tic.disabled = True
             tic.tic("attack checked")
             if not self.attack_checked((p, 0)):
                 tic.tic("make node")
                 new_node = self.make_node(node.incorrect_lines, new_R)
+                # print(new_node.obj.convert_to_AF().R)
                 tic.tic("get attack")
                 new_node.addon = node.obj.get_attack(p)
                 self.tried.append((p, abs(new_node.distance - node.distance)))
@@ -183,7 +187,7 @@ class AStar:
         print("Error Test:", best_node.distance, "/", len(self.test_data), "|" , round(100 * best_node.distance / len(self.test_data), 2), "%")
 
 
-if __name__ == "__main__":
+def main():
 
     # dataset params ---------------------------------------------------------------
     # 0: mushroom
@@ -204,11 +208,11 @@ if __name__ == "__main__":
 
     start_time = time()
     
-    tic = Tic("Load dataset")
+    
     tic.disabled = True
 
     r = rules.Rules()
-    train, test, args, _ = r.load_dataset(3, 0.7, seed)
+    train, test, args, _ = r.load_dataset(4, 0.7, seed)
     # train = train + test
     if config.GLOBAL_TOP:
         args = [config.TOP] + args
@@ -222,4 +226,9 @@ if __name__ == "__main__":
     end_time = time()
     minutes, seconds = divmod(end_time - start_time, 60)
     print("Time:", round(minutes), "min", round(seconds), "s | ", round(end_time - start_time, 2), "s")
+
+if __name__ == "__main__":
+    tic = Tic("Load dataset")
+    #cProfile.run('main()', sort='cumtime')
+    main()
 
