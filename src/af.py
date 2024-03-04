@@ -628,7 +628,7 @@ class AF:
     
     def check_data(self, data, step):
         from astar import Tic
-        tic = Tic("Alive", 8, False)
+        tic = Tic("Alive", 8, True)
         set_alive_vec = np.vectorize(self.set_alive_dead, excluded=['facts'])
         self.A = set_alive_vec(arg=self.A, facts=data[step][1]).tolist()
         
@@ -717,8 +717,7 @@ class AF:
     def compute_grounded(self, facts):
         labels = dict()
         for x in self.A:
-            if x.name in facts or x.name in [config.TARGET, config.TOP] or \
-                    is_top(x.name) or is_and(x.name):
+            if x.name in facts + [config.TARGET, config.TOP]:
                 labels[x.name] = "undecided"
             else:
                 labels[x.name] = "out"

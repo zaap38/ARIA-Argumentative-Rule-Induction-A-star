@@ -103,8 +103,8 @@ class AStar:
         tic.tic("Compute possible attacks")
         possible = node.obj.compute_v2().tolist()
 
-        # for p in tqdm(possible):
-        for p in possible:
+        for p in tqdm(possible):
+        #for p in possible:
             new_R = cp.deepcopy(node.obj.R)
             new_R[p] = 1
             #if not self.exist(new_R):
@@ -208,7 +208,7 @@ if __name__ == "__main__":
     tic.disabled = True
 
     r = rules.Rules()
-    train, test, args, _ = r.load_dataset(0, 0.05, seed)
+    train, test, args, _ = r.load_dataset(3, 0.7, seed)
     # train = train + test
     if config.GLOBAL_TOP:
         args = [config.TOP] + args
@@ -217,7 +217,7 @@ if __name__ == "__main__":
     tic.tic("AStar start")
 
     astar = AStar(train, args, test)
-    astar.run(20)
+    astar.run(200)
 
     end_time = time()
     minutes, seconds = divmod(end_time - start_time, 60)
