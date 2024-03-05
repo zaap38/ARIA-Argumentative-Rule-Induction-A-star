@@ -1,33 +1,12 @@
 #pragma once
 #include "argument.h"
-#include "af.cpp"
 #include <vector>
 #include <tuple>
 #include <string>
 
-#typedef std::tuple<Argument, Argument> Attack;
 
+typedef std::tuple<Argument, Argument> Attack;
 
-class EncodedAF {
-
-    public:
-        EncodedGraph();
-        EncodedAF(const EncodedAF & af);
-        ~EncodedGraph();
-        AF * convertToAF() const;
-        void addArgument(Argument a);
-        void addArguments(const std::vector<Argument> & a);
-        void initAttackRelation();
-        void addAttack(const Attack & r);
-        void removeAttack(const Attack & r);
-        std::vector<Argument> getArguments() const;
-        std::vector<Attack> getAttacks() const;
-        std::vector<Attack> getPossibleAddons() const;
-
-    private:
-        std::vector<Argument> _a;  // argument list
-        std::vector<std::vector<int>> _r;  // encoded attack relation; 1: attack; 0: no attack; -1: invalid
-};
 
 class AF {
 
@@ -48,4 +27,26 @@ class AF {
         std::vector<Argument> _a;
         std::vector<Attack> _r;
 
+};
+
+
+class EncodedAF {
+
+    public:
+        EncodedAF();
+        EncodedAF(const EncodedAF & af);
+        ~EncodedAF();
+        AF * convertToAF() const;
+        void addArgument(Argument a);
+        void addArguments(const std::vector<Argument> & a);
+        void initAttackRelation();
+        void addAttack(const Attack & r);
+        void removeAttack(const Attack & r);
+        std::vector<Argument> getArguments() const;
+        std::vector<Attack> getAttacks() const;
+        std::vector<Attack> getPossibleAddons() const;
+
+    private:
+        std::vector<Argument> _a;  // argument list
+        std::vector<std::vector<int>> _r;  // encoded attack relation; 1: attack; 0: no attack; -1: invalid
 };
