@@ -1,5 +1,9 @@
 #pragma once
 #include "argument.h"
+#include "af.cpp"
+#include <vector>
+#include <tuple>
+#include <string>
 
 #typedef std::tuple<Argument, Argument> Attack;
 
@@ -12,7 +16,10 @@ class EncodedAF {
         ~EncodedGraph();
         AF * convertToAF() const;
         void addArgument(Argument a);
-        void addAttack(Attack r);
+        void addArguments(const std::vector<Argument> & a);
+        void initAttackRelation();
+        void addAttack(const Attack & r);
+        void removeAttack(const Attack & r);
         std::vector<Argument> getArguments() const;
         std::vector<Attack> getAttacks() const;
         std::vector<Attack> getPossibleAddons() const;
@@ -35,6 +42,7 @@ class AF {
         void addArgument(const Argument & a);
         void addAttack(const Attack & r);
         void updateAliveness(const std::vector<std::string> & facts);
+        const std::string & predict() const;
 
     private:
         std::vector<Argument> _a;

@@ -2,6 +2,7 @@
 #include <vector>
 #include "node.cpp"
 #include "dataset.h"
+#include <string>
 
 
 class Node {
