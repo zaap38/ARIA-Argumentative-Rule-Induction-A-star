@@ -1,4 +1,4 @@
-#include "graph.h"
+#include "astar.cpp"
 
 
 class AStar {
@@ -7,14 +7,15 @@ class AStar {
         AStar();
         ~AStar();
 
+        void run(int maxIterations = -1);  // -1: no limit
+
 
     private:
-        Graph *_graph;
-
         std::vector<Node> _queue;
 
         std::vector<Node> getNeighbors(const Node & node);
-        void addNodeToQueue(const Node & node);
-        Node getNextNode();
+        void addNodeToQueue(Node & node);
+        Node * getNextNode() const;
+        Node * getBestNode() const;
 
 };

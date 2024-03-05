@@ -14,10 +14,12 @@ class Argument {
         int getId();
         bool getStatus();
 
+        bool operator==(const Argument & a) const;
+
     private:
         std::string _attribute;
         std::string _value;
         int _id;
-        bool _status;
+        bool _status;  // true: alive; false: dead/not in facts
 
 };

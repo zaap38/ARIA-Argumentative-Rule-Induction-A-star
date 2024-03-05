@@ -12,6 +12,6 @@ class Graph<T> {
         ~Graph();
 
     private:
-        std::vector<Node<T>> _nodes;
+        std::vector<Node> _nodes;
 
 };
