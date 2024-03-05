@@ -135,3 +135,7 @@ token.txt
 */result/
 *.csv
 */output/
+
+# C++ stuffs
+*.o
+*.exe
