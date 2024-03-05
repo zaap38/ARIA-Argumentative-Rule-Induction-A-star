@@ -5,6 +5,8 @@
 #include <fstream>
 #include "argument.h"
 #include "snippets.h"
+#include <random>
+#include <algorithm>
 
 
 class Data {
@@ -37,6 +39,10 @@ class Dataset {
         Data & operator[](int i);
         Data & get(int i);
         void addAttribute(const std::string & attribute);
+        void shuffle();
+        void setLabelIndex(int index);
+        void setDelim(char delim);
+        void addIgnoredIndex(int index);
 
     private:
         int _labelIndex;

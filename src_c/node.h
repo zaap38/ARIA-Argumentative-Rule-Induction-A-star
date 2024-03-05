@@ -3,6 +3,7 @@
 #include <vector>
 #include "dataset.h"
 #include <string>
+#include <random>
 
 
 class Node {
@@ -11,6 +12,7 @@ class Node {
         Node();
         Node(int id);
         Node(int id, EncodedAF * value);
+        Node(const Node & node);
         ~Node();
 
         float getDistance(bool ignoreRSize = false);
@@ -19,6 +21,7 @@ class Node {
 
         void setColor(int color);
         void setPredecessor(int predecessor);
+        std::vector<Node> getNeighbors() const;
 
     private:
         int _id;

@@ -27,8 +27,7 @@ Node AStar::run(int maxIterations) {
 }
 
 std::vector<Node> AStar::getNeighbors(const Node & node) {
-    std::vector<Node> neighbors;
-    // ...
+    std::vector<Node> neighbors = node.getNeighbors();
     return neighbors;
 }
 

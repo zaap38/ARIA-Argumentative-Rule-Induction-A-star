@@ -26,3 +26,13 @@ void EncodedAF::initAttackRelation() {
         _r.push_back(row);
     }
 }
+
+AF::AF() {
+    _a = std::vector<Argument>();
+    _r = std::vector<Attack>();
+}
+
+AF::~AF() {
+    _a.clear();
+    _r.clear();
+}

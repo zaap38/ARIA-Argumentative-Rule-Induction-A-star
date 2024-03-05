@@ -46,3 +46,55 @@ void Dataset::load(const std::string & filename) {
         }
     }
 }
+
+std::tuple<Dataset, Dataset> Dataset::split(double ratio) const {
+    Dataset train;
+    Dataset test;
+
+    int trainSize = _data.size() * ratio;
+    int testSize = _data.size() - trainSize;
+
+    for (int i = 0; i < trainSize; ++i) {
+        train._data.push_back(_data[i]);
+    }
+    for (int i = trainSize; i < _data.size(); ++i) {
+        test._data.push_back(_data[i]);
+    }
+
+    return std::make_tuple(train, test);
+}
+
+int Dataset::size() const {
+    return _data.size();
+}
+
+Data & Dataset::operator[](int i) {
+    return get(i);
+}
+
+Data & Dataset::get(int i) {
+    return _data[i];
+}
+
+void Dataset::addAttribute(const std::string & attribute) {
+    _attributes.push_back(attribute);
+}
+
+void Dataset::shuffle() {
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(_data.begin(), _data.end(), g);
+}
+
+void Dataset::setLabelIndex(int index) {
+    _labelIndex = index;
+}
+
+void Dataset::setDelim(char delim) {
+    _delim = delim;
+}
+
+void Dataset::addIgnoredIndex(int index) {
+    _ignoredIndexes.push_back(index);
+}
+
