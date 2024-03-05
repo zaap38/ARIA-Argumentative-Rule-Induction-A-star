@@ -5,7 +5,7 @@
 class Argument {
 
     public:
-
+        Argument();
         Argument(std::string attribute, std::string value, int id, bool status);
         ~Argument();
 
@@ -14,6 +14,8 @@ class Argument {
         std::string getName() const;  // get the full name, i.e. "attribute=value"
         int getId();
         bool getStatus();
+        void setValue(std::string value);
+        void setAttribute(std::string attribute);
 
         bool operator==(const Argument & a) const;
 
