@@ -1,5 +1,14 @@
 #include "node.h"
 
+Node::Node() {
+    _id = std::rand() % 100000000;  // fix that one day
+    _color = 0;
+    _distance = -1;
+    _predecessor = -1;
+    _value = nullptr;
+    _dataset = nullptr;
+}
+
 
 Node::Node(int id) {
     _id = id;
