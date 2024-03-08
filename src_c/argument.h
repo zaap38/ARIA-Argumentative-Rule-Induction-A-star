@@ -13,8 +13,14 @@ class Argument {
         std::string getValue() const;
         std::string getName() const;  // get the full name, i.e. "attribute=value"
         int getId() const;
-        bool getStatus() const;
-        void setStatus(bool status);
+        int getStatus() const;
+        bool in() const;
+        bool out() const;
+        bool undec() const;
+        void setStatus(int status);
+        void setIn();
+        void setOut();
+        void setUndec();
         void setValue(const std::string & value);
         void setAttribute(const std::string & attribute);
 
@@ -25,6 +31,6 @@ class Argument {
         std::string _attribute;
         std::string _value;
         int _id;
-        bool _status;  // true: alive; false: dead/not in facts
+        int _status;  // 0: TBD ; 1: in ; 2: out
 
 };

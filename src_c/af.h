@@ -16,9 +16,11 @@ class AF {
         ~AF();
 
         std::vector<Argument> getArguments() const;
+        Argument * getArgument(int i);
         std::vector<Attack> getAttacks() const;
-        std::vector<Argument> getInAttacks(const Argument & a) const;
-        std::vector<Argument> getOutAttacks(const Argument & a) const;
+        std::vector<Argument*> getInAttacks(const Argument & a);
+        std::vector<Argument*> getOutAttacks(const Argument & a);
+        void setArguments(const std::vector<Argument> & a);
         void addArgument(const Argument & a);
         void addAttack(const Attack & r);
         void updateAliveness(const std::vector<Fact> & facts);
@@ -29,6 +31,8 @@ class AF {
         std::vector<Attack> _r;
 
         void computeExtension();
+        Argument * getRootArgument();
+        bool isRoot(const Argument & a);
         bool targetAlive(const Fact & target) const;
 
 };

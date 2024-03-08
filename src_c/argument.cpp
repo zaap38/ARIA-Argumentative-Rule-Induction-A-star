@@ -44,14 +44,38 @@ bool Argument::operator!=(const Argument & a) const {
     return !(getName() == a.getName());
 }
 
-bool Argument::getStatus() const {
+int Argument::getStatus() const {
     return _status;
 }
 
-void Argument::setStatus(bool status) {
+void Argument::setStatus(int status) {
     _status = status;
 }
 
 int Argument::getId() const {
     return _id;
+}
+
+bool Argument::in() const {
+    return _status == 1;
+}
+
+bool Argument::out() const {
+    return _status == 2;
+}
+
+bool Argument::undec() const {
+    return _status == 0;
+}
+
+void Argument::setIn() {
+    _status = 1;
+}
+
+void Argument::setOut() {
+    _status = 2;
+}
+
+void Argument::setUndec() {
+    _status = 0;
 }
