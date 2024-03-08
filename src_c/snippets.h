@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <iostream>
 
 
 std::vector<std::string> splitStr(const std::string & s, char delim);

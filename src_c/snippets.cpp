@@ -12,8 +12,8 @@ std::vector<std::string> splitStr(const std::string & s, char delim) {
             current = "";
         } else {
             current += s[index];
-            ++index;
         }
+        ++index;
     }
     return result;
 }

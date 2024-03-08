@@ -9,7 +9,9 @@ Dataset::~Dataset() {
 
 }
 
-void Dataset::load(const std::string & filename) {
+void Dataset::load(const std::string & filename,
+                   int labelIndex,
+                   const std::vector<int> & ignoredIndexes) {
     std::ifstream
     file(filename);
     std::string line;
@@ -24,11 +26,17 @@ void Dataset::load(const std::string & filename) {
         std::vector<std::string> facts;
         std::string label;
 
+        if (labelIndex == -1) {
+            labelIndex = elements.size() - 1;
+        }
+
         for (int i = 0; i < elements.size(); ++i) {
 
             if (i == _labelIndex) {
                 label = elements[i];
-            } else if (!intIn(_ignoredIndexes, i)) {
+            }
+            
+            if (!intIn(_ignoredIndexes, i)) {
 
                 std::string value = elements[i];
                 std::string attribute = _attributes[i];
@@ -41,10 +49,20 @@ void Dataset::load(const std::string & filename) {
                     _arguments.push_back(a);
                     argumentNames.push_back(full);
                 }
-                facts.push_back(full);
+                if (i != _labelIndex) {
+                    facts.push_back(full);
+                }
             }
         }
+        Data dataline;
+        dataline.setFacts(facts);
+        dataline.setLabel(label);
+        _data.push_back(dataline);
     }
+}
+
+void Dataset::setAttributes(const std::vector<std::string> & attributes) {
+    _attributes = attributes;
 }
 
 std::tuple<Dataset, Dataset> Dataset::split(double ratio) const {
@@ -104,6 +122,10 @@ Data::Data() {
 
 Data::~Data() {
 
+}
+
+void Data::setFacts(const std::vector<std::string> & facts) {
+    _facts = facts;
 }
 
 void Data::addFact(const std::string & fact) {
