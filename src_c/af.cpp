@@ -211,21 +211,26 @@ bool AF::targetAlive(const Fact & target) const {
     return false;
 }
 
-void AF::computeExtension() {
+void AF::computeExtension(const Fact & target) {
+    // if target is not "", break when target is computed
     Argument * root = getRootArgument();
     std::vector<Argument> extension;
+    bool doBreak = false;
     while (root != nullptr) {
         extension.push_back(*root);
+        if (root->getName() == target) doBreak = true;
         std::vector<Argument*> attacked = getOutAttacks(*root);
         for (int i = 0; i < attacked.size(); ++i) {
             attacked[i]->setStatus(false);
+            if (attacked[i]->getName() == target) doBreak = true;
         }
+        if (doBreak) break;
     }
 }
 
 Argument * AF::getRootArgument() {
     for (int i = 0; i < _a.size(); ++i) {
-        if (isRoot(_a[i])) {
+        if (_a[i].undec() && isRoot(_a[i])) {
             return &_a[i];
         }
     }
@@ -238,7 +243,7 @@ bool AF::isRoot(const Argument & a) {
     */
     std::vector<Argument*> inAttacks = getInAttacks(a);
     for (int i = 0; i < inAttacks.size(); ++i) {
-        if (inAttacks[i]->in()) {
+        if (!inAttacks[i]->out()) {
             return false;
         }
     }

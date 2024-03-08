@@ -30,7 +30,7 @@ class AF {
         std::vector<Argument> _a;
         std::vector<Attack> _r;
 
-        void computeExtension();
+        void computeExtension(const Fact & target = "");
         Argument * getRootArgument();
         bool isRoot(const Argument & a);
         bool targetAlive(const Fact & target) const;
