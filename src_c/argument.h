@@ -14,6 +14,7 @@ class Argument {
         std::string getName() const;  // get the full name, i.e. "attribute=value"
         int getId() const;
         bool getStatus() const;
+        void setStatus(bool status);
         void setValue(const std::string & value);
         void setAttribute(const std::string & attribute);
 

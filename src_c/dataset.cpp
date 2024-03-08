@@ -98,3 +98,26 @@ void Dataset::addIgnoredIndex(int index) {
     _ignoredIndexes.push_back(index);
 }
 
+Data::Data() {
+
+}
+
+Data::~Data() {
+
+}
+
+void Data::addFact(const std::string & fact) {
+    _facts.push_back(fact);
+}
+
+void Data::setLabel(const std::string & label) {
+    _label = label;
+}
+
+const std::vector<std::string> & Data::getFacts() const {
+    return _facts;
+}
+
+const std::string & Data::getLabel() const {
+    return _label;
+}
