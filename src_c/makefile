@@ -8,7 +8,7 @@ CXXFLAGS = -std=c++17 -Wall
 TARGET = gaari.exe
 
 # Specify the source files
-SRCS = main.cpp
+SRCS = main.cpp astar.cpp node.cpp af.cpp argument.cpp snippets.cpp dataset.cpp
 
 # Specify the object files
 OBJS = $(SRCS:.cpp=.o)

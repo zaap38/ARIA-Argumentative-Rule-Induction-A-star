@@ -12,7 +12,7 @@ int main(int argc, char * argv[]) {
     int datasetId = 0;
 
     // init dataset
-    Dataset d = Dataset();
+    Dataset d;
     d.load("data.csv");  // load data
     Dataset train;
     Dataset test;

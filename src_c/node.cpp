@@ -44,22 +44,20 @@ Node::~Node() {
 }
 
 
-float Node::getDistance(bool ignoreRSize = false) {
+float Node::getDistance(bool ignoreRSize) {
     if (_distance < 0) {
         computeDistance(ignoreRSize);
     }
     return _distance;
 }
 
-void Node::computeDistance(bool ignoreRSize = false) {
+void Node::computeDistance(bool ignoreRSize) {
     
     int correct = 0;
     int total = _dataset->size();
     for (int i = 0; i < total; ++i) {
         AF af = *_value->convertToAF();
-        af.updateAliveness(_dataset->get(i).getFacts());
-        std::string predicted = af.predict();
-        if (predicted == _dataset->get(i).getLabel()) {
+        if (af.predict(_dataset->get(i).getFacts(), _dataset->get(i).getLabel())) {
             ++correct;
         }
     }
