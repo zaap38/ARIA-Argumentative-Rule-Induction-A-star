@@ -6,6 +6,7 @@
 
 
 typedef std::tuple<Argument, Argument> Attack;
+typedef std::string Fact;
 
 
 class AF {
@@ -20,12 +21,15 @@ class AF {
         std::vector<Argument> getOutAttacks(const Argument & a) const;
         void addArgument(const Argument & a);
         void addAttack(const Attack & r);
-        void updateAliveness(const std::vector<std::string> & facts);
-        const std::string & predict() const;
+        void updateAliveness(const std::vector<Fact> & facts);
+        bool predict(const std::vector<Fact> & facts, const Fact & target);
 
     private:
         std::vector<Argument> _a;
         std::vector<Attack> _r;
+
+        void computeExtension();
+        bool targetAlive(const Fact & target) const;
 
 };
 
@@ -43,10 +47,12 @@ class EncodedAF {
         void addAttack(const Attack & r);
         void removeAttack(const Attack & r);
         std::vector<Argument> getArguments() const;
-        std::vector<Attack> getAttacks() const;
+        std::vector<std::vector<int>> getAttacks() const;
+        std::vector<Attack> getAttackTuples() const;
         std::vector<Attack> getPossibleAddons() const;
+        std::tuple<int, int> getAttackIndex(const Attack & r) const;
 
     private:
         std::vector<Argument> _a;  // argument list
-        std::vector<std::vector<int>> _r;  // encoded attack relation; 1: attack; 0: no attack; -1: invalid
+        std::vector<std::vector<int>> _r;  // 2D array of ints: encoded attack relation; 1: attack; 0: no attack; -1: invalid
 };
