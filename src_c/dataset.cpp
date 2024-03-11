@@ -30,7 +30,6 @@ void Dataset::load(const std::string & filename,
         }
 
         for (size_t i = 0; i < elements.size(); ++i) {
-                    std::cout << ">>>" << _arguments.size() << std::endl;
 
             if (i == _labelIndex) {
                 label = elements[i];
@@ -46,15 +45,8 @@ void Dataset::load(const std::string & filename,
                     Argument a;
                     a.setAttribute(attribute);  // to add based on index i
                     a.setValue(value);
-                    std::cout << a.getName() << std::endl;
-                    std::cout << "------>" << _arguments.size() << std::endl;
-                    for (int j = 0; j < _arguments.size(); ++j) {
-                        std::cout <<j<< "=>" << _arguments[j].getName() << std::endl;
-                    }
                     _arguments.clear();
-                    std::cout << "Clear:" << _arguments.size() << std::endl;
                     _arguments.push_back(a);
-                    std::cout << _arguments.size() << std::endl;
                     argumentNames.push_back(full);
                 }
                 if (i != _labelIndex) {
