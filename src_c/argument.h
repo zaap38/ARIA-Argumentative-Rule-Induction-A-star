@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <iostream>
 
 
 class Argument {
@@ -32,5 +33,6 @@ class Argument {
         std::string _value;
         int _id;
         int _status;  // 0: TBD ; 1: in ; 2: out
+        int _degree;  // depth of the node - used to avoid cycles
 
 };

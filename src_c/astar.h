@@ -1,6 +1,8 @@
 #pragma once
 #include "dataset.h"
 #include "node.h"
+#include <vector>
+#include <iostream>
 
 
 class AStar {

@@ -12,6 +12,7 @@ AStar::~AStar() {
 
 Node AStar::run(int maxIterations) {
     int iterations = 0;
+    std::cout << "----" << std::endl;
     while (iterations != maxIterations) {
         Node * node = getNextNode();
         if (node == nullptr || node->getDistance() < 1) { // break if reached 0% errors or explored everything

@@ -10,6 +10,7 @@ Argument::Argument() {
 Argument::Argument(const std::string & attribute, const std::string & value) {
     _attribute = attribute;
     _value = value;
+    _id = rand() % 100000000;
 }
 
 Argument::~Argument() {

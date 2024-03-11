@@ -56,10 +56,11 @@ void Node::computeDistance(bool ignoreRSize) {
     int correct = 0;
     int total = _dataset->size();
     for (int i = 0; i < total; ++i) {
-        AF af = *_value->convertToAF();
-        if (af.predict(_dataset->get(i).getFacts(), _dataset->get(i).getLabel())) {
+        AF * af = _value->convertToAF();
+        if (af->predict(_dataset->get(i).getFacts(), _dataset->get(i).getLabel())) {
             ++correct;
         }
+        delete af;
     }
     int addedSizeDistance = 0;
     if (!ignoreRSize) {

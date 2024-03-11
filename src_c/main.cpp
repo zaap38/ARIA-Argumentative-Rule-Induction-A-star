@@ -27,7 +27,7 @@ int main(int argc, char * argv[]) {
     std::cout << "Init AStar" << std::endl;
 
     // init astar graph
-    AStar a = AStar();
+    AStar a;
     a.setData(&train);  // set dataset to compute distance
     a.run(maxIterations);
 

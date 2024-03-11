@@ -25,12 +25,12 @@ void Dataset::load(const std::string & filename,
         std::vector<std::string> elements = splitStr(line, _delim);
         std::vector<std::string> facts;
         std::string label;
-
         if (labelIndex == -1) {
             labelIndex = elements.size() - 1;
         }
 
-        for (int i = 0; i < elements.size(); ++i) {
+        for (size_t i = 0; i < elements.size(); ++i) {
+                    std::cout << ">>>" << _arguments.size() << std::endl;
 
             if (i == _labelIndex) {
                 label = elements[i];
@@ -41,12 +41,20 @@ void Dataset::load(const std::string & filename,
                 std::string value = elements[i];
                 std::string attribute = _attributes[i];
                 std::string full = attribute + "=" + value;
-
+                
                 if (!strIn(argumentNames, elements[i])) {  // incorrect type
                     Argument a;
                     a.setAttribute(attribute);  // to add based on index i
                     a.setValue(value);
+                    std::cout << a.getName() << std::endl;
+                    std::cout << "------>" << _arguments.size() << std::endl;
+                    for (int j = 0; j < _arguments.size(); ++j) {
+                        std::cout <<j<< "=>" << _arguments[j].getName() << std::endl;
+                    }
+                    _arguments.clear();
+                    std::cout << "Clear:" << _arguments.size() << std::endl;
                     _arguments.push_back(a);
+                    std::cout << _arguments.size() << std::endl;
                     argumentNames.push_back(full);
                 }
                 if (i != _labelIndex) {
@@ -70,7 +78,6 @@ std::tuple<Dataset, Dataset> Dataset::split(double ratio) const {
     Dataset test;
 
     int trainSize = _data.size() * ratio;
-    int testSize = _data.size() - trainSize;
 
     for (int i = 0; i < trainSize; ++i) {
         train._data.push_back(_data[i]);
