@@ -23,6 +23,7 @@ class Node {
         void setPredecessor(int predecessor);
         std::vector<Node> getNeighbors() const;
         void print(const std::string & prefix = "") const;
+        std::string getLabelAttribute() const;
 
     private:
         int _id;

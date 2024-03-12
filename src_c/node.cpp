@@ -60,7 +60,7 @@ void Node::computeDistance(bool ignoreRSize) {
     int total = _dataset->size();
     for (int i = 0; i < total; ++i) {
         AF * af = _value->convertToAF();
-        if (af->predict(_dataset->get(i).getFacts(), _dataset->get(i).getLabel())) {
+        if (af->predict(_dataset->get(i).getFacts(), _dataset->getLabelAttribute()) == _dataset->get(i).getLabel()) {
             ++correct;
         }
         delete af;
@@ -108,4 +108,8 @@ void Node::print(const std::string & prefix) const {
     std::cout << "vvvvvv" << std::endl;
     _value->print();
     std::cout << "======" << std::endl;
+}
+
+std::string Node::getLabelAttribute() const {
+    return _dataset->getLabelAttribute();
 }

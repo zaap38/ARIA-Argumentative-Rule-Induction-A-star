@@ -18,13 +18,13 @@ class Data {
 
         void addFact(const std::string & fact);
         void setFacts(const std::vector<std::string> & facts);
-        void setLabel(const std::string & label);
+        void setLabel(bool label);
         const std::vector<std::string> & getFacts() const;
-        const std::string & getLabel() const;
+        bool getLabel() const;
 
     private:
         std::vector<std::string> _facts;
-        std::string _label;
+        bool _label;
 
 };
 
@@ -50,9 +50,12 @@ class Dataset {
         void setDelim(char delim);
         void addIgnoredIndex(int index);
         std::vector<Argument> getArguments() const;
+        std::string getLabelAttribute() const;
+        void setLabelAttribute(const std::string & labelAttribute);
 
     private:
         int _labelIndex;
+        std::string _labelAttribute;
         char _delim;
         std::vector<int> _ignoredIndexes;
         std::vector<Argument> _arguments;

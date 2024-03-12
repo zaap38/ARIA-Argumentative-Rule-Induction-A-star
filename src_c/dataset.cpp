@@ -13,8 +13,8 @@ void Dataset::load(const std::string & filename,
                    const std::string & labelValue,
                    int labelIndex,
                    const std::vector<int> & ignoredIndexes) {
-    std::ifstream
-    file(filename);
+
+    std::ifstream file(filename);
     std::string line;
 
     _arguments.clear();
@@ -25,15 +25,17 @@ void Dataset::load(const std::string & filename,
 
         std::vector<std::string> elements = splitStr(line, _delim);
         std::vector<std::string> facts;
-        std::string label;
-        if (labelIndex == -1) {
-            labelIndex = elements.size() - 1;
+        bool label;
+        _labelIndex = labelIndex;
+        if (_labelIndex == -1) {
+            _labelIndex = elements.size() - 1;
+            _labelAttribute = _attributes[_labelIndex];
         }
 
         for (size_t i = 0; i < elements.size(); ++i) {
 
             if (i == _labelIndex) {
-                label = elements[i];
+                label = (elements[i] == labelValue)? true : false;
             }
             
             if (!intIn(_ignoredIndexes, i)) {
@@ -41,13 +43,13 @@ void Dataset::load(const std::string & filename,
                 std::string value = elements[i];
                 std::string attribute = _attributes[i];
                 std::string full = attribute + "=" + value;
-                std::cout << full << std::endl;
                 if (!strIn(argumentNames, full)) {  // incorrect type
                     Argument a;
                     a.setAttribute(attribute);  // to add based on index i
                     a.setValue(value);
                     if (i == _labelIndex) {
                         if (value == labelValue) {
+                            a.setIsLabel(true);
                             _arguments.insert(_arguments.begin(), a);
                             argumentNames.push_back(full);
                         }
@@ -65,12 +67,19 @@ void Dataset::load(const std::string & filename,
         dataline.setFacts(facts);
         dataline.setLabel(label);
         _data.push_back(dataline);
-        printVector(argumentNames);
     }
+}
+
+void Dataset::setLabelAttribute(const std::string & labelAttribute) {
+    _labelAttribute = labelAttribute;
 }
 
 void Dataset::setAttributes(const std::vector<std::string> & attributes) {
     _attributes = attributes;
+}
+
+std::string Dataset::getLabelAttribute() const {
+    return _labelAttribute;
 }
 
 std::tuple<Dataset, Dataset> Dataset::split(double ratio) const {
@@ -142,7 +151,7 @@ void Data::addFact(const std::string & fact) {
     _facts.push_back(fact);
 }
 
-void Data::setLabel(const std::string & label) {
+void Data::setLabel(bool label) {
     _label = label;
 }
 
@@ -150,7 +159,7 @@ const std::vector<std::string> & Data::getFacts() const {
     return _facts;
 }
 
-const std::string & Data::getLabel() const {
+bool Data::getLabel() const {
     return _label;
 }
 

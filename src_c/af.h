@@ -25,7 +25,7 @@ class AF {
         void addArgument(const Argument & a);
         void addAttack(const Attack & r);
         void updateAliveness(const std::vector<Fact> & facts);
-        bool predict(const std::vector<Fact> & facts, const Fact & target);
+        bool predict(const std::vector<Fact> & facts, const std::string & target);
 
     private:
         std::vector<Argument> _a;
@@ -34,7 +34,7 @@ class AF {
         void computeExtension(const Fact & target = "");
         Argument * getRootArgument();
         bool isRoot(const Argument & a);
-        bool targetAlive(const Fact & target) const;
+        bool targetAlive(const std::string & target) const;
 
 };
 
@@ -49,18 +49,18 @@ class EncodedAF {
         AF * convertToAF() const;
         void addArgument(Argument a);
         void addArguments(const std::vector<Argument> & a);
-        void initAttackRelation();
-        void addAttack(const Attack & r);
-        void removeAttack(const Attack & r);
-        std::vector<Argument> getArguments() const;
-        std::vector<std::vector<int>> getAttacks() const;
-        std::vector<Attack> getAttackTuples() const;
-        std::vector<Attack> getPossibleAddons() const;
-        std::tuple<int, int> getAttackIndex(const Attack & r) const;
-        void print() const;
-        void printMatrix() const;
+                void initAttackRelation();
+                void addAttack(const Attack & r);
+                void removeAttack(const Attack & r);
+                std::vector<Argument> getArguments() const;
+                std::vector<std::vector<int>> getAttacks() const;
+                std::vector<Attack> getAttackTuples() const;
+                std::vector<Attack> getPossibleAddons() const;
+                std::tuple<int, int> getAttackIndex(const Attack & r) const;
+                void print() const;
+                void printMatrix() const;
 
-    private:
-        std::vector<Argument> _a;  // argument list
-        std::vector<std::vector<int>> _r;  // 2D array of ints: encoded attack relation; 1: attack; 0: no attack; -1: invalid
+            private:
+                std::vector<Argument> _a;  // argument list
+                std::vector<std::vector<int>> _r;  // 2D array of ints: encoded attack relation; 1: attack; 0: no attack; -1: invalid
 };

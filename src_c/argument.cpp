@@ -5,16 +5,26 @@ Argument::Argument() {
     _attribute = "";
     _value = "";
     _id = rand() % 100000000;
+    _isLabel = false;
 }
 
 Argument::Argument(const std::string & attribute, const std::string & value) {
     _attribute = attribute;
     _value = value;
     _id = rand() % 100000000;
+    _isLabel = false;
 }
 
 Argument::~Argument() {
     // nothing to do
+}
+
+bool Argument::isLabel() const {
+    return _isLabel;
+}
+
+void Argument::setIsLabel(bool isLabel) {
+    _isLabel = isLabel;
 }
 
 std::string Argument::getName() const {

@@ -9,7 +9,7 @@ int main(int argc, char * argv[]) {
     
     // config
     float ratio = 0.7;
-    int maxIterations = 20;  // -1 for no limit
+    int maxIterations = 3000000;  // -1 for no limit
     int datasetId = 0;
 
     std::cout << "Init Dataset" << std::endl;
@@ -20,10 +20,14 @@ int main(int argc, char * argv[]) {
     d.load("../src/datasets/balloons/yellow-small+adult-stretch.data.txt", "T");  // load data
     Dataset train;
     Dataset test;
+    
     std::tuple<Dataset, Dataset> splitted = d.split(ratio);  // split into train/test
     train = std::get<0>(splitted);
     test = std::get<1>(splitted);
-    std::cout << train.size() << " " << test.size() << " " <<d.size() << std::endl;  // "70 30
+    train.setLabelAttribute(d.getLabelAttribute());
+    test.setLabelAttribute(d.getLabelAttribute());
+    
+    // std::cout << train.size() << " " << test.size() << " " <<d.size() << std::endl;  // "70 30
 
     std::cout << "Init AStar" << std::endl;
     // init astar graph

@@ -120,8 +120,10 @@ std::vector<Attack> EncodedAF::getPossibleAddons() const {
             /*
             Attack not already present, not reflexive, and not already attacked by someone else.
             Attacked node is already attacking something, or is the label.
+            Attacker and Attacked do not share the same attribute name.
             */
-            if (i != j && _r[i][j] == 0 && (j == 0 || intIn(_r[j], 1))) {
+            if (i != j && _r[i][j] == 0 && (j == 0 || intIn(_r[j], 1))
+                    && _a[i].getAttribute() != _a[j].getAttribute()) {
                 possibleAddons.push_back(std::make_tuple(_a[i], _a[j]));
             }
         }
@@ -153,7 +155,7 @@ void EncodedAF::initAttackRelation() {
         }
         _r.push_back(row);
     }
-    printMatrix();
+    // printMatrix();
 }
 
 void EncodedAF::print() const {
@@ -228,24 +230,28 @@ void AF::updateAliveness(const std::vector<Fact> & facts) {
     */
     for (int i = 0; i < _a.size(); ++i) {
         _a[i].setOut();
-        for (int j = 0; j < facts.size(); ++j) {
-            if (_a[i].getName() == facts[j]) {
-                _a[i].setUndec();
-                break;
+        if (_a[i].isLabel()) {
+            _a[i].setUndec();
+        } else {
+            for (int j = 0; j < facts.size(); ++j) {
+                if (_a[i].getName() == facts[j]) {
+                    _a[i].setUndec();
+                    break;
+                }
             }
         }
     }
 }
 
-bool AF::predict(const std::vector<Fact> & facts, const Fact & target) {
+bool AF::predict(const std::vector<Fact> & facts, const std::string & target) {
     updateAliveness(facts);
     computeExtension();
     return targetAlive(target);
 }
 
-bool AF::targetAlive(const Fact & target) const {
+bool AF::targetAlive(const std::string & target) const {
     for (int i = 0; i < _a.size(); ++i) {
-        if (_a[i].getName() == target) {
+        if (_a[i].getAttribute() == target) {
             return _a[i].getStatus();
         }
     }
