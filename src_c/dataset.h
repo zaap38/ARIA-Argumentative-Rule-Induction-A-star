@@ -36,6 +36,7 @@ class Dataset {
         ~Dataset();
 
         void load(const std::string & src,
+                  const std::string & labelValue,
                   int labelIndex = -1,
                   const std::vector<int> & ignoredIndexes = {});
         std::tuple<Dataset, Dataset> split(double ratio = 0.7) const;  // ratio: train%, (1 - ratio): test%

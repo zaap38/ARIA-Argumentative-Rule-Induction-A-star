@@ -17,7 +17,7 @@ int main(int argc, char * argv[]) {
     // init dataset
     Dataset d;
     d.setAttributes({"color", "size", "act", "age", "inflated"});  // set attributes
-    d.load("../src/datasets/balloons/yellow-small+adult-stretch.data.txt");  // load data
+    d.load("../src/datasets/balloons/yellow-small+adult-stretch.data.txt", "T");  // load data
     Dataset train;
     Dataset test;
     std::tuple<Dataset, Dataset> splitted = d.split(ratio);  // split into train/test

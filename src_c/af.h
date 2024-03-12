@@ -3,6 +3,7 @@
 #include <vector>
 #include <tuple>
 #include <string>
+#include "snippets.h"
 
 
 typedef std::tuple<Argument, Argument> Attack;
@@ -57,6 +58,7 @@ class EncodedAF {
         std::vector<Attack> getPossibleAddons() const;
         std::tuple<int, int> getAttackIndex(const Attack & r) const;
         void print() const;
+        void printMatrix() const;
 
     private:
         std::vector<Argument> _a;  // argument list

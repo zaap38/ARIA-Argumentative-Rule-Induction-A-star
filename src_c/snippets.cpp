@@ -14,6 +14,7 @@ std::vector<std::string> splitStr(const std::string & s, char delim) {
         }
         ++index;
     }
+    result.push_back(current);
     return result;
 }
 

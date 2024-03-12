@@ -21,6 +21,19 @@ EncodedAF::~EncodedAF() {
     _r.clear();
 }
 
+void EncodedAF::printMatrix() const {
+    for (int i = 0; i < _a.size(); ++i) {
+        std::cout << _a[i].getName() << " ";
+    }
+    std::cout << std::endl;
+    for (int i = 0; i < _r.size(); ++i) {
+        for (int j = 0; j < _r[i].size(); ++j) {
+            std::cout << _r[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
 AF * EncodedAF::convertToAF() const {
     AF * af = new AF();
     /*for (int i = 0; i < _a.size(); ++i) {
@@ -96,6 +109,7 @@ void EncodedAF::removeAttack(const Attack & r) {
     int j = std::get<1>(indexes);
     if (i != -1 && j != -1) {
         _r[i][j] = 0;
+        _r[j][i] = 0;
     }
 }
 
@@ -103,7 +117,11 @@ std::vector<Attack> EncodedAF::getPossibleAddons() const {
     std::vector<Attack> possibleAddons;
     for (int i = 0; i < _a.size(); ++i) {
         for (int j = 0; j < _a.size(); ++j) {
-            if (i != j && _r[i][j] == 0) {
+            /*
+            Attack not already present, not reflexive, and not already attacked by someone else.
+            Attacked node is already attacking something, or is the label.
+            */
+            if (i != j && _r[i][j] == 0 && (j == 0 || intIn(_r[j], 1))) {
                 possibleAddons.push_back(std::make_tuple(_a[i], _a[j]));
             }
         }
@@ -127,7 +145,7 @@ void EncodedAF::initAttackRelation() {
     for (int i = 0; i < _a.size(); ++i) {
         std::vector<int> row;
         for (int j = 0; j < _a.size(); ++j) {
-            if (i == j) {  // impossible reflexive attack
+            if (i == j || i == 0) {  // attack impossible if reflexive or from label
                 row.push_back(-1);
             } else {
                 row.push_back(0);
@@ -135,6 +153,7 @@ void EncodedAF::initAttackRelation() {
         }
         _r.push_back(row);
     }
+    printMatrix();
 }
 
 void EncodedAF::print() const {

@@ -10,6 +10,7 @@ Dataset::~Dataset() {
 }
 
 void Dataset::load(const std::string & filename,
+                   const std::string & labelValue,
                    int labelIndex,
                    const std::vector<int> & ignoredIndexes) {
     std::ifstream
@@ -40,13 +41,20 @@ void Dataset::load(const std::string & filename,
                 std::string value = elements[i];
                 std::string attribute = _attributes[i];
                 std::string full = attribute + "=" + value;
-                
+                std::cout << full << std::endl;
                 if (!strIn(argumentNames, full)) {  // incorrect type
                     Argument a;
                     a.setAttribute(attribute);  // to add based on index i
                     a.setValue(value);
-                    _arguments.push_back(a);
-                    argumentNames.push_back(full);
+                    if (i == _labelIndex) {
+                        if (value == labelValue) {
+                            _arguments.insert(_arguments.begin(), a);
+                            argumentNames.push_back(full);
+                        }
+                    } else {
+                        _arguments.push_back(a);
+                        argumentNames.push_back(full);
+                    }
                 }
                 if (i != _labelIndex) {
                     facts.push_back(full);
@@ -57,6 +65,7 @@ void Dataset::load(const std::string & filename,
         dataline.setFacts(facts);
         dataline.setLabel(label);
         _data.push_back(dataline);
+        printVector(argumentNames);
     }
 }
 
