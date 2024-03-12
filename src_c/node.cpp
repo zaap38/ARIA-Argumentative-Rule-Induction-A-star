@@ -65,6 +65,7 @@ void Node::computeDistance(bool ignoreRSize) {
         }
         delete af;
     }
+    std::cout << "after" << std::endl;
     int addedSizeDistance = 0;
     if (!ignoreRSize) {
         addedSizeDistance = _value->getAttacks().size() / 1000;
