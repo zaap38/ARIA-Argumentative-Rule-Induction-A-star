@@ -22,7 +22,7 @@ class Node {
         void setColor(int color);
         void setPredecessor(int predecessor);
         std::vector<Node> getNeighbors() const;
-        void print() const;
+        void print(const std::string & prefix = "") const;
 
     private:
         int _id;

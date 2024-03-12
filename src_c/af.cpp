@@ -231,7 +231,6 @@ void AF::computeExtension(const Fact & target) {
     Argument * root = getRootArgument();
     std::vector<Argument> extension;
     bool doBreak = false;
-    std::cout << "before-ext" << std::endl;
     while (root != nullptr) {
         root->setStatus(1);
         extension.push_back(*root);
@@ -242,10 +241,8 @@ void AF::computeExtension(const Fact & target) {
             if (attacked[i]->getName() == target) doBreak = true;
         }
         if (doBreak) break;
-        std::cout << "root: " << root->getName() << std::endl;
         root = getRootArgument();
     }
-    std::cout << "after-ext" << std::endl;
 }
 
 Argument * AF::getRootArgument() {
@@ -267,6 +264,5 @@ bool AF::isRoot(const Argument & a) {
             return false;
         }
     }
-    std::cout << a.getName() << " "  << a.getStatus() << std::endl;
     return a.getStatus() == 0;
 }

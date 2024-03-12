@@ -22,7 +22,6 @@ Node AStar::run(int maxIterations) {
         }
         std::vector<Node> neighbors = getNeighbors(*node);
         for (int i = 0; i < neighbors.size(); ++i) {
-            std::cout << neighbors.size() << std::endl;
             addNodeToQueue(neighbors[i]);
         }
         ++iterations;
@@ -47,8 +46,10 @@ Node * AStar::getNextNode() {
     
     for (int i = 0; i < _queue.size(); ++i) {
         if (_queue[i].getColor() == 1) {  // grey
-            if (bestNode == nullptr || _queue[i].getDistance() < bestNode->getDistance()) {
-                bestNode = &_queue[i];
+
+            if (bestNode == nullptr || bestNode->getDistance() != -1 ||
+                    _queue[i].getDistance() < bestNode->getDistance()) {
+                if (_queue[i].getDistance() != -1) bestNode = &_queue[i];
             }
         }
     }

@@ -103,7 +103,7 @@ std::vector<Node> Node::getNeighbors() const {
     return neighbors;
 }
 
-void Node::print() const {
-    std::cout << "Distance: " << _distance << std::endl;
+void Node::print(const std::string & prefix) const {
+    std::cout << prefix << " Distance: " << _distance << '/' << _dataset->size() << std::endl;
     _value->print();
 }
