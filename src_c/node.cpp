@@ -65,7 +65,6 @@ void Node::computeDistance(bool ignoreRSize) {
         }
         delete af;
     }
-    std::cout << "after" << std::endl;
     int addedSizeDistance = 0;
     if (!ignoreRSize) {
         addedSizeDistance = _value->getAttacks().size() / 1000;
@@ -93,9 +92,10 @@ std::vector<Node> Node::getNeighbors() const {
     std::vector<Node> neighbors;
     std::vector<Attack> possibleAddons = _value->getPossibleAddons();
     for (int i = 0; i < possibleAddons.size(); ++i) {
-        if (_neighbors[i].getColor() == 0) {
+        if (true || _neighbors[i].getColor() == 0) {
             Node neighborNode;
             neighborNode._value = new EncodedAF(*_value);
+            neighborNode._dataset = _dataset;
             neighborNode._value->addAttack(possibleAddons[i]);
             neighbors.push_back(neighborNode);
         }
@@ -104,6 +104,8 @@ std::vector<Node> Node::getNeighbors() const {
 }
 
 void Node::print(const std::string & prefix) const {
-    std::cout << prefix << " Distance: " << _distance << '/' << _dataset->size() << std::endl;
+    std::cout << prefix << "Distance: " << _distance << '/' << _dataset->size() << std::endl;
+    std::cout << "vvvvvv" << std::endl;
     _value->print();
+    std::cout << "======" << std::endl;
 }

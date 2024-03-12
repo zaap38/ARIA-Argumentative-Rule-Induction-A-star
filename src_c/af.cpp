@@ -65,6 +65,7 @@ void EncodedAF::addAttack(const Attack & r) {
     int j = std::get<1>(indexes);
     if (i != -1 && j != -1) {
         _r[i][j] = 1;
+        _r[j][i] = -1;
     }
 }
 
@@ -100,7 +101,13 @@ void EncodedAF::removeAttack(const Attack & r) {
 
 std::vector<Attack> EncodedAF::getPossibleAddons() const {
     std::vector<Attack> possibleAddons;
-    // TODO: return the attacks which can be added to the current AF
+    for (int i = 0; i < _a.size(); ++i) {
+        for (int j = 0; j < _a.size(); ++j) {
+            if (i != j && _r[i][j] == 0) {
+                possibleAddons.push_back(std::make_tuple(_a[i], _a[j]));
+            }
+        }
+    }
     return possibleAddons;
 }
 

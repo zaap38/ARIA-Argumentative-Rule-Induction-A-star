@@ -34,7 +34,7 @@ int main(int argc, char * argv[]) {
     // run astar graph
     Node result = a.run(maxIterations);
 
-    result.print();
+    result.print("Result: ");
 
     
     std::cout << "Clean" << std::endl;

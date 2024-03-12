@@ -15,8 +15,8 @@ Node AStar::run(int maxIterations) {
     addStartNodeToQueue();
     while (iterations != maxIterations) {
         Node * node = getNextNode();
-        std::cout << "It: " << iterations << std::endl;
-        node->print();
+        if (iterations % 100 == 0 && iterations > 0) std::cout << "It: " << iterations << std::endl;
+        // node->print();
         if (node == nullptr || node->getDistance() < 1) { // break if reached 0% errors or explored everything
             break;
         }
@@ -46,7 +46,6 @@ Node * AStar::getNextNode() {
     
     for (int i = 0; i < _queue.size(); ++i) {
         if (_queue[i].getColor() == 1) {  // grey
-
             if (bestNode == nullptr || bestNode->getDistance() != -1 ||
                     _queue[i].getDistance() < bestNode->getDistance()) {
                 if (_queue[i].getDistance() != -1) bestNode = &_queue[i];
