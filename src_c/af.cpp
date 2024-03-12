@@ -11,6 +11,11 @@ EncodedAF::EncodedAF(const EncodedAF & af) {
     _r = af.getAttacks();
 }
 
+EncodedAF::EncodedAF(const std::vector<Argument> & arguments) {
+    _a = arguments;
+    initAttackRelation();
+}
+
 EncodedAF::~EncodedAF() {
     _a.clear();
     _r.clear();
@@ -123,6 +128,15 @@ void EncodedAF::initAttackRelation() {
         }
         _r.push_back(row);
     }
+}
+
+void EncodedAF::print() const {
+    AF * af = convertToAF();
+    std::vector<Attack> attacks = af->getAttacks();
+    for (int i = 0; i < attacks.size(); ++i) {
+        std::cout << std::get<0>(attacks[i]).getName() << " " << std::get<1>(attacks[i]).getName() << std::endl;
+    }
+    delete af;
 }
 
 AF::AF() {

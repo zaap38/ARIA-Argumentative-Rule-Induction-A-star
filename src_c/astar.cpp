@@ -12,7 +12,7 @@ AStar::~AStar() {
 
 Node AStar::run(int maxIterations) {
     int iterations = 0;
-    std::cout << "----" << std::endl;
+    addStartNodeToQueue();
     while (iterations != maxIterations) {
         Node * node = getNextNode();
         if (node == nullptr || node->getDistance() < 1) { // break if reached 0% errors or explored everything
@@ -55,7 +55,7 @@ Node * AStar::getNextNode() {
 
 Node * AStar::getBestNode() {
     Node * bestNode = nullptr; // Declare the variable bestNode
-    
+
     for (int i = 0; i < _queue.size(); ++i) {
         if (_queue[i].getColor() == 1) {  // grey
             if (bestNode == nullptr || _queue[i].getDistance() < bestNode->getDistance()) {
@@ -69,4 +69,15 @@ Node * AStar::getBestNode() {
 
 void AStar::setData(Dataset * dataset) {
     _dataset = dataset;
+}
+
+void AStar::addStartNodeToQueue() {
+    Node startNode = Node(0, _dataset, new EncodedAF(_dataset->getArguments()));
+    startNode.setColor(1);  // grey
+    _queue.push_back(startNode);
+}
+
+void AStar::isDatasetNullptr() {
+    if (_dataset == nullptr) std::cout << "null" << std::endl;
+    else std::cout << "not null" << std::endl;
 }

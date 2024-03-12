@@ -142,3 +142,7 @@ const std::vector<std::string> & Data::getFacts() const {
 const std::string & Data::getLabel() const {
     return _label;
 }
+
+std::vector<Argument> Dataset::getArguments() const {
+    return _arguments;
+}

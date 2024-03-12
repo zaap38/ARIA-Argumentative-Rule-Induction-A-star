@@ -11,7 +11,7 @@ class Node {
     public:
         Node();
         Node(int id);
-        Node(int id, EncodedAF * value);
+        Node(int id, Dataset * dataset, EncodedAF * value);
         Node(const Node & node);
         ~Node();
 
@@ -22,6 +22,7 @@ class Node {
         void setColor(int color);
         void setPredecessor(int predecessor);
         std::vector<Node> getNeighbors() const;
+        void print() const;
 
     private:
         int _id;

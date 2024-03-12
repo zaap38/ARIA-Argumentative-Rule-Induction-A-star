@@ -3,6 +3,7 @@
 #include "node.h"
 #include <vector>
 #include <iostream>
+#include "snippets.h"
 
 
 class AStar {
@@ -13,6 +14,7 @@ class AStar {
 
         Node run(int maxIterations = -1);  // -1: no limit
         void setData(Dataset * dataset);
+        void isDatasetNullptr();
 
 
     private:
@@ -20,6 +22,7 @@ class AStar {
         Dataset * _dataset;  // pointer to the dataset
 
         std::vector<Node> getNeighbors(const Node & node);
+        void addStartNodeToQueue();
         void addNodeToQueue(Node & node);
         Node * getNextNode();
         Node * getBestNode();

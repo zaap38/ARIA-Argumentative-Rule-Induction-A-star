@@ -2,13 +2,14 @@
 #include "astar.h"
 #include "dataset.h"
 #include <tuple>
+#include "node.h"
 
 
 int main(int argc, char * argv[]) {
     
     // config
     float ratio = 0.7;
-    int maxIterations = -1;
+    int maxIterations = 10;
     int datasetId = 0;
 
     std::cout << "Init Dataset" << std::endl;
@@ -25,19 +26,18 @@ int main(int argc, char * argv[]) {
     std::cout << train.size() << " " << test.size() << " " <<d.size() << std::endl;  // "70 30
 
     std::cout << "Init AStar" << std::endl;
-
     // init astar graph
     AStar a;
     a.setData(&train);  // set dataset to compute distance
-    a.run(maxIterations);
 
     std::cout << "Run AStar" << std::endl;
-
     // run astar graph
+    Node result = a.run(maxIterations);
+
+    result.print();
 
     
     std::cout << "Clean" << std::endl;
-
     // cleanup
     
    std::cout << "Finish" << std::endl;

@@ -19,13 +19,13 @@ Node::Node(int id) {
     _dataset = nullptr;
 }
 
-Node::Node(int id, EncodedAF * value) {
+Node::Node(int id, Dataset * dataset, EncodedAF * value) {
+    _dataset = dataset;
     _id = id;
     _color = 0;
     _distance = -1;
     _predecessor = -1;
     _value = value;
-    _dataset = nullptr;
 }
 
 Node::Node(const Node & node) {
@@ -52,7 +52,10 @@ float Node::getDistance(bool ignoreRSize) {
 }
 
 void Node::computeDistance(bool ignoreRSize) {
-    
+    /*
+    _distance = number of misclassified examples + (number of attacks / 1000)
+    Perfect score is 0
+    */
     int correct = 0;
     int total = _dataset->size();
     for (int i = 0; i < total; ++i) {
@@ -97,4 +100,9 @@ std::vector<Node> Node::getNeighbors() const {
         }
     }
     return neighbors;
+}
+
+void Node::print() const {
+    std::cout << "Distance: " << _distance << std::endl;
+    _value->print();
 }

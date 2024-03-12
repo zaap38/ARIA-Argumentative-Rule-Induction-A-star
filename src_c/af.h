@@ -43,6 +43,7 @@ class EncodedAF {
     public:
         EncodedAF();
         EncodedAF(const EncodedAF & af);
+        EncodedAF(const std::vector<Argument> & arguments);
         ~EncodedAF();
         AF * convertToAF() const;
         void addArgument(Argument a);
@@ -55,6 +56,7 @@ class EncodedAF {
         std::vector<Attack> getAttackTuples() const;
         std::vector<Attack> getPossibleAddons() const;
         std::tuple<int, int> getAttackIndex(const Attack & r) const;
+        void print() const;
 
     private:
         std::vector<Argument> _a;  // argument list

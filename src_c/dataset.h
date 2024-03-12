@@ -48,6 +48,7 @@ class Dataset {
         void setLabelIndex(int index);
         void setDelim(char delim);
         void addIgnoredIndex(int index);
+        std::vector<Argument> getArguments() const;
 
     private:
         int _labelIndex;
