@@ -41,11 +41,10 @@ void Dataset::load(const std::string & filename,
                 std::string attribute = _attributes[i];
                 std::string full = attribute + "=" + value;
                 
-                if (!strIn(argumentNames, elements[i])) {  // incorrect type
+                if (!strIn(argumentNames, full)) {  // incorrect type
                     Argument a;
                     a.setAttribute(attribute);  // to add based on index i
                     a.setValue(value);
-                    _arguments.clear();
                     _arguments.push_back(a);
                     argumentNames.push_back(full);
                 }
@@ -68,6 +67,9 @@ void Dataset::setAttributes(const std::vector<std::string> & attributes) {
 std::tuple<Dataset, Dataset> Dataset::split(double ratio) const {
     Dataset train;
     Dataset test;
+
+    train._arguments = _arguments;
+    test._arguments = _arguments;
 
     int trainSize = _data.size() * ratio;
 

@@ -9,7 +9,7 @@ int main(int argc, char * argv[]) {
     
     // config
     float ratio = 0.7;
-    int maxIterations = 10;
+    int maxIterations = 2;  // -1 for no limit
     int datasetId = 0;
 
     std::cout << "Init Dataset" << std::endl;

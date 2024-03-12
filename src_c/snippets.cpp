@@ -34,3 +34,13 @@ bool intIn(const std::vector<int> & v, int e) {
     }
     return false;
 }
+
+void printVector(const std::vector<std::string> & v) {
+    std::cout << '[';
+    for (int i = 0; i < v.size(); ++i) {
+        std::string sep = ", ";
+        if (i == v.size() - 1) sep = "";
+        std::cout << v[i] << sep;
+    }
+    std::cout << ']' << std::endl;
+}

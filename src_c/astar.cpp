@@ -15,11 +15,15 @@ Node AStar::run(int maxIterations) {
     addStartNodeToQueue();
     while (iterations != maxIterations) {
         Node * node = getNextNode();
+        std::cout << "It: " << iterations << std::endl;
+        node->print();
         if (node == nullptr || node->getDistance() < 1) { // break if reached 0% errors or explored everything
             break;
         }
+        std::cout << "---" << std::endl;
         std::vector<Node> neighbors = getNeighbors(*node);
         for (int i = 0; i < neighbors.size(); ++i) {
+            std::cout << neighbors.size() << std::endl;
             addNodeToQueue(neighbors[i]);
         }
         ++iterations;
