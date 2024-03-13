@@ -19,11 +19,14 @@ Node AStar::run(int maxIterations) {
 
     while (iterations != maxIterations) {
         Node * node = getNextNode();
+        //std::cout << "a" << std::endl;
         distance = (node->getDistance() < distance) || distance == -1? node->getDistance() : distance;
+        //std::cout << "b" << std::endl;
         if (iterations % 100 == 0 && iterations > 0) {
             std::cout << "It: " << iterations << " - Best distance: " << distance << std::endl;
             std::cout << _queue.size() << std::endl;
             //node->print();
+            //node->getValue()->printMatrix();
         }
         if (node == nullptr || node->getDistance() < 1) { // break if reached 0% errors or explored everything
             break;
@@ -38,7 +41,7 @@ Node AStar::run(int maxIterations) {
                 visitedHashes.push_back(hash);
             }
         }
-        std::cout << added << " added" << std::endl;
+        //std::cout << added << " added" << std::endl;
         ++iterations;
     }
     return *getBestNode();
@@ -59,7 +62,6 @@ void AStar::addNodeToQueue(Node & node) {
 Node * AStar::getNextNode() {
     Node * bestNode = nullptr; // Declare the variable bestNode
     int bestNodeIndex = -1;
-    std::cout << "vvvvvvvvvvvvv" << std::endl;
     for (int i = 0; i < _queue.size(); ++i) {
         if (_queue[i].getColor() == 1 && (false || _queue[i].getAttackSize() <= _maxRsize)) {  // grey
             if (bestNode == nullptr || bestNode->getDistance() == -1 ||
@@ -69,7 +71,6 @@ Node * AStar::getNextNode() {
                     bestNodeIndex = i;
                 }
             }
-            std::cout << _queue[i].getValue()->getHash() << std::endl;
         }
     }
     if (bestNodeIndex != -1) {

@@ -28,7 +28,8 @@ void EncodedAF::printMatrix() const {
     std::cout << std::endl;
     for (int i = 0; i < _r.size(); ++i) {
         for (int j = 0; j < _r[i].size(); ++j) {
-            std::cout << _r[i][j] << " ";
+            char value = _r[i][j] == 1? '1' : _r[i][j] == -1? 'x' : '0';
+            std::cout << value << " ";
         }
         std::cout << std::endl;
     }
@@ -213,7 +214,7 @@ void EncodedAF::initAttackRelation() {
     for (int i = 0; i < _a.size(); ++i) {
         std::vector<int> row;
         for (int j = 0; j < _a.size(); ++j) {
-            if (i == j || i == 0) {  // attack impossible if reflexive or from label
+            if (i == j || i == 0 || _a[i].getAttribute() == _a[j].getAttribute()) {  // attack impossible if reflexive or from label
                 row.push_back(-1);
             } else {
                 row.push_back(0);

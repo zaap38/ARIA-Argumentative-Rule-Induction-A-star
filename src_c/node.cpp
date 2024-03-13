@@ -67,7 +67,7 @@ void Node::computeDistance(bool ignoreRSize) {
     }
     float addedSizeDistance = 0;
     if (!ignoreRSize) {
-        addedSizeDistance = _value->getAttacks().size() / 1000;
+        addedSizeDistance = _value->getAttackSize() / 1000.0;
     }
     _distance = (total - correct) + addedSizeDistance;
 }
