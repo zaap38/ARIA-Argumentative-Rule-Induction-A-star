@@ -19,6 +19,21 @@ void Dataset::loadCar() {
     load("../src/datasets/car/car.data.txt", "vgood");  // load data
 }
 
+void Dataset::loadMushroom() {
+    setAttributes({"class", "cap-shape", "cap-surface", "cap-color", "bruises", "odor", "gill-attachment",
+                    "gill-spacing", "gill-size", "gill-color", "stalk-shape", "stalk-root",
+                    "stalk-surface-above-ring", "stalk-surface-below-ring", "stalk-color-above-ring",
+                    "stalk-color-below-ring", "veil-type", "veil-color", "ring-number", "ring-type",
+                    "spore-print-color", "population", "habitat"});  // set attributes
+    load("../src/datasets/mushroom/agaricus-lepiota.data.txt", "e", 0);  // load data
+}
+
+void Dataset::loadBreastCancer() {
+    setAttributes({"class", "age", "menopause", "tumor-size", "inv-nodes", "node-caps", "deg-malign",
+                "breast", "breast-quad", "irradiat"});  // set attributes
+    load("../src/datasets/breast-cancer/breast-cancer.data.txt", "recurrence-events", 0);  // load data
+}
+
 void Dataset::load(const std::string & filename,
                    const std::string & labelValue,
                    int labelIndex,
@@ -30,22 +45,20 @@ void Dataset::load(const std::string & filename,
     _arguments.clear();
     _data.clear();
     std::vector<std::string> argumentNames;
-
     while (std::getline(file, line)) {
-
         std::vector<std::string> elements = splitStr(line, _delim);
         std::vector<std::string> facts;
         bool label;
         _labelIndex = labelIndex;
         if (_labelIndex == -1) {
             _labelIndex = elements.size() - 1;
-            _labelAttribute = _attributes[_labelIndex];
         }
+        _labelAttribute = _attributes[_labelIndex];
 
         for (size_t i = 0; i < elements.size(); ++i) {
 
             if (i == _labelIndex) {
-                label = (elements[i] == labelValue)? true : false;
+                label = (elements[i] == labelValue)? true: false;
             }
             
             if (!intIn(_ignoredIndexes, i)) {

@@ -4,6 +4,7 @@
 #include "dataset.h"
 #include <string>
 #include <random>
+#include <typeinfo>
 
 
 class Node {

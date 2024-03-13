@@ -55,6 +55,9 @@ class Dataset {
 
         void loadBalloons();
         void loadCar();
+        void loadMushroom();
+        void loadVoting();
+        void loadBreastCancer();
 
     private:
         int _labelIndex;

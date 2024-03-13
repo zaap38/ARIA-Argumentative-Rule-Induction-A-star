@@ -16,8 +16,11 @@ int main(int argc, char * argv[]) {
 
     // init dataset
     Dataset d;
-    d.loadBalloons();
+    //d.loadBalloons();
     //d.loadCar();
+    d.loadMushroom();
+    //d.loadVoting();
+    //d.loadBreastCancer();
     Dataset train;
     Dataset test;
     

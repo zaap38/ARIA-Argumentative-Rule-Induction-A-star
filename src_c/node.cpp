@@ -58,13 +58,14 @@ void Node::computeDistance(bool ignoreRSize) {
     */
     int correct = 0;
     int total = _dataset->size();
+    AF * af = _value->convertToAF();
     for (int i = 0; i < total; ++i) {
-        AF * af = _value->convertToAF();
+        //std::cout << i << "/" << total << std::endl;
         if (af->predict(_dataset->get(i).getFacts(), _dataset->getLabelAttribute()) == _dataset->get(i).getLabel()) {
             ++correct;
         }
-        delete af;
     }
+    delete af;
     float addedSizeDistance = 0;
     if (!ignoreRSize) {
         addedSizeDistance = _value->getAttackSize() / 1000.0;

@@ -19,17 +19,15 @@ Node AStar::run(int maxIterations) {
 
     while (iterations != maxIterations) {
         Node * node = getNextNode();
-        //std::cout << "a" << std::endl;
+        if (node == nullptr || node->getDistance() < 1) { // break if reached 0% errors or explored everything
+            std::cout << "Break!" << std::endl;
+            break;
+        }
         distance = (node->getDistance() < distance) || distance == -1? node->getDistance() : distance;
-        //std::cout << "b" << std::endl;
-        if (iterations % 100 == 0 && iterations > 0) {
+        if (iterations % 1 == 0 && iterations > 0) {
             std::cout << "It: " << iterations << " - Best distance: " << distance << std::endl;
-            std::cout << _queue.size() << std::endl;
             //node->print();
             //node->getValue()->printMatrix();
-        }
-        if (node == nullptr || node->getDistance() < 1) { // break if reached 0% errors or explored everything
-            break;
         }
         std::vector<Node> neighbors = getNeighbors(*node);
         int added = 0;
