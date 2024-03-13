@@ -53,6 +53,9 @@ class Dataset {
         std::string getLabelAttribute() const;
         void setLabelAttribute(const std::string & labelAttribute);
 
+        void loadBalloons();
+        void loadCar();
+
     private:
         int _labelIndex;
         std::string _labelAttribute;

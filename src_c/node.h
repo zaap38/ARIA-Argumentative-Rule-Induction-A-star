@@ -21,6 +21,7 @@ class Node {
 
         void setColor(int color);
         void setPredecessor(int predecessor);
+        int getAttackSize() const;
         std::vector<Node> getNeighbors() const;
         void print(const std::string & prefix = "") const;
         std::string getLabelAttribute() const;
@@ -29,7 +30,7 @@ class Node {
         int _id;
         EncodedAF * _value;
         int _color;  // 0: white; 1: grey; 2: black
-        int _distance;  // -1 means not initialized
+        float _distance;  // -1 means not initialized
         int _predecessor;  // predecessor id
         std::vector<Node> _neighbors;
         Dataset * _dataset;  // pointer to the dataset

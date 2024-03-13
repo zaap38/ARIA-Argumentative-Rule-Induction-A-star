@@ -9,15 +9,15 @@ int main(int argc, char * argv[]) {
     
     // config
     float ratio = 0.7;
-    int maxIterations = 3000000;  // -1 for no limit
+    int maxIterations = 50000;  // -1 for no limit
     int datasetId = 0;
 
     std::cout << "Init Dataset" << std::endl;
 
     // init dataset
     Dataset d;
-    d.setAttributes({"color", "size", "act", "age", "inflated"});  // set attributes
-    d.load("../src/datasets/balloons/yellow-small+adult-stretch.data.txt", "T");  // load data
+    d.loadBalloons();
+    //d.loadCar();
     Dataset train;
     Dataset test;
     

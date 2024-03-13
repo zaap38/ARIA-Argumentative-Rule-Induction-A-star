@@ -4,6 +4,7 @@
 AStar::AStar() {
     _queue = std::vector<Node>();
     _dataset = nullptr;
+    _maxRsize = 3;
 }
 
 AStar::~AStar() {
@@ -12,18 +13,32 @@ AStar::~AStar() {
 
 Node AStar::run(int maxIterations) {
     int iterations = 0;
+    int distance = -1;
     addStartNodeToQueue();
+    std::vector<std::string> visitedHashes;
+
     while (iterations != maxIterations) {
         Node * node = getNextNode();
-        if (iterations % 10000 == 0 && iterations > 0) std::cout << "It: " << iterations << std::endl;
-        // node->print();
+        distance = (node->getDistance() < distance) || distance == -1? node->getDistance() : distance;
+        if (iterations % 100 == 0 && iterations > 0) {
+            std::cout << "It: " << iterations << " - Best distance: " << distance << std::endl;
+            std::cout << _queue.size() << std::endl;
+            //node->print();
+        }
         if (node == nullptr || node->getDistance() < 1) { // break if reached 0% errors or explored everything
             break;
         }
         std::vector<Node> neighbors = getNeighbors(*node);
+        int added = 0;
         for (int i = 0; i < neighbors.size(); ++i) {
-            addNodeToQueue(neighbors[i]);
+            std::string hash = neighbors[i].getValue()->getHash();
+            if (!strIn(visitedHashes, hash)) {
+                addNodeToQueue(neighbors[i]);
+                ++added;
+                visitedHashes.push_back(hash);
+            }
         }
+        std::cout << added << " added" << std::endl;
         ++iterations;
     }
     return *getBestNode();
@@ -43,14 +58,22 @@ void AStar::addNodeToQueue(Node & node) {
 
 Node * AStar::getNextNode() {
     Node * bestNode = nullptr; // Declare the variable bestNode
-    
+    int bestNodeIndex = -1;
+    std::cout << "vvvvvvvvvvvvv" << std::endl;
     for (int i = 0; i < _queue.size(); ++i) {
-        if (_queue[i].getColor() == 1) {  // grey
-            if (bestNode == nullptr || bestNode->getDistance() != -1 ||
+        if (_queue[i].getColor() == 1 && (false || _queue[i].getAttackSize() <= _maxRsize)) {  // grey
+            if (bestNode == nullptr || bestNode->getDistance() == -1 ||
                     _queue[i].getDistance() < bestNode->getDistance()) {
-                if (_queue[i].getDistance() != -1) bestNode = &_queue[i];
+                if (_queue[i].getDistance() != -1) {
+                    bestNode = &_queue[i];
+                    bestNodeIndex = i;
+                }
             }
+            std::cout << _queue[i].getValue()->getHash() << std::endl;
         }
+    }
+    if (bestNodeIndex != -1) {
+        _queue[bestNodeIndex].setColor(2);  // black
     }
 
     return bestNode;

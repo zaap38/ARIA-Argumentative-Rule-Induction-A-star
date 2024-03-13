@@ -9,6 +9,16 @@ Dataset::~Dataset() {
 
 }
 
+void Dataset::loadBalloons() {
+    setAttributes({"color", "size", "act", "age", "inflated"});  // set attributes
+    load("../src/datasets/balloons/yellow-small+adult-stretch.data.txt", "T");  // load data
+}
+
+void Dataset::loadCar() {
+    setAttributes({"buying", "maint", "doors", "persons", "lug_boot", "safety", "acceptability"});  // set attributes
+    load("../src/datasets/car/car.data.txt", "vgood");  // load data
+}
+
 void Dataset::load(const std::string & filename,
                    const std::string & labelValue,
                    int labelIndex,

@@ -65,7 +65,7 @@ void Node::computeDistance(bool ignoreRSize) {
         }
         delete af;
     }
-    int addedSizeDistance = 0;
+    float addedSizeDistance = 0;
     if (!ignoreRSize) {
         addedSizeDistance = _value->getAttacks().size() / 1000;
     }
@@ -78,6 +78,10 @@ int Node::getColor() const {
 
 EncodedAF * Node::getValue() const {
     return _value;
+}
+
+int Node::getAttackSize() const {
+    return _value->getAttackSize();
 }
 
 void Node::setColor(int color) {

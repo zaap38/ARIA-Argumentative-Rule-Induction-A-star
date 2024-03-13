@@ -20,6 +20,7 @@ class AStar {
     private:
         std::vector<Node> _queue;
         Dataset * _dataset;  // pointer to the dataset
+        int _maxRsize;
 
         std::vector<Node> getNeighbors(const Node & node);
         void addStartNodeToQueue();

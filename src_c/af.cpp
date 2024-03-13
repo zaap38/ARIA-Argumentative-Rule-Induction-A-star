@@ -39,15 +39,50 @@ AF * EncodedAF::convertToAF() const {
     /*for (int i = 0; i < _a.size(); ++i) {
         af->addArgument(_a[i]);
     }*/
-    af->setArguments(_a);
+    // af->setArguments(_a);
+    //std::cout << "in";
+    std::vector<Argument> args;
+    for (int i = 0; i < _a.size(); ++i) {
+        if (isInAttack(_a[i])) {
+            args.push_back(_a[i]);
+        }
+    }
+    af->setArguments(args);
     for (int i = 0; i < _r.size(); ++i) {
         for (int j = 0; j < _r[i].size(); ++j) {
             if (_r[i][j] == 1) {
-                af->addAttack(std::make_tuple(*af->getArgument(i), *af->getArgument(j)));
+                af->addAttack(std::make_tuple(*af->getArgumentByName(_a[i].getName()),
+                                              *af->getArgumentByName(_a[j].getName())));
             }
         }
     }
+    
     return af;
+}
+
+Argument * AF::getArgumentByName(const std::string & name) {
+    for (int i = 0; i < _a.size(); ++i) {
+        if (_a[i].getName() == name) {
+            return &_a[i];
+        }
+    }
+    return nullptr;
+}
+
+bool EncodedAF::isInAttack(const Argument & a) const {
+    int index = -1;
+    for (int i = 0; i < _a.size(); ++i) {
+        if (_a[i] == a) {
+            index = i;
+            break;
+        }
+    }
+    for (int i = 0; i < _r.size(); ++i) {
+        if (_r[index][i] == 1 || _r[i][index] == 1) {
+            return true;
+        }
+    }
+    return false;
 }
 
 std::vector<Argument> EncodedAF::getArguments() const {
@@ -56,6 +91,37 @@ std::vector<Argument> EncodedAF::getArguments() const {
 
 std::vector<std::vector<int>> EncodedAF::getAttacks() const {
     return _r;
+}
+
+int EncodedAF::getAttackSize() const {
+    int count = 0;
+    for (int i = 0; i < _r.size(); ++i) {
+        for (int j = 0; j < _r[i].size(); ++j) {
+            if (_r[i][j] == 1) {
+                ++count;
+            }
+        }
+    }
+    return count;
+}
+
+std::string EncodedAF::getHash() const {
+    std::string hash = "";
+    int cpt = 0;
+    int sum = 0;
+    for (int i = 0; i < _r.size(); ++i) {
+        for (int j = 0; j < _r[i].size(); ++j) {
+            //hash += std::to_string(_r[i][j]);
+            sum += pow(std::max(_r[i][j], 0) * 2, cpt++);
+            if (cpt > 7) {
+                hash += std::to_string(sum - 1);
+                sum = 0;
+                cpt = 0;
+            
+            }
+        }
+    }
+    return hash;
 }
 
 std::vector<Attack> EncodedAF::getAttackTuples() const {
@@ -194,19 +260,17 @@ std::vector<Attack> AF::getAttacks() const {
     return _r;
 }
 
-std::vector<Argument*> AF::getInAttacks(const Argument & a) {
+std::vector<Argument*> AF::getInAttackers(const Argument & a) {
     std::vector<Argument*> inAttacks;
     for (int i = 0; i < _r.size(); ++i) {
         if (std::get<1>(_r[i]) == a) {
-            inAttacks.push_back(&std::get<0>(_r[i]));  // unsure about this line, probably should be a
-                                                       // pointer (so no &) but according to vscode there
-                                                       // is an error doing that
+            inAttacks.push_back(getArgumentByName(std::get<0>(_r[i]).getName()));
         }
     }
     return inAttacks;
 }
 
-std::vector<Argument*> AF::getOutAttacks(const Argument & a) {
+std::vector<Argument*> AF::getOutAttackers(const Argument & a) {
     std::vector<Argument*> outAttacks;
     for (int i = 0; i < _r.size(); ++i) {
         if (std::get<0>(_r[i]) == a) {
@@ -252,10 +316,24 @@ bool AF::predict(const std::vector<Fact> & facts, const std::string & target) {
 bool AF::targetAlive(const std::string & target) const {
     for (int i = 0; i < _a.size(); ++i) {
         if (_a[i].getAttribute() == target) {
-            return _a[i].getStatus();
+            return _a[i].in();
         }
     }
     return false;
+}
+
+void AF::printArguments() const {
+    std::vector<std::string> argNames;
+    for (int i = 0; i < _a.size(); ++i) {
+        argNames.push_back(_a[i].getName());
+    }
+    printVector(argNames);
+}
+
+void AF::printAttacks() const {
+    for (int i = 0; i < _r.size(); ++i) {
+        std::cout << std::get<0>(_r[i]).getName() << " " << std::get<1>(_r[i]).getName() << std::endl;
+    }
 }
 
 void AF::computeExtension(const Fact & target) {
@@ -264,13 +342,13 @@ void AF::computeExtension(const Fact & target) {
     std::vector<Argument> extension;
     bool doBreak = false;
     while (root != nullptr) {
-        root->setStatus(1);
+        root->setIn();
         extension.push_back(*root);
         if (root->getName() == target) doBreak = true;
-        std::vector<Argument*> attacked = getOutAttacks(*root);
+        std::vector<Argument*> attacked = getOutAttackers(*root);
         for (int i = 0; i < attacked.size(); ++i) {
-            attacked[i]->setStatus(false);
-            if (attacked[i]->getName() == target) doBreak = true;
+            attacked[i]->setOut();
+            if (attacked[i]->getAttribute() == target) doBreak = true;
         }
         if (doBreak) break;
         root = getRootArgument();
@@ -279,7 +357,7 @@ void AF::computeExtension(const Fact & target) {
 
 Argument * AF::getRootArgument() {
     for (int i = 0; i < _a.size(); ++i) {
-        if (_a[i].undec() && isRoot(_a[i])) {
+        if (isRoot(_a[i])) {
             return &_a[i];
         }
     }
@@ -290,11 +368,12 @@ bool AF::isRoot(const Argument & a) {
     /*
     Is a root if all attackers are dead and node _status is 0 (i.e., TBD).
     */
-    std::vector<Argument*> inAttacks = getInAttacks(a);
+    std::vector<Argument*> inAttacks = getInAttackers(a);
+    if (!a.undec()) return false;
     for (int i = 0; i < inAttacks.size(); ++i) {
         if (!inAttacks[i]->out()) {
             return false;
         }
     }
-    return a.getStatus() == 0;
+    return true;
 }
