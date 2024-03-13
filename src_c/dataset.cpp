@@ -34,6 +34,12 @@ void Dataset::loadBreastCancer() {
     load("../src/datasets/breast-cancer/breast-cancer.data.txt", "recurrence-events", 0);  // load data
 }
 
+void Dataset::loadFake() {
+    setAttributes({"a", "b", "c", "label"});  // set attributes
+    load("../src/datasets/fake/fake.data.txt", "T");  // load data
+
+}
+
 void Dataset::load(const std::string & filename,
                    const std::string & labelValue,
                    int labelIndex,
@@ -76,7 +82,7 @@ void Dataset::load(const std::string & filename,
                             _arguments.insert(_arguments.begin(), a);
                             argumentNames.push_back(full);
                         }
-                    } else {
+                    } else if (value != "?") {
                         _arguments.push_back(a);
                         argumentNames.push_back(full);
                     }

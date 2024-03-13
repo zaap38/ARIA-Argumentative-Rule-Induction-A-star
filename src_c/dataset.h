@@ -58,6 +58,7 @@ class Dataset {
         void loadMushroom();
         void loadVoting();
         void loadBreastCancer();
+        void loadFake();
 
     private:
         int _labelIndex;

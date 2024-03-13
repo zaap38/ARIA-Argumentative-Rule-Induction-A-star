@@ -24,9 +24,9 @@ Node AStar::run(int maxIterations) {
             break;
         }
         distance = (node->getDistance() < distance) || distance == -1? node->getDistance() : distance;
-        if (iterations % 1 == 0 && iterations > 0) {
+        if (iterations % 10 == 0 && iterations > 0) {
             std::cout << "It: " << iterations << " - Best distance: " << distance << std::endl;
-            //node->print();
+            node->print();
             //node->getValue()->printMatrix();
         }
         std::vector<Node> neighbors = getNeighbors(*node);

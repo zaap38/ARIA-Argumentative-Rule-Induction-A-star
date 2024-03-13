@@ -9,7 +9,7 @@ int main(int argc, char * argv[]) {
     
     // config
     float ratio = 0.7;
-    int maxIterations = 50000;  // -1 for no limit
+    int maxIterations = -1;  // -1 for no limit
     int datasetId = 0;
 
     std::cout << "Init Dataset" << std::endl;
@@ -18,9 +18,10 @@ int main(int argc, char * argv[]) {
     Dataset d;
     //d.loadBalloons();
     //d.loadCar();
-    d.loadMushroom();
+    //d.loadMushroom();
     //d.loadVoting();
     //d.loadBreastCancer();
+    d.loadFake();
     Dataset train;
     Dataset test;
     
