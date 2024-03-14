@@ -16,7 +16,7 @@ void Dataset::loadBalloons() {
 
 void Dataset::loadCar() {
     setAttributes({"buying", "maint", "doors", "persons", "lug_boot", "safety", "acceptability"});  // set attributes
-    load("../src/datasets/car/car.data.txt", "vgood");  // load data
+    load("../src/datasets/car/car.data.txt", "unacc");  // load data
 }
 
 void Dataset::loadMushroom() {

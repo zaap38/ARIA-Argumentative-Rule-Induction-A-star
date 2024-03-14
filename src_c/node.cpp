@@ -51,6 +51,21 @@ float Node::getDistance(bool ignoreRSize) {
     return _distance;
 }
 
+int Node::runOnDataset(int offset, int coreCount) {
+    /*
+    Used for multi-threading purpose.
+    */
+    AF * af = _value->convertToAF();
+    int correctCount = 0;
+    for (int i = offset; i < _dataset->size(); i += coreCount) {
+        if (af->predict(_dataset->get(i).getFacts(), _dataset->getLabelAttribute()) == _dataset->get(i).getLabel()) {
+            ++correctCount;
+        }
+    }
+    delete af;
+    return correctCount;
+}
+
 void Node::computeDistance(bool ignoreRSize) {
     /*
     _distance = number of misclassified examples + (number of attacks / 1000)
@@ -58,14 +73,14 @@ void Node::computeDistance(bool ignoreRSize) {
     */
     int correct = 0;
     int total = _dataset->size();
-    AF * af = _value->convertToAF();
-    for (int i = 0; i < total; ++i) {
-        //std::cout << i << "/" << total << std::endl;
-        if (af->predict(_dataset->get(i).getFacts(), _dataset->getLabelAttribute()) == _dataset->get(i).getLabel()) {
-            ++correct;
-        }
+    const auto processor_count = std::thread::hardware_concurrency();
+    std::vector<std::future<int>> corrects;
+    for (int i = 0; i < processor_count; ++i) {
+        corrects.push_back(std::async(&Node::runOnDataset, this, i, processor_count));
     }
-    delete af;
+    for (int i = 0; i < processor_count; ++i) {
+        correct += corrects[i].get();
+    }
     float addedSizeDistance = 0;
     if (!ignoreRSize) {
         addedSizeDistance = _value->getAttackSize() / 1000.0;

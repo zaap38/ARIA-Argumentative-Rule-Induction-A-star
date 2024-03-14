@@ -4,11 +4,15 @@
 AStar::AStar() {
     _queue = std::vector<Node>();
     _dataset = nullptr;
-    _maxRsize = 10;
+    _maxRsize = 1000;
 }
 
 AStar::~AStar() {
     _queue.clear();
+}
+
+void AStar::setMaxRsize(int maxRsize) {
+    _maxRsize = maxRsize;
 }
 
 Node AStar::run(int maxIterations) {
@@ -25,7 +29,7 @@ Node AStar::run(int maxIterations) {
             break;
         }
         distance = (node->getDistance() < distance) || distance == -1? node->getDistance() : distance;
-        if (iterations % 10 == 0 && iterations > 0) {
+        if (false && iterations % 1 == 0 && iterations > 0) {
             std::cout << "It: " << iterations << " - Best distance: " << distance << std::endl;
             node->print();
             //node->getValue()->printMatrix();

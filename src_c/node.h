@@ -5,6 +5,8 @@
 #include <string>
 #include <random>
 #include <typeinfo>
+#include <thread>
+#include <future>
 
 
 class Node {
@@ -37,5 +39,6 @@ class Node {
         Dataset * _dataset;  // pointer to the dataset
         
         void computeDistance(bool ignoreRSize = false);
+        int runOnDataset(int offset, int coreCount);
 
 };

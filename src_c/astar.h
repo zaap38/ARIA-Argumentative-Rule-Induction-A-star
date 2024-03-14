@@ -15,6 +15,7 @@ class AStar {
         Node run(int maxIterations = -1);  // -1: no limit
         void setData(Dataset * dataset);
         void isDatasetNullptr();
+        void setMaxRsize(int maxRsize);
 
 
     private:
