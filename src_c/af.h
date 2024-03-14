@@ -8,6 +8,7 @@
 #include <cmath>
 
 
+typedef std::tuple<Argument*, Argument*> AttackPtr;
 typedef std::tuple<Argument, Argument> Attack;
 typedef std::string Fact;
 
@@ -21,12 +22,12 @@ class AF {
         std::vector<Argument> getArguments() const;
         Argument * getArgument(int i);
         Argument * getArgumentByName(const std::string & name);
-        std::vector<Attack> getAttacks() const;
+        std::vector<AttackPtr> getAttacks() const;
         std::vector<Argument*> getInAttackers(const Argument & a);
         std::vector<Argument*> getOutAttackers(const Argument & a);
         void setArguments(const std::vector<Argument> & a);
         void addArgument(const Argument & a);
-        void addAttack(const Attack & r);
+        void addAttack(const AttackPtr & r);
         void updateAliveness(const std::vector<Fact> & facts);
         bool predict(const std::vector<Fact> & facts, const std::string & target);
         void printAttacks() const;
@@ -34,7 +35,7 @@ class AF {
 
     private:
         std::vector<Argument> _a;
-        std::vector<Attack> _r;
+        std::vector<AttackPtr> _r;
 
         void computeExtension(const Fact & target = "");
         Argument * getRootArgument();

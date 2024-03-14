@@ -37,11 +37,6 @@ void EncodedAF::printMatrix() const {
 
 AF * EncodedAF::convertToAF() const {
     AF * af = new AF();
-    /*for (int i = 0; i < _a.size(); ++i) {
-        af->addArgument(_a[i]);
-    }*/
-    // af->setArguments(_a);
-    //std::cout << "in";
     std::vector<Argument> args;
     for (int i = 0; i < _a.size(); ++i) {
         if (isInAttack(_a[i])) {
@@ -52,8 +47,8 @@ AF * EncodedAF::convertToAF() const {
     for (int i = 0; i < _r.size(); ++i) {
         for (int j = 0; j < _r[i].size(); ++j) {
             if (_r[i][j] == 1) {
-                af->addAttack(std::make_tuple(*af->getArgumentByName(_a[i].getName()),
-                                              *af->getArgumentByName(_a[j].getName())));
+                af->addAttack(std::make_tuple(af->getArgumentByName(_a[i].getName()),
+                                              af->getArgumentByName(_a[j].getName())));
             }
         }
     }
@@ -138,8 +133,6 @@ std::vector<Attack> EncodedAF::getAttackTuples() const {
 }
 
 void EncodedAF::addAttack(const Attack & r) {
-    Argument a1 = std::get<0>(r);
-    Argument a2 = std::get<1>(r);
     std::tuple<int, int> indexes = getAttackIndex(r);
     int i = std::get<0>(indexes);
     int j = std::get<1>(indexes);
@@ -169,8 +162,6 @@ std::tuple<int, int> EncodedAF::getAttackIndex(const Attack & r) const {
 }
 
 void EncodedAF::removeAttack(const Attack & r) {
-    Argument a1 = std::get<0>(r);
-    Argument a2 = std::get<1>(r);
     std::tuple<int, int> indexes = getAttackIndex(r);
     int i = std::get<0>(indexes);
     int j = std::get<1>(indexes);
@@ -180,7 +171,7 @@ void EncodedAF::removeAttack(const Attack & r) {
     }
 }
 
-std::vector<Attack> EncodedAF::getPossibleAddons() const {
+std::vector<std::tuple<Argument, Argument>> EncodedAF::getPossibleAddons() const {
     std::vector<Attack> possibleAddons;
     for (int i = 0; i < _a.size(); ++i) {
         for (int j = 0; j < _a.size(); ++j) {
@@ -227,9 +218,9 @@ void EncodedAF::initAttackRelation() {
 
 void EncodedAF::print() const {
     AF * af = convertToAF();
-    std::vector<Attack> attacks = af->getAttacks();
+    std::vector<AttackPtr> attacks = af->getAttacks();
     for (int i = 0; i < attacks.size(); ++i) {
-        std::cout << std::get<0>(attacks[i]).getName() << " " << std::get<1>(attacks[i]).getName() << std::endl;
+        std::cout << std::get<0>(attacks[i])->getName() << " " << std::get<1>(attacks[i])->getName() << std::endl;
     }
     std::cout << "A size: " << af->getArguments().size() << " | R size: " << af->getAttacks().size() << std::endl;
     delete af;
@@ -237,7 +228,7 @@ void EncodedAF::print() const {
 
 AF::AF() {
     _a = std::vector<Argument>();
-    _r = std::vector<Attack>();
+    _r = std::vector<AttackPtr>();
 }
 
 AF::~AF() {
@@ -257,15 +248,15 @@ std::vector<Argument> AF::getArguments() const {
     return _a;
 }
 
-std::vector<Attack> AF::getAttacks() const {
+std::vector<AttackPtr> AF::getAttacks() const {
     return _r;
 }
 
 std::vector<Argument*> AF::getInAttackers(const Argument & a) {
     std::vector<Argument*> inAttacks;
     for (int i = 0; i < _r.size(); ++i) {
-        if (std::get<1>(_r[i]) == a) {
-            inAttacks.push_back(getArgumentByName(std::get<0>(_r[i]).getName()));
+        if (*std::get<1>(_r[i]) == a) {
+            inAttacks.push_back(std::get<0>(_r[i]));
         }
     }
     return inAttacks;
@@ -274,8 +265,8 @@ std::vector<Argument*> AF::getInAttackers(const Argument & a) {
 std::vector<Argument*> AF::getOutAttackers(const Argument & a) {
     std::vector<Argument*> outAttacks;
     for (int i = 0; i < _r.size(); ++i) {
-        if (std::get<0>(_r[i]) == a) {
-            outAttacks.push_back(&std::get<1>(_r[i]));
+        if (*std::get<0>(_r[i]) == a) {
+            outAttacks.push_back(std::get<1>(_r[i]));
         }
     }
     return outAttacks;
@@ -285,7 +276,7 @@ void AF::addArgument(const Argument & a) {
     _a.push_back(a);
 }
 
-void AF::addAttack(const Attack & r) {
+void AF::addAttack(const AttackPtr & r) {
     _r.push_back(r);
 }
 
@@ -333,7 +324,7 @@ void AF::printArguments() const {
 
 void AF::printAttacks() const {
     for (int i = 0; i < _r.size(); ++i) {
-        std::cout << std::get<0>(_r[i]).getName() << " " << std::get<1>(_r[i]).getName() << std::endl;
+        std::cout << std::get<0>(_r[i])->getName() << " " << std::get<1>(_r[i])->getName() << std::endl;
     }
 }
 
