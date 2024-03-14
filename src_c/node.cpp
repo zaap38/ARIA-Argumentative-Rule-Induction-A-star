@@ -74,6 +74,7 @@ void Node::computeDistance(bool ignoreRSize) {
     int correct = 0;
     int total = _dataset->size();
     const auto processor_count = std::thread::hardware_concurrency();
+    std::cout << "Processor count: " << processor_count << std::endl;
     std::vector<std::future<int>> corrects;
     for (int i = 0; i < processor_count; ++i) {
         corrects.push_back(std::async(&Node::runOnDataset, this, i, processor_count));
