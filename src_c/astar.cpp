@@ -4,7 +4,7 @@
 AStar::AStar() {
     _queue = std::vector<Node>();
     _dataset = nullptr;
-    _maxRsize = 3;
+    _maxRsize = 10;
 }
 
 AStar::~AStar() {
@@ -20,7 +20,8 @@ Node AStar::run(int maxIterations) {
     while (iterations != maxIterations) {
         Node * node = getNextNode();
         if (node == nullptr || node->getDistance() < 1) { // break if reached 0% errors or explored everything
-            std::cout << "Break!" << std::endl;
+            std::string reason = node == nullptr? "No more nodes" : "Reached 0 errors";
+            std::cout << "Break! Reason: " << reason << std::endl;
             break;
         }
         distance = (node->getDistance() < distance) || distance == -1? node->getDistance() : distance;
@@ -82,7 +83,7 @@ Node * AStar::getBestNode() {
     Node * bestNode = nullptr; // Declare the variable bestNode
 
     for (int i = 0; i < _queue.size(); ++i) {
-        if (_queue[i].getColor() == 1) {  // grey
+        if (_queue[i].getColor() == 2) {  // black
             if (bestNode == nullptr || _queue[i].getDistance() < bestNode->getDistance()) {
                 bestNode = &_queue[i];
             }

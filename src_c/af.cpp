@@ -47,8 +47,7 @@ AF * EncodedAF::convertToAF() const {
     for (int i = 0; i < _r.size(); ++i) {
         for (int j = 0; j < _r[i].size(); ++j) {
             if (_r[i][j] == 1) {
-                af->addAttack(std::make_tuple(af->getArgumentByName(_a[i].getName()),
-                                              af->getArgumentByName(_a[j].getName())));
+                af->addAttack(_a[i], _a[j]);
             }
         }
     }
@@ -278,6 +277,22 @@ void AF::addArgument(const Argument & a) {
 
 void AF::addAttack(const AttackPtr & r) {
     _r.push_back(r);
+}
+
+void AF::addAttack(const std::string & name1, const std::string & name2) {
+    Argument * a1 = getArgumentByName(name1);
+    Argument * a2 = getArgumentByName(name2);
+    if (a1 != nullptr && a2 != nullptr) {
+        addAttack(std::make_tuple(a1, a2));
+    }
+}
+
+void AF::addAttack(const Argument & a1, const Argument & a2) {
+    Argument * a1Ptr = getArgumentByName(a1.getName());
+    Argument * a2Ptr = getArgumentByName(a2.getName());
+    if (a1Ptr != nullptr && a2Ptr != nullptr) {
+        addAttack(std::make_tuple(a1Ptr, a2Ptr));
+    }
 }
 
 void AF::updateAliveness(const std::vector<Fact> & facts) {

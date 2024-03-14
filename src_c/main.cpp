@@ -3,9 +3,13 @@
 #include "dataset.h"
 #include <tuple>
 #include "node.h"
+#include "test.h"
 
 
 int main(int argc, char * argv[]) {
+
+    // tests
+    test();
     
     // config
     float ratio = 0.7;

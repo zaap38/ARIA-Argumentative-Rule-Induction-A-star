@@ -27,7 +27,8 @@ class AF {
         std::vector<Argument*> getOutAttackers(const Argument & a);
         void setArguments(const std::vector<Argument> & a);
         void addArgument(const Argument & a);
-        void addAttack(const AttackPtr & r);
+        void addAttack(const std::string & name1, const std::string & name2);
+        void addAttack(const Argument & a1, const Argument & a2);
         void updateAliveness(const std::vector<Fact> & facts);
         bool predict(const std::vector<Fact> & facts, const std::string & target);
         void printAttacks() const;
@@ -41,6 +42,7 @@ class AF {
         Argument * getRootArgument();
         bool isRoot(const Argument & a);
         bool targetAlive(const std::string & target) const;
+        void addAttack(const AttackPtr & r);
 
 };
 

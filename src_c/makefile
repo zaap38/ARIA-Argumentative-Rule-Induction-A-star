@@ -2,13 +2,13 @@
 CXX = g++
 
 # Specify compiler flags
-CXXFLAGS = -std=c++17 -Wno-Wsign-compare
+CXXFLAGS = -std=c++20 -Wno-Wsign-compare
 
 # Specify the target executable
 TARGET = gaari.exe
 
 # Specify the source files
-SRCS = main.cpp astar.cpp node.cpp af.cpp argument.cpp snippets.cpp dataset.cpp
+SRCS = main.cpp astar.cpp node.cpp af.cpp argument.cpp snippets.cpp dataset.cpp test.cpp
 
 # Specify the object files
 OBJS = $(SRCS:.cpp=.o)

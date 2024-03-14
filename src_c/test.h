@@ -11,5 +11,6 @@
 
 
 void test();
+void assertEqual(auto v1, auto v2);
 
 void testPredict();
