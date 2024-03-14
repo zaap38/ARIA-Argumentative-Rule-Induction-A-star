@@ -111,9 +111,17 @@ std::string Dataset::getLabelAttribute() const {
     return _labelAttribute;
 }
 
-std::tuple<Dataset, Dataset> Dataset::split(double ratio) const {
+void Dataset::shuffle() {
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(_data.begin(), _data.end(), g);
+}
+
+std::tuple<Dataset, Dataset> Dataset::split(double ratio) {
     Dataset train;
     Dataset test;
+
+    shuffle();
 
     train._arguments = _arguments;
     test._arguments = _arguments;
@@ -144,12 +152,6 @@ Data & Dataset::get(int i) {
 
 void Dataset::addAttribute(const std::string & attribute) {
     _attributes.push_back(attribute);
-}
-
-void Dataset::shuffle() {
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(_data.begin(), _data.end(), g);
 }
 
 void Dataset::setLabelIndex(int index) {

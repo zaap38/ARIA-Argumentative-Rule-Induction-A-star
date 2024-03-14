@@ -27,11 +27,11 @@ int main(int argc, char * argv[]) {
 
     // init dataset
     Dataset d;
-    d.loadBalloons();
+    //d.loadBalloons();
     //d.loadCar();
     //d.loadMushroom();
     //d.loadVoting();
-    //d.loadBreastCancer();
+    d.loadBreastCancer();
     //d.loadFake();
     Dataset train;
     Dataset test;
@@ -50,7 +50,7 @@ int main(int argc, char * argv[]) {
     // init astar graph
     AStar a;
     a.setData(&train);  // set dataset to compute distance
-    a.setMaxRsize(10);  // set maxRsize
+    a.setMaxRsize(30);  // set maxRsize
     timestamps.push_back(high_resolution_clock::now());
 
     std::cout << "Run AStar" << std::endl;
