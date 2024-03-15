@@ -3,6 +3,8 @@
 
 Dataset::Dataset() {
     _delim = ',';
+    std::random_device rd;
+    _seed = rd();
 }
 
 Dataset::~Dataset() {
@@ -16,7 +18,7 @@ void Dataset::loadBalloons() {
 
 void Dataset::loadCar() {
     setAttributes({"buying", "maint", "doors", "persons", "lug_boot", "safety", "acceptability"});  // set attributes
-    load("../src/datasets/car/car.data.txt", "unacc");  // load data
+    load("../src/datasets/car/car.data.txt", "vgood");  // load data
 }
 
 void Dataset::loadMushroom() {
@@ -111,9 +113,18 @@ std::string Dataset::getLabelAttribute() const {
     return _labelAttribute;
 }
 
+void Dataset::setSeed(int seed) {
+    _seed = seed;
+}
+
+void Dataset::randomizeSeed() {
+    std::random_device rd;
+    _seed = rd();
+}
+
 void Dataset::shuffle() {
     std::random_device rd;
-    std::mt19937 g(rd());
+    std::mt19937 g(_seed);
     std::shuffle(_data.begin(), _data.end(), g);
 }
 

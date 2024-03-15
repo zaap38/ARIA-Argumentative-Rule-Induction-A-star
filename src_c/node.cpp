@@ -55,6 +55,8 @@ int Node::runOnDataset(int offset, int coreCount) {
     /*
     Used for multi-threading purpose.
     */
+   std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
     AF * af = _value->convertToAF();
     int correctCount = 0;
     for (int i = offset; i < _dataset->size(); i += coreCount) {
@@ -74,7 +76,6 @@ void Node::computeDistance(bool ignoreRSize) {
     int correct = 0;
     int total = _dataset->size();
     const auto processor_count = std::thread::hardware_concurrency();
-    //std::cout << "Processor count: " << processor_count << std::endl;
     std::vector<std::future<int>> corrects;
     for (int i = 0; i < processor_count; ++i) {
         corrects.push_back(std::async(&Node::runOnDataset, this, i, processor_count));

@@ -7,6 +7,8 @@
 #include <typeinfo>
 #include <thread>
 #include <future>
+#include <chrono>
+#include <mutex>
 
 
 class Node {
@@ -37,6 +39,8 @@ class Node {
         int _predecessor;  // predecessor id
         std::vector<Node> _neighbors;
         Dataset * _dataset;  // pointer to the dataset
+
+        std::mutex _lock; // Mutex for synchronizing cout
         
         void computeDistance(bool ignoreRSize = false);
         int runOnDataset(int offset, int coreCount);

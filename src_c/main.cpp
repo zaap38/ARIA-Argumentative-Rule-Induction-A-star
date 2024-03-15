@@ -22,16 +22,18 @@ int main(int argc, char * argv[]) {
     float ratio = 0.7;
     int maxIterations = -1;  // -1 for no limit
     int datasetId = 0;
+    int seed = 10;
 
     std::cout << "Init Dataset" << std::endl;
 
     // init dataset
     Dataset d;
+    d.setSeed(seed);
     //d.loadBalloons();
-    //d.loadCar();
+    d.loadCar();
     //d.loadMushroom();
     //d.loadVoting();
-    d.loadBreastCancer();
+    //d.loadBreastCancer();
     //d.loadFake();
     Dataset train;
     Dataset test;

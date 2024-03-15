@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include "snippets.h"
+#include <chrono>
 
 
 class AStar {

@@ -52,6 +52,8 @@ class Dataset {
         std::vector<Argument> getArguments() const;
         std::string getLabelAttribute() const;
         void setLabelAttribute(const std::string & labelAttribute);
+        void setSeed(int seed);
+        void randomizeSeed();
 
         void loadBalloons();
         void loadCar();
@@ -64,6 +66,7 @@ class Dataset {
         int _labelIndex;
         std::string _labelAttribute;
         char _delim;
+        int _seed;
         std::vector<int> _ignoredIndexes;
         std::vector<Argument> _arguments;
         std::vector<Data> _data;
