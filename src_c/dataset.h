@@ -65,6 +65,7 @@ class Dataset {
     private:
         int _labelIndex;
         std::string _labelAttribute;
+        std::string _negation;
         char _delim;
         int _seed;
         std::vector<int> _ignoredIndexes;

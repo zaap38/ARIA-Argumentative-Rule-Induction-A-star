@@ -204,8 +204,13 @@ void EncodedAF::initAttackRelation() {
     for (int i = 0; i < _a.size(); ++i) {
         std::vector<int> row;
         for (int j = 0; j < _a.size(); ++j) {
-            if (i == j || i == 0 || _a[i].getAttribute() == _a[j].getAttribute()) {  // attack impossible if reflexive or from label
-                row.push_back(-1);
+            if (i == j || i == 0 || i == 1 ||
+                    _a[i].getAttribute() == _a[j].getAttribute()) {  // attack impossible if reflexive or from label or negation
+                if (i == 1 && j == 0) {
+                    row.push_back(1);
+                } else {
+                    row.push_back(-1);
+                }
             } else {
                 row.push_back(0);
             }
@@ -301,7 +306,7 @@ void AF::updateAliveness(const std::vector<Fact> & facts) {
     */
     for (int i = 0; i < _a.size(); ++i) {
         _a[i].setOut();
-        if (_a[i].isLabel()) {
+        if (_a[i].isLabel() || _a[i].isNegation()) {
             _a[i].setUndec();
         } else {
             for (int j = 0; j < facts.size(); ++j) {

@@ -29,11 +29,14 @@ class Argument {
         bool operator!=(const Argument & a) const;
         bool isLabel() const;
         void setIsLabel(bool isLabel);
+        bool isNegation() const;
+        void setIsNegation(bool isNegation);
 
     private:
         std::string _attribute;
         std::string _value;
         bool _isLabel;
+        bool _isNegation;
         int _id;
         int _status;  // 0: TBD ; 1: in ; 2: out
         int _degree;  // depth of the node - used to avoid cycles

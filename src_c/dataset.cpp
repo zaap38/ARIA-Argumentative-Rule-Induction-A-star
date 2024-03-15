@@ -5,6 +5,7 @@ Dataset::Dataset() {
     _delim = ',';
     std::random_device rd;
     _seed = rd();
+    _negation = "!";  // default negation
 }
 
 Dataset::~Dataset() {
@@ -83,6 +84,12 @@ void Dataset::load(const std::string & filename,
                             a.setIsLabel(true);
                             _arguments.insert(_arguments.begin(), a);
                             argumentNames.push_back(full);
+                            Argument neg;
+                            neg.setAttribute(_negation);
+                            neg.setValue(full);
+                            neg.setIsNegation(true);
+                            argumentNames.push_back(neg.getName());
+                            _arguments.insert(_arguments.begin() + 1, neg);
                         }
                     } else if (value != "?") {
                         _arguments.push_back(a);

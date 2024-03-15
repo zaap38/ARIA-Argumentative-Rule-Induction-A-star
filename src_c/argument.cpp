@@ -6,6 +6,7 @@ Argument::Argument() {
     _value = "";
     _id = rand() % 100000000;
     _isLabel = false;
+    _isNegation = false;
 }
 
 Argument::Argument(const std::string & attribute, const std::string & value) {
@@ -13,6 +14,7 @@ Argument::Argument(const std::string & attribute, const std::string & value) {
     _value = value;
     _id = rand() % 100000000;
     _isLabel = false;
+    _isNegation = false;
 }
 
 Argument::~Argument() {
@@ -25,6 +27,14 @@ bool Argument::isLabel() const {
 
 void Argument::setIsLabel(bool isLabel) {
     _isLabel = isLabel;
+}
+
+bool Argument::isNegation() const {
+    return _isNegation;
+}
+
+void Argument::setIsNegation(bool isNegation) {
+    _isNegation = isNegation;
 }
 
 std::string Argument::getName() const {
