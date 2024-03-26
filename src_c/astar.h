@@ -5,6 +5,8 @@
 #include <iostream>
 #include "snippets.h"
 #include <chrono>
+#include <thread>
+#include <future>
 
 
 class AStar {
@@ -28,6 +30,7 @@ class AStar {
         void addStartNodeToQueue();
         void addNodeToQueue(Node & node);
         Node * getNextNode();
+        std::tuple<Node*, int> runOnQueue(int offset, int coreCount);
         Node * getBestNode();
 
 };

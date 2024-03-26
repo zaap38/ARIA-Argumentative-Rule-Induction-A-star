@@ -100,22 +100,35 @@ int EncodedAF::getAttackSize() const {
     return count;
 }
 
-std::string EncodedAF::getHash() const {
+std::string EncodedAF::getHash(const std::string & callFrom) const {
+    //if (callFrom != "") std::cout << "getHash() called from " << callFrom << std::endl;
     std::string hash = "";
     int cpt = 0;
-    int sum = 0;
+    int wordSize = 32;
+    uint64_t maxValue = 0;
+    uint64_t sum = 0;
+    for (int i = 0; i < wordSize; ++i) {
+        maxValue += pow(2, i);
+    }
+    int paddingLength = std::to_string(maxValue).size();
+    //std::cout << maxValue << "=========>" << paddingLength << std::endl;
     for (int i = 0; i < _r.size(); ++i) {
         for (int j = 0; j < _r[i].size(); ++j) {
             //hash += std::to_string(_r[i][j]);
-            sum += pow(std::max(_r[i][j], 0) * 2, cpt++);
-            if (cpt > 7) {
-                hash += std::to_string(sum - 1);
+            sum += std::max(_r[i][j], 0) * pow(2, cpt++);
+            if (cpt > wordSize || (i == _r.size() - 1 && j == _r[i].size() - 1)) {
+                std::string tmp = std::to_string(sum);
+                while (tmp.size() < paddingLength) tmp = "0" + tmp;
+                //std::cout << tmp.size() << " " << paddingLength << std::endl;
+                //std::cout << " ----> " << sum << " == " << tmp << std::endl;
+                hash += tmp;
                 sum = 0;
                 cpt = 0;
-            
             }
         }
     }
+    //std::cout << "hash " << hash << std::endl;
+    //this->print();
     return hash;
 }
 
@@ -304,6 +317,7 @@ void AF::updateAliveness(const std::vector<Fact> & facts) {
     /*
     Set all arguments to undec if in facts, out otherwise.
     */
+    //std::cout << "vvv" << std::endl;
     for (int i = 0; i < _a.size(); ++i) {
         _a[i].setOut();
         if (_a[i].isLabel() || _a[i].isNegation()) {
@@ -316,6 +330,7 @@ void AF::updateAliveness(const std::vector<Fact> & facts) {
                 }
             }
         }
+        //std::cout << _a[i].getName() << " " << _a[i].getStatus() << std::endl;
     }
 }
 

@@ -20,7 +20,7 @@ int main(int argc, char * argv[]) {
     
     // config
     float ratio = 0.7;
-    int maxIterations = 100;  // -1 for no limit
+    int maxIterations = -1;  // -1 for no limit
     int datasetId = 0;
     int seed = 10;
 
@@ -29,8 +29,8 @@ int main(int argc, char * argv[]) {
     // init dataset
     Dataset d;
     d.setSeed(seed);
-    d.loadBalloons();
-    //d.loadCar();
+    //d.loadBalloons();
+    d.loadCar();
     //d.loadMushroom();
     //d.loadVoting();
     //d.loadBreastCancer();

@@ -6,6 +6,7 @@
 #include "snippets.h"
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 
 
 typedef std::tuple<Argument*, Argument*> AttackPtr;
@@ -69,7 +70,7 @@ class EncodedAF {
         void printMatrix() const;
         bool isInAttack(const Argument & a) const;
         int getAttackSize() const;
-        std::string getHash() const;
+        std::string getHash(const std::string & callFrom = "") const;
 
     private:
         std::vector<Argument> _a;  // argument list
