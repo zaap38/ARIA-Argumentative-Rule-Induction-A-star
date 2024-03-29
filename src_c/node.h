@@ -21,6 +21,7 @@ class Node {
         ~Node();
 
         float getDistance(bool ignoreRSize = false);
+        float getAccuracy(int precision = 0);
         int getColor() const;
         EncodedAF * getValue() const;
 
@@ -30,6 +31,8 @@ class Node {
         std::vector<Node> getNeighbors() const;
         void print(const std::string & prefix = "") const;
         std::string getLabelAttribute() const;
+
+        void setDataset(Dataset * dataset);
 
     private:
         int _id;

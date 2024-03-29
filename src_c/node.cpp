@@ -55,9 +55,9 @@ int Node::runOnDataset(int offset, int coreCount) {
     /*
     Used for multi-threading purpose.
     */
-   std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
     AF * af = _value->convertToAF();
+
     int correctCount = 0;
     for (int i = offset; i < _dataset->size(); i += coreCount) {
         if (af->predict(_dataset->get(i).getFacts(), _dataset->getLabelAttribute()) == _dataset->get(i).getLabel()) {
@@ -75,8 +75,8 @@ void Node::computeDistance(bool ignoreRSize) {
     */
     int correct = 0;
     int total = _dataset->size();
-    const auto processor_count = std::thread::hardware_concurrency();
-    //int processor_count = 1;
+    //const auto processor_count = std::thread::hardware_concurrency();
+    int processor_count = 1;
     std::vector<std::future<int>> corrects;
     for (int i = 0; i < processor_count; ++i) {
         corrects.push_back(std::async(&Node::runOnDataset, this, i, processor_count));
@@ -93,6 +93,16 @@ void Node::computeDistance(bool ignoreRSize) {
 
 int Node::getColor() const {
     return _color;
+}
+
+float Node::getAccuracy(int precision) {
+    int multiple = pow(10, precision);
+    return round(multiple * 100 * (1 - getDistance() / _dataset->size())) / multiple;
+}
+
+void Node::setDataset(Dataset * dataset) {
+    _dataset = dataset;
+    _distance = -1;
 }
 
 EncodedAF * Node::getValue() const {

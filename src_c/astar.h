@@ -17,6 +17,7 @@ class AStar {
 
         Node run(int maxIterations = -1);  // -1: no limit
         void setData(Dataset * dataset);
+        void setTestData(Dataset * test);  // set test dataset (for validation
         void isDatasetNullptr();
         void setMaxRsize(int maxRsize);
 
@@ -24,6 +25,7 @@ class AStar {
     private:
         std::vector<Node> _queue;
         Dataset * _dataset;  // pointer to the dataset
+        Dataset * _testDataset;  // pointer to the test dataset
         int _maxRsize;
 
         std::vector<Node> getNeighbors(const Node & node);

@@ -20,6 +20,7 @@ int main(int argc, char * argv[]) {
     
     // config
     float ratio = 0.7;
+    float minBalanceRatio = 0.4;  // should be < 0.5
     int maxIterations = -1;  // -1 for no limit
     int datasetId = 0;
     int seed = 10;
@@ -38,6 +39,7 @@ int main(int argc, char * argv[]) {
     Dataset train;
     Dataset test;
     
+    d.balance(minBalanceRatio);  // re-balance dataset
     std::tuple<Dataset, Dataset> splitted = d.split(ratio);  // split into train/test
     train = std::get<0>(splitted);
     test = std::get<1>(splitted);
@@ -52,7 +54,8 @@ int main(int argc, char * argv[]) {
     // init astar graph
     AStar a;
     a.setData(&train);  // set dataset to compute distance
-    a.setMaxRsize(30);  // set maxRsize
+    a.setTestData(&test);  // set test dataset
+    a.setMaxRsize(50);  // set maxRsize
     timestamps.push_back(high_resolution_clock::now());
 
     std::cout << "Run AStar" << std::endl;
@@ -61,6 +64,13 @@ int main(int argc, char * argv[]) {
     timestamps.push_back(high_resolution_clock::now());
 
     result.print("Result: ");
+
+    std::cout << "Train acc.: " << result.getDistance() << "/" << train.size() <<
+    " - " << 100 - (100 * result.getDistance() / (float) train.size()) << std::endl;
+
+    result.setDataset(&test);
+    std::cout << "Test acc.: " << result.getDistance() << "/" << test.size() <<
+    " - " << 100 - (100 * result.getDistance() / (float) test.size()) << std::endl;
 
     
     std::cout << "Clean" << std::endl;

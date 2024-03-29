@@ -220,7 +220,8 @@ void EncodedAF::initAttackRelation() {
             if (i == j || i == 0 || i == 1 ||
                     _a[i].getAttribute() == _a[j].getAttribute()) {  // attack impossible if reflexive or from label or negation
                 if (i == 1 && j == 0) {
-                    row.push_back(1);
+                    //row.push_back(1);
+                    row.push_back(0);
                 } else {
                     row.push_back(-1);
                 }
@@ -319,10 +320,10 @@ void AF::updateAliveness(const std::vector<Fact> & facts) {
     */
     //std::cout << "vvv" << std::endl;
     for (int i = 0; i < _a.size(); ++i) {
-        _a[i].setOut();
         if (_a[i].isLabel() || _a[i].isNegation()) {
             _a[i].setUndec();
         } else {
+            _a[i].setOut();
             for (int j = 0; j < facts.size(); ++j) {
                 if (_a[i].getName() == facts[j]) {
                     _a[i].setUndec();
@@ -335,9 +336,18 @@ void AF::updateAliveness(const std::vector<Fact> & facts) {
 }
 
 bool AF::predict(const std::vector<Fact> & facts, const std::string & target) {
+    using namespace std::chrono;
+    high_resolution_clock::time_point timepoint = high_resolution_clock::now();
     updateAliveness(facts);
+    //std::cout << "updateAliveness() = " << duration_cast<nanoseconds>(high_resolution_clock::now() - timepoint).count() / 1000.0 << std::endl;
+    timepoint = high_resolution_clock::now();
     computeExtension();
-    return targetAlive(target);
+    //std::cout << "computeExtension() = " << duration_cast<nanoseconds>(high_resolution_clock::now() - timepoint).count() / 1000.0 << std::endl;
+    timepoint = high_resolution_clock::now();
+    bool result = targetAlive(target);
+    //std::cout << "targetAlive() = " << duration_cast<nanoseconds>(high_resolution_clock::now() - timepoint).count() / 1000.0 << std::endl;
+
+    return result;
 }
 
 bool AF::targetAlive(const std::string & target) const {

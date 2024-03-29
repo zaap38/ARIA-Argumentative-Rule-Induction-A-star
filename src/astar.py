@@ -122,6 +122,7 @@ class AStar:
                 self.tried.append((p, abs(new_node.distance - node.distance)))
                 new_node.color = 1
                 self.queue.append(new_node)
+        print(len(self.queue))
 
     def exist(self, R):
         for n in self.nodes:

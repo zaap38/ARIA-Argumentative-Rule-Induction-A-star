@@ -2,7 +2,7 @@
 CXX = g++
 
 # Specify compiler flags
-CXXFLAGS = -std=c++20 -Wno-Wsign-compare
+CXXFLAGS = -std=c++20 -O3 -Wno-Wsign-compare
 
 # Specify the target executable
 TARGET = gaari.exe

@@ -135,6 +135,37 @@ void Dataset::shuffle() {
     std::shuffle(_data.begin(), _data.end(), g);
 }
 
+void Dataset::balance(float minRatio) {
+    std::vector<Data> newData = _data;
+    int positive = 0;
+    int negative = 0;
+    for (int i = 0; i < _data.size(); ++i) {
+        if (_data[i].getLabel()) {
+            ++positive;
+        } else {
+            ++negative;
+        }
+    }
+    int total = positive + negative;
+    while (positive < total * minRatio || negative < total * minRatio) {
+        int randIndex = rand() % newData.size();
+        if (positive < negative) {
+            if (newData[randIndex].getLabel()) {
+                newData.push_back(newData[randIndex]);
+                ++positive;
+            }
+        } else if (negative < positive) {
+            if (!newData[randIndex].getLabel()) {
+                newData.push_back(newData[randIndex]);
+                ++negative;
+            }
+        }
+        total = positive + negative;
+    }
+    
+    _data = newData;
+}
+
 std::tuple<Dataset, Dataset> Dataset::split(double ratio) {
     Dataset train;
     Dataset test;

@@ -46,6 +46,7 @@ class Dataset {
         void addAttribute(const std::string & attribute);
         void setAttributes(const std::vector<std::string> & attributes);
         void shuffle();
+        void balance(float minRatio = 0.3);
         void setLabelIndex(int index);
         void setDelim(char delim);
         void addIgnoredIndex(int index);
