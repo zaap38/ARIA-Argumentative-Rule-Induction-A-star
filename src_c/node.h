@@ -33,12 +33,14 @@ class Node {
         std::string getLabelAttribute() const;
 
         void setDataset(Dataset * dataset);
+        bool changes();
 
     private:
         int _id;
         EncodedAF * _value;
         int _color;  // 0: white; 1: grey; 2: black
         float _distance;  // -1 means not initialized
+        float _predDistance;  // predecessor distance
         int _predecessor;  // predecessor id
         std::vector<Node> _neighbors;
         Dataset * _dataset;  // pointer to the dataset

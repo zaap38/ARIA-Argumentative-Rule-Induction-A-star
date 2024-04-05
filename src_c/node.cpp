@@ -7,6 +7,7 @@ Node::Node() {
     _predecessor = -1;
     _value = nullptr;
     _dataset = nullptr;
+    _predDistance = -1;
 }
 
 
@@ -17,6 +18,7 @@ Node::Node(int id) {
     _predecessor = -1;
     _value = nullptr;
     _dataset = nullptr;
+    _predDistance = -1;
 }
 
 Node::Node(int id, Dataset * dataset, EncodedAF * value) {
@@ -26,6 +28,7 @@ Node::Node(int id, Dataset * dataset, EncodedAF * value) {
     _distance = -1;
     _predecessor = -1;
     _value = value;
+    _predDistance = -1;
 }
 
 Node::Node(const Node & node) {
@@ -35,6 +38,7 @@ Node::Node(const Node & node) {
     _predecessor = node._predecessor;
     _value = new EncodedAF(*node._value);
     _dataset = node._dataset;
+    _predDistance = node._predDistance;
 }
 
 Node::~Node() {
@@ -130,10 +134,15 @@ std::vector<Node> Node::getNeighbors() const {
             neighborNode._value = new EncodedAF(*_value);
             neighborNode._dataset = _dataset;
             neighborNode._value->addAttack(possibleAddons[i]);
+            neighborNode._predDistance = _distance;
             neighbors.push_back(neighborNode);
         }
     }
     return neighbors;
+}
+
+bool Node::changes() {
+    return _predDistance == -1 || (int) getDistance() != (int) _predDistance;
 }
 
 void Node::print(const std::string & prefix) const {

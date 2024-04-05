@@ -23,7 +23,7 @@ int main(int argc, char * argv[]) {
     float minBalanceRatio = 0.4;  // should be < 0.5
     int maxIterations = -1;  // -1 for no limit
     int datasetId = 0;
-    int seed = 10;
+    int seed = 11;//10;
 
     std::cout << "Init Dataset" << std::endl;
 

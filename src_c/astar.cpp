@@ -23,6 +23,7 @@ Node AStar::run(int maxIterations) {
 
     using namespace std::chrono;
 
+    high_resolution_clock::time_point startTime = high_resolution_clock::now();
     high_resolution_clock::time_point time = high_resolution_clock::now();
 
     while (iterations != maxIterations) {
@@ -42,7 +43,8 @@ Node AStar::run(int maxIterations) {
             //std::cout << "Rsize: " << node->getAttackSize() << std::endl;
             //node->print();
             //node->getValue()->printMatrix();
-            std::cout << "It: " << iterations << std::endl;
+            std::cout << "It: " << iterations << " - " <<
+                duration_cast<milliseconds>(time - startTime).count() / 1000.0 << "s" << std::endl;
             Node copyBestNode = *getBestNode();
             float accTrain = copyBestNode.getAccuracy(1);
             copyBestNode.setDataset(_testDataset);
@@ -88,13 +90,19 @@ std::tuple<Node*, int> AStar::runOnQueue(int offset, int coreCount) {
     int bestNodeIndex = -1;
     
     for (int i = offset; i < _queue.size(); i += coreCount) {
-        if (_queue[i].getColor() == 1 && (_queue[i].getAttackSize() <= _maxRsize)) {  // grey
+
+        if (_queue[i].getColor() == 1 &&  // grey node
+            _queue[i].changes() &&  // branch is having an impact
+            (_queue[i].getAttackSize() <= _maxRsize)) {
+
             if (bestNode == nullptr || _queue[i].getDistance() < bestNode->getDistance()) {
                 bestNode = &_queue[i];
                 bestNodeIndex = i;
             }
+
         }
     }
+    
     return std::make_tuple(bestNode, bestNodeIndex);
 }
 
