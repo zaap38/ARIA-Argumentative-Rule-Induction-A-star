@@ -38,7 +38,8 @@ class Dataset {
         void load(const std::string & src,
                   const std::string & labelValue,
                   int labelIndex = -1,
-                  const std::vector<int> & ignoredIndexes = {});
+                  const std::vector<int> & ignoredIndexes = {},
+                  bool sampling = false);
         std::tuple<Dataset, Dataset> split(double ratio = 0.7);  // ratio: train%, (1 - ratio): test%
         int size() const;
         Data & operator[](int i);
@@ -62,6 +63,7 @@ class Dataset {
         void loadVoting();
         void loadBreastCancer();
         void loadFake();
+        void loadHeartDisease();
 
     private:
         int _labelIndex;

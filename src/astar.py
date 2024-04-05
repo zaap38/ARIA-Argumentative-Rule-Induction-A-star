@@ -167,6 +167,7 @@ class AStar:
         while good:
             tic.tic("Select node")
             current = self.select_node()
+            current.obj.convert_to_AF().print_attacks()
             # print("Queue dist:", [(n.addon, n.distance) for n in self.queue])
             if count % 1 == 0 and count > 0:
                 print("Step:", count, end=' | ')
@@ -213,7 +214,7 @@ def main():
     tic.disabled = True
 
     r = rules.Rules()
-    train, test, args, _ = r.load_dataset(4, 0.7, seed)
+    train, test, args, _ = r.load_dataset(2, 0.7, seed)
     # train = train + test
     if config.GLOBAL_TOP:
         args = [config.TOP] + args

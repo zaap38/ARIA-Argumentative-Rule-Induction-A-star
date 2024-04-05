@@ -35,11 +35,12 @@ int main(int argc, char * argv[]) {
     //d.loadMushroom();
     //d.loadVoting();
     //d.loadBreastCancer();
+    //d.loadHeartDisease();  // TODO: value sampling
     //d.loadFake();
     Dataset train;
     Dataset test;
     
-    d.balance(minBalanceRatio);  // re-balance dataset
+    //d.balance(minBalanceRatio);  // re-balance dataset
     std::tuple<Dataset, Dataset> splitted = d.split(ratio);  // split into train/test
     train = std::get<0>(splitted);
     test = std::get<1>(splitted);

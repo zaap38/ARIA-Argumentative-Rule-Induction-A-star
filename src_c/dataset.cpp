@@ -37,6 +37,20 @@ void Dataset::loadBreastCancer() {
     load("../src/datasets/breast-cancer/breast-cancer.data.txt", "recurrence-events", 0);  // load data
 }
 
+void Dataset::loadVoting() {
+    setAttributes({"party", "handicapped-infants", "water-project-cost-sharing", "adoption-of-the-budget-resolution",
+                    "physician-fee-freeze", "el-salvador-aid", "religious-groups-in-schools", "anti-satellite-test-ban",
+                    "aid-to-nicaraguan-contras", "mx-missile", "immigration", "synfuels-corporation-cutback", "education-spending",
+                    "superfund-right-to-sue", "crime", "duty-free-exports", "export-administration-act-south-africa"});  // set attributes
+    load("../src/datasets/voting/house-votes-84.data.txt", "republican", 0);  // load data
+}
+
+void Dataset::loadHeartDisease() {
+    setAttributes({"age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach",
+                    "exang", "oldpeak", "slope", "ca", "thal", "class"});  // set attributes
+    load("../src/datasets/heart-disease/processed.cleveland.data.txt", "0", -1, {}, true);  // load data
+}
+
 void Dataset::loadFake() {
     setAttributes({"a", "b", "c", "label"});  // set attributes
     load("../src/datasets/fake/fake.data.txt", "T");  // load data
@@ -46,7 +60,8 @@ void Dataset::loadFake() {
 void Dataset::load(const std::string & filename,
                    const std::string & labelValue,
                    int labelIndex,
-                   const std::vector<int> & ignoredIndexes) {
+                   const std::vector<int> & ignoredIndexes,
+                   bool sampling) {
 
     std::ifstream file(filename);
     std::string line;

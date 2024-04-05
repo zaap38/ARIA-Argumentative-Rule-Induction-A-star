@@ -101,7 +101,7 @@ int Node::getColor() const {
 
 float Node::getAccuracy(int precision) {
     int multiple = pow(10, precision);
-    return round(multiple * 100 * (1 - getDistance() / _dataset->size())) / multiple;
+    return round(multiple * 100 * (1 - ((int) getDistance()) / (float) _dataset->size())) / multiple;
 }
 
 void Node::setDataset(Dataset * dataset) {
