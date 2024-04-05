@@ -88,12 +88,13 @@ void AStar::addNodeToQueue(Node & node) {
 std::tuple<Node*, int> AStar::runOnQueue(int offset, int coreCount) {
     Node * bestNode = nullptr; // Declare the variable bestNode
     int bestNodeIndex = -1;
-    
+    int candidateCount = 0;
     for (int i = offset; i < _queue.size(); i += coreCount) {
 
         if (_queue[i].getColor() == 1 &&  // grey node
             _queue[i].changes() &&  // branch is having an impact
             (_queue[i].getAttackSize() <= _maxRsize)) {
+            ++candidateCount;
 
             if (bestNode == nullptr || _queue[i].getDistance() < bestNode->getDistance()) {
                 bestNode = &_queue[i];
@@ -102,7 +103,7 @@ std::tuple<Node*, int> AStar::runOnQueue(int offset, int coreCount) {
 
         }
     }
-    
+    std::cout << "Candidate count: " << candidateCount << std::endl;
     return std::make_tuple(bestNode, bestNodeIndex);
 }
 
