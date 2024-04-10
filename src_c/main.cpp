@@ -24,18 +24,21 @@ int main(int argc, char * argv[]) {
     int maxIterations = -1;  // -1 for no limit
     int datasetId = 0;
     int seed = 11;//10;
+    float samplingInterval = 5;
 
     std::cout << "Init Dataset" << std::endl;
 
     // init dataset
     Dataset d;
+    d.setSamplingInterval(samplingInterval);
+    
     d.setSeed(seed);
     //d.loadBalloons();
     d.loadCar();
     //d.loadMushroom();
     //d.loadVoting();
     //d.loadBreastCancer();
-    //d.loadHeartDisease();  // TODO: value sampling
+    //d.loadHeartDisease();
     //d.loadFake();
     Dataset train;
     Dataset test;

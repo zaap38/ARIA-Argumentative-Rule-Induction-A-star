@@ -48,6 +48,7 @@ Node AStar::run(int maxIterations) {
             std::cout << "Train: " << accTrain << "% - Test: " << accTest << "%" << std::endl;
             //std::cout << "It: " << iterations << " - Best distance: " << distance << " - Data: " << _dataset->size() << std::endl;
             std::cout << "Rsize: " << node->getAttackSize() << std::endl;
+            //node->printArguments();
             //node->print();
             //node->getValue()->printMatrix();
 

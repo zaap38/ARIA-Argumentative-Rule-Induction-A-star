@@ -35,6 +35,8 @@ class Node {
         void setDataset(Dataset * dataset);
         bool changes();
 
+        void printArguments() const;
+
     private:
         int _id;
         EncodedAF * _value;

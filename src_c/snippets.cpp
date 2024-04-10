@@ -45,3 +45,28 @@ void printVector(const std::vector<std::string> & v) {
     }
     std::cout << ']' << std::endl;
 }
+
+double round(double value, int precision) {
+    return std::round(value * std::pow(10, precision)) / std::pow(10, precision);
+}
+
+std::string trim(const std::string & str) {
+    // Find the position of the decimal point
+    size_t dotPosition = str.find('.');
+    if (dotPosition == std::string::npos) {
+        return str; // No decimal point found, return the original string
+    }
+
+    // Find the position of the last non-zero digit
+    size_t lastNonZeroDigit = str.find_last_not_of('0');
+    if (lastNonZeroDigit == std::string::npos) {
+        // All digits after the decimal point are zeros
+        return str.substr(0, dotPosition);
+    } else if (lastNonZeroDigit == dotPosition) {
+        // All digits after the decimal point are zeros, except for the last one
+        return str.substr(0, lastNonZeroDigit + 2); // Include the decimal point
+    } else {
+        // Remove trailing zeros after the last non-zero digit
+        return str.substr(0, lastNonZeroDigit + 1);
+    }
+}

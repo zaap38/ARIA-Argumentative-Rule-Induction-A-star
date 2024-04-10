@@ -8,7 +8,10 @@
 #include <random>
 #include <algorithm>
 #include <iostream>
+#include <map>
 
+
+typedef std::map<std::string, std::tuple<float, float>> Ranges;
 
 class Data {
 
@@ -38,8 +41,8 @@ class Dataset {
         void load(const std::string & src,
                   const std::string & labelValue,
                   int labelIndex = -1,
-                  const std::vector<int> & ignoredIndexes = {},
-                  bool sampling = false);
+                  const std::vector<int> & floatingValues = {},
+                  const std::vector<int> & ignoredIndexes = {});
         std::tuple<Dataset, Dataset> split(double ratio = 0.7);  // ratio: train%, (1 - ratio): test%
         int size() const;
         Data & operator[](int i);
@@ -56,6 +59,7 @@ class Dataset {
         void setLabelAttribute(const std::string & labelAttribute);
         void setSeed(int seed);
         void randomizeSeed();
+        void setSamplingInterval(float interval);
 
         void loadBalloons();
         void loadCar();
@@ -70,9 +74,13 @@ class Dataset {
         std::string _labelAttribute;
         std::string _negation;
         char _delim;
+        float _samplingInterval;
         int _seed;
         std::vector<int> _ignoredIndexes;
         std::vector<Argument> _arguments;
         std::vector<Data> _data;
         std::vector<std::string> _attributes;
+
+        Ranges getRanges(const std::string & filename,
+                         const std::vector<int> & floatingValues) const;
 };

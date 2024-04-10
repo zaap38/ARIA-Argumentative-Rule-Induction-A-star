@@ -192,8 +192,11 @@ std::vector<std::tuple<Argument, Argument>> EncodedAF::getPossibleAddons() const
             Attacked node is already attacking something, or is the label.
             Attacker and Attacked do not share the same attribute name.
             */
-            if (i != j && _r[i][j] == 0 && (j == 0 || intIn(_r[j], 1))
-                    && _a[i].getAttribute() != _a[j].getAttribute()) {
+            if (i != j && _r[i][j] == 0 && (j == 0 || intIn(_r[j], 1))  // not reflexive/forbidden/symmetric + connected
+                    && _a[i].getAttribute() != _a[j].getAttribute()  // arguments of the same attribute cannot attack each other
+                    //&& !intIn(_r[i], 1)  // limit to one attack per argument
+                    && (_r[i][0] == 0)  // an argument attacking the target cannot attack something else
+                    ) {
                 possibleAddons.push_back(std::make_tuple(_a[i], _a[j]));
             }
         }
@@ -220,7 +223,6 @@ void EncodedAF::initAttackRelation() {
             if (i == j || i == 0 || i == 1 ||
                     _a[i].getAttribute() == _a[j].getAttribute()) {  // attack impossible if reflexive or from label or negation
                 if (i == 1 && j == 0) {
-                    //row.push_back(1);
                     row.push_back(0);
                 } else {
                     row.push_back(-1);

@@ -6,6 +6,7 @@ Dataset::Dataset() {
     std::random_device rd;
     _seed = rd();
     _negation = "!";  // default negation
+    _samplingInterval = 5;  // default sampling interval
 }
 
 Dataset::~Dataset() {
@@ -48,7 +49,8 @@ void Dataset::loadVoting() {
 void Dataset::loadHeartDisease() {
     setAttributes({"age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach",
                     "exang", "oldpeak", "slope", "ca", "thal", "class"});  // set attributes
-    load("../src/datasets/heart-disease/processed.cleveland.data.txt", "0", -1, {}, true);  // load data
+    load("../src/datasets/heart-disease/processed.cleveland.data.txt", "0", -1,
+        {0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});  // load data
 }
 
 void Dataset::loadFake() {
@@ -60,11 +62,13 @@ void Dataset::loadFake() {
 void Dataset::load(const std::string & filename,
                    const std::string & labelValue,
                    int labelIndex,
-                   const std::vector<int> & ignoredIndexes,
-                   bool sampling) {
+                   const std::vector<int> & floatingValues,
+                   const std::vector<int> & ignoredIndexes) {
 
     std::ifstream file(filename);
     std::string line;
+
+    Ranges ranges = getRanges(filename, floatingValues);
 
     _arguments.clear();
     _data.clear();
@@ -87,8 +91,22 @@ void Dataset::load(const std::string & filename,
             
             if (!intIn(_ignoredIndexes, i)) {
 
-                std::string value = elements[i];
                 std::string attribute = _attributes[i];
+                std::string value = elements[i];
+
+                // sampling of continuous attributes
+                if (intIn(floatingValues, i) && value != "?") {
+                    float min = std::get<0>(ranges[attribute]);
+                    float max = std::get<1>(ranges[attribute]);
+                    float fvalue = std::stof(value);
+                    float range = max - min;
+                    float step = range / _samplingInterval;
+                    int interval = (fvalue - min) / step;
+                    double valMin = round(interval * step + min, 2);
+                    double valMax = round((interval + 1) * step + min, 2);
+                    value = trim(std::to_string(valMin)) + "-" + trim(std::to_string(valMax));
+                }
+
                 std::string full = attribute + "=" + value;
                 if (!strIn(argumentNames, full)) {  // incorrect type
                     Argument a;
@@ -121,6 +139,44 @@ void Dataset::load(const std::string & filename,
         dataline.setLabel(label);
         _data.push_back(dataline);
     }
+    // printVector(argumentNames);
+}
+
+Ranges Dataset::getRanges(const std::string & filename, const std::vector<int> & floatingValues) const {
+
+    Ranges ranges;
+    std::ifstream file(filename);
+    std::string line;
+
+    while (std::getline(file, line)) {
+
+        std::vector<std::string> elements = splitStr(line, _delim);
+
+        for (size_t i = 0; i < elements.size(); ++i) {
+
+            if (intIn(floatingValues, i) && elements[i] != "?") {
+                std::string attribute = _attributes[i];
+                float value = std::stof(elements[i]);
+
+                if (ranges.find(attribute) == ranges.end()) {
+                    ranges.insert(std::make_pair(attribute, std::make_tuple(value, value)));
+                } else {
+                    float min = std::get<0>(ranges[attribute]);
+                    float max = std::get<1>(ranges[attribute]);
+
+                    if (value < min) {
+                        min = value;
+                    } else if (value > max) {
+                        max = value;
+                    }
+
+                    ranges[attribute] = std::make_tuple(min, max);
+                }
+            }
+        }
+    }
+
+    return ranges;
 }
 
 void Dataset::setLabelAttribute(const std::string & labelAttribute) {
@@ -228,6 +284,10 @@ void Dataset::setDelim(char delim) {
 
 void Dataset::addIgnoredIndex(int index) {
     _ignoredIndexes.push_back(index);
+}
+
+void Dataset::setSamplingInterval(float interval) {
+    _samplingInterval = interval;
 }
 
 Data::Data() {

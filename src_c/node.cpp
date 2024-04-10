@@ -99,6 +99,10 @@ int Node::getColor() const {
     return _color;
 }
 
+void Node::printArguments() const {
+    _value->convertToAF()->printArguments();
+}
+
 float Node::getAccuracy(int precision) {
     int multiple = pow(10, precision);
     return round(multiple * 100 * (1 - ((int) getDistance()) / (float) _dataset->size())) / multiple;
