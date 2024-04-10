@@ -48,6 +48,7 @@ class Node {
         Dataset * _dataset;  // pointer to the dataset
 
         std::mutex _lock; // Mutex for synchronizing cout
+        int _sharedIndex;
         
         void computeDistance(bool ignoreRSize = false);
         int runOnDataset(int offset, int coreCount);

@@ -59,16 +59,35 @@ int Node::runOnDataset(int offset, int coreCount) {
     /*
     Used for multi-threading purpose.
     */
+    /*using namespace std::chrono;
+    high_resolution_clock::time_point time = high_resolution_clock::now();*/
 
     AF * af = _value->convertToAF();
 
     int correctCount = 0;
-    for (int i = offset; i < _dataset->size(); i += coreCount) {
+    /*for (int i = offset; i < _dataset->size(); i += coreCount) {
         if (af->predict(_dataset->get(i).getFacts(), _dataset->getLabelAttribute()) == _dataset->get(i).getLabel()) {
             ++correctCount;
         }
+    }*/
+    int index = 0;
+    _lock.lock();
+    index = _sharedIndex;
+    _sharedIndex += 1;
+    _lock.unlock();
+    while (index < _dataset->size()) {
+        if (af->predict(_dataset->get(index).getFacts(), _dataset->getLabelAttribute()) == _dataset->get(index).getLabel()) {
+            ++correctCount;
+        }
+        _lock.lock();
+        index = _sharedIndex;
+        _sharedIndex += 1;
+        _lock.unlock();
     }
     delete af;
+    /*_lock.lock();
+    std::cout << "runOnDataset(" << offset << ") = " << duration_cast<milliseconds>(high_resolution_clock::now() - time).count() << std::endl;
+    _lock.unlock();*/
     return correctCount;
 }
 
@@ -79,9 +98,10 @@ void Node::computeDistance(bool ignoreRSize) {
     */
     int correct = 0;
     int total = _dataset->size();
-    //const auto processor_count = std::thread::hardware_concurrency();
-    int processor_count = 1;
+    const auto processor_count = std::thread::hardware_concurrency();
+    //int processor_count = 1;
     std::vector<std::future<int>> corrects;
+    _sharedIndex = 0;
     for (int i = 0; i < processor_count; ++i) {
         corrects.push_back(std::async(&Node::runOnDataset, this, i, processor_count));
     }

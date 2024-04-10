@@ -114,8 +114,8 @@ Node * AStar::getNextNode() {
     //const auto processor_count = std::thread::hardware_concurrency();
     // multi-threading useless because we already split proc for data eval
     const auto processor_count = 1;
-    using namespace std::chrono;
-    high_resolution_clock::time_point time = high_resolution_clock::now();
+    //using namespace std::chrono;
+    //high_resolution_clock::time_point time = high_resolution_clock::now();
 
     std::vector<std::future<std::tuple<Node*, int>>> bestNodes;
     for (int i = 0; i < processor_count; ++i) {
