@@ -34,9 +34,9 @@ int main(int argc, char * argv[]) {
     
     d.setSeed(seed);
     //d.loadBalloons();
-    d.loadCar();
+    //d.loadCar();
     //d.loadMushroom();
-    //d.loadVoting();
+    d.loadVoting();
     //d.loadBreastCancer();
     //d.loadHeartDisease();
     //d.loadFake();

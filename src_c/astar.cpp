@@ -27,7 +27,7 @@ Node AStar::run(int maxIterations) {
     high_resolution_clock::time_point time = high_resolution_clock::now();
 
     while (iterations != maxIterations) {
-        std::cout << "vvvvv" << std::endl;
+        //std::cout << "vvvvv" << std::endl;
         time = high_resolution_clock::now();
         Node * node = getNextNode();
         //std::cout << "getNextNode() = " << duration_cast<milliseconds>(high_resolution_clock::now() - time).count() << std::endl;
@@ -39,8 +39,8 @@ Node AStar::run(int maxIterations) {
         }
         distance = (node->getDistance() < distance) || distance == -1? node->getDistance() : distance;
         if (true && iterations % 1 == 0 && iterations > 0) {
-            std::cout << "It: " << iterations << " - " <<
-                duration_cast<milliseconds>(time - startTime).count() / 1000.0 << "s" << std::endl;
+            std::cout << "--v-- It: " << iterations << " - " <<
+                duration_cast<milliseconds>(time - startTime).count() / 1000.0 << "s --v--" << std::endl;
             Node copyBestNode = *getBestNode();
             float accTrain = copyBestNode.getAccuracy(1);
             copyBestNode.setDataset(_testDataset);
