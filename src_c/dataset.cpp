@@ -20,7 +20,7 @@ void Dataset::loadBalloons() {
 
 void Dataset::loadCar() {
     setAttributes({"buying", "maint", "doors", "persons", "lug_boot", "safety", "acceptability"});  // set attributes
-    load("../src/datasets/car/car.data.txt", "vgood");  // load data
+    load("../src/datasets/car/car.data.txt", "acc");  // load data
 }
 
 void Dataset::loadMushroom() {
@@ -51,6 +51,12 @@ void Dataset::loadHeartDisease() {
                     "exang", "oldpeak", "slope", "ca", "thal", "class"});  // set attributes
     load("../src/datasets/heart-disease/processed.cleveland.data.txt", "0", -1,
         {0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});  // load data
+}
+
+void Dataset::loadIris() {
+    setAttributes({"sepal-length", "sepal-width", "petal-length", "petal-width", "class"});  // set attributes
+    load("../src/datasets/iris/iris.data.txt", "Iris-virginica", 4,
+    {0, 1, 2, 3});  // load data
 }
 
 void Dataset::loadFake() {
@@ -95,7 +101,7 @@ void Dataset::load(const std::string & filename,
                 std::string value = elements[i];
 
                 // sampling of continuous attributes
-                if (intIn(floatingValues, i) && value != "?") {
+                if (intIn(floatingValues, i) && value != "?" && value[0] != 0) {
                     float min = std::get<0>(ranges[attribute]);
                     float max = std::get<1>(ranges[attribute]);
                     float fvalue = std::stof(value);
@@ -154,7 +160,7 @@ Ranges Dataset::getRanges(const std::string & filename, const std::vector<int> &
 
         for (size_t i = 0; i < elements.size(); ++i) {
 
-            if (intIn(floatingValues, i) && elements[i] != "?") {
+            if (intIn(floatingValues, i) && elements[i] != "?" && elements[i][0] != 0) {
                 std::string attribute = _attributes[i];
                 float value = std::stof(elements[i]);
 

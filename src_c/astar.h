@@ -20,6 +20,7 @@ class AStar {
         void setTestData(Dataset * test);  // set test dataset (for validation
         void isDatasetNullptr();
         void setMaxRsize(int maxRsize);
+        void setVerbose(bool verbose);
 
 
     private:
@@ -27,6 +28,8 @@ class AStar {
         Dataset * _dataset;  // pointer to the dataset
         Dataset * _testDataset;  // pointer to the test dataset
         int _maxRsize;
+
+        bool _verbose;
 
         std::vector<Node> getNeighbors(const Node & node);
         void addStartNodeToQueue();

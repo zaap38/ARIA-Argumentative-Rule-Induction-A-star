@@ -5,6 +5,7 @@ AStar::AStar() {
     _queue = std::vector<Node>();
     _dataset = nullptr;
     _maxRsize = 1000;
+    _verbose = false;
 }
 
 AStar::~AStar() {
@@ -38,7 +39,7 @@ Node AStar::run(int maxIterations) {
             break;
         }
         distance = (node->getDistance() < distance) || distance == -1? node->getDistance() : distance;
-        if (true && iterations % 1 == 0 && iterations > 0) {
+        if (_verbose && iterations % 1 == 0 && iterations > 0) {
             std::cout << "--v-- It: " << iterations << " - " <<
                 duration_cast<milliseconds>(time - startTime).count() / 1000.0 << "s --v--" << std::endl;
             Node copyBestNode = *getBestNode();
@@ -173,4 +174,8 @@ void AStar::addStartNodeToQueue() {
 void AStar::isDatasetNullptr() {
     if (_dataset == nullptr) std::cout << "null" << std::endl;
     else std::cout << "not null" << std::endl;
+}
+
+void AStar::setVerbose(bool verbose) {
+    _verbose = verbose;
 }

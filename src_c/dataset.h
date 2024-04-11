@@ -68,6 +68,7 @@ class Dataset {
         void loadBreastCancer();
         void loadFake();
         void loadHeartDisease();
+        void loadIris();
 
     private:
         int _labelIndex;
