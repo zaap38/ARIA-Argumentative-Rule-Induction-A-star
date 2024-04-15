@@ -46,6 +46,14 @@ void Dataset::loadVoting() {
     load("../src/datasets/voting/house-votes-84.data.txt", "republican", 0);  // load data
 }
 
+void Dataset::loadBreastCancerWisconsin() {
+    setAttributes({"id", "clump-thickness", "uniformity-of-cell-size", "uniformity-of-cell-shape",
+                    "marginal-adhesion", "single-epithelial-cell-size", "bare-nuclei", "bland-chromatin",
+                    "normal-nucleoli", "mitoses", "class"});  // set attributes
+    load("../src/datasets/breast-cancer-wisconsin/breast-cancer-wisconsin.data.txt", "4", 10,
+        {1, 2, 3, 4, 5, 6, 7, 8, 9}, {0});  // load data
+}
+
 void Dataset::loadHeartDisease() {
     setAttributes({"age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach",
                     "exang", "oldpeak", "slope", "ca", "thal", "class"});  // set attributes

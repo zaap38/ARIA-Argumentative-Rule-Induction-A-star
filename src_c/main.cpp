@@ -42,7 +42,8 @@ int main(int argc, char * argv[]) {
         //d.loadMushroom();
         //d.loadVoting();
         //d.loadBreastCancer();
-        d.loadHeartDisease();
+        d.loadBreastCancerWisconsin();
+        //d.loadHeartDisease();
         //d.loadIris();
         //d.loadFake();
         Dataset train;
