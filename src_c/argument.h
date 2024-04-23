@@ -38,7 +38,7 @@ class Argument {
         bool _isLabel;
         bool _isNegation;
         int _id;
-        int _status;  // 0: TBD ; 1: in ; 2: out
+        int _status;  // 0: undec ; 1: in ; 2: out
         int _degree;  // depth of the node - used to avoid cycles
 
 };

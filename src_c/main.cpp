@@ -27,7 +27,7 @@ int main(int argc, char * argv[]) {
         float minBalanceRatio = 0.4;  // should be < 0.5
         int maxIterations = -1;  // -1 for no limit
         int datasetId = 0;
-        int seed = 11 + 5 + runIndex;//10;
+        int seed = 11 + runIndex;//10;
         float samplingInterval = 3;
 
         //std::cout << "Init Dataset" << std::endl;
@@ -38,11 +38,11 @@ int main(int argc, char * argv[]) {
         
         d.setSeed(seed);
         //d.loadBalloons();
-        //d.loadCar();
+        d.loadCar();
         //d.loadMushroom();
         //d.loadVoting();
         //d.loadBreastCancer();
-        d.loadBreastCancerWisconsin();
+        //d.loadBreastCancerWisconsin();
         //d.loadHeartDisease();
         //d.loadIris();
         //d.loadFake();
@@ -74,7 +74,7 @@ int main(int argc, char * argv[]) {
         Node result = a.run(maxIterations);
         timestamps.push_back(high_resolution_clock::now());
 
-        //result.print("Result run " + std::to_string(runIndex) + ": ");
+        result.print("Result run " + std::to_string(runIndex) + ": ");
 
         std::cout << "Train acc.: " << result.getDistance() << "/" << train.size() <<
         " - " << result.getAccuracy(1) << std::endl;

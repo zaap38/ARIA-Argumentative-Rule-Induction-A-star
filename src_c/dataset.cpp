@@ -20,7 +20,7 @@ void Dataset::loadBalloons() {
 
 void Dataset::loadCar() {
     setAttributes({"buying", "maint", "doors", "persons", "lug_boot", "safety", "acceptability"});  // set attributes
-    load("../src/datasets/car/car.data.txt", "acc");  // load data
+    load("../src/datasets/car/car.data.txt", "vgood");  // load data
 }
 
 void Dataset::loadMushroom() {
@@ -126,6 +126,9 @@ void Dataset::load(const std::string & filename,
                     Argument a;
                     a.setAttribute(attribute);  // to add based on index i
                     a.setValue(value);
+                    /*Argument neg_arg;
+                    neg_arg.setAttribute(attribute);
+                    neg_arg.setValue(value);*/
                     if (i == _labelIndex) {
                         if (value == labelValue) {
                             a.setIsLabel(true);
@@ -141,6 +144,11 @@ void Dataset::load(const std::string & filename,
                     } else if (value != "?") {
                         _arguments.push_back(a);
                         argumentNames.push_back(full);
+                        Argument neg;
+                        neg.setAttribute('!' + attribute);
+                        neg.setValue(value);
+                        _arguments.push_back(neg);
+                        argumentNames.push_back(neg.getName());
                     }
                 }
                 if (i != _labelIndex) {
@@ -153,7 +161,7 @@ void Dataset::load(const std::string & filename,
         dataline.setLabel(label);
         _data.push_back(dataline);
     }
-    // printVector(argumentNames);
+    //printVector(argumentNames);
 }
 
 Ranges Dataset::getRanges(const std::string & filename, const std::vector<int> & floatingValues) const {

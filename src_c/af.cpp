@@ -321,18 +321,28 @@ void AF::updateAliveness(const std::vector<Fact> & facts) {
     Set all arguments to undec if in facts, out otherwise.
     */
     //std::cout << "vvv" << std::endl;
+    //printVector(facts);
     for (int i = 0; i < _a.size(); ++i) {
         if (_a[i].isLabel() || _a[i].isNegation()) {
             _a[i].setUndec();
         } else {
             _a[i].setOut();
+            if (_a[i].getName()[0] == '!') {
+                _a[i].setUndec();
+            }
             for (int j = 0; j < facts.size(); ++j) {
-                if (_a[i].getName() == facts[j]) {
+                std::string name = _a[i].getName();
+                if (name[0] == '!') name = name.substr(1, name.size() - 1);
+                if (name == facts[j]) {
                     _a[i].setUndec();
+                    if (_a[i].getName()[0] == '!') {
+                        _a[i].setOut();
+                    }
                     break;
                 }
             }
         }
+        //std::cout << _a[i].getName() << "---" << _a[i].getStatus() << std::endl;
         //std::cout << _a[i].getName() << " " << _a[i].getStatus() << std::endl;
     }
 }
