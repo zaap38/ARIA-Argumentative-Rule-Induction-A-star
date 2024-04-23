@@ -83,7 +83,7 @@ void Dataset::load(const std::string & filename,
     std::string line;
 
     Ranges ranges = getRanges(filename, floatingValues);
-
+    _ignoredIndexes = ignoredIndexes;
     _arguments.clear();
     _data.clear();
     std::vector<std::string> argumentNames;

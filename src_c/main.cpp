@@ -18,14 +18,14 @@ int main(int argc, char * argv[]) {
     test();
     timestamps.push_back(high_resolution_clock::now());
 
-    int runCount = 1;
+    int runCount = 10;
     bool verbose = true;
     for (int runIndex = 0; runIndex < runCount; ++runIndex) {
     
         // config
         float ratio = 0.7;
         float minBalanceRatio = 0.4;  // should be < 0.5
-        int maxIterations = -1;  // -1 for no limit
+        int maxIterations = 101;  // -1 for no limit
         int datasetId = 0;
         int seed = 11 + runIndex;//10;
         float samplingInterval = 3;
@@ -40,7 +40,7 @@ int main(int argc, char * argv[]) {
         //d.loadBalloons();
         d.loadCar();
         //d.loadMushroom();
-        //d.loadVoting();
+        d.loadVoting();
         //d.loadBreastCancer();
         //d.loadBreastCancerWisconsin();
         //d.loadHeartDisease();
