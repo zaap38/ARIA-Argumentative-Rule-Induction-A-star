@@ -40,15 +40,21 @@ Node AStar::run(int maxIterations) {
         }
         distance = (node->getDistance() < distance) || distance == -1? node->getDistance() : distance;
         if (_verbose && iterations % 1 == 0 && iterations > 0) {
+            std::ofstream output("output.txt", std::ios::app);
+            output << "--v-- It: " << iterations << " - " <<
+                duration_cast<milliseconds>(time - startTime).count() / 1000.0 << "s --v--" << std::endl;
             std::cout << "--v-- It: " << iterations << " - " <<
                 duration_cast<milliseconds>(time - startTime).count() / 1000.0 << "s --v--" << std::endl;
             Node copyBestNode = *getBestNode();
             float accTrain = copyBestNode.getAccuracy(1);
             copyBestNode.setDataset(_testDataset);
             float accTest = copyBestNode.getAccuracy(1);
+            output << "Train: " << accTrain << "% - Test: " << accTest << "%" << std::endl;
             std::cout << "Train: " << accTrain << "% - Test: " << accTest << "%" << std::endl;
             //std::cout << "It: " << iterations << " - Best distance: " << distance << " - Data: " << _dataset->size() << std::endl;
+            output << "Rsize: " << node->getAttackSize() << std::endl;
             std::cout << "Rsize: " << node->getAttackSize() << std::endl;
+            output.close();
             //node->printArguments();
             //node->print();
             //node->getValue()->printMatrix();

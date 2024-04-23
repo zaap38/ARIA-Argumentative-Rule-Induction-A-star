@@ -7,6 +7,7 @@
 #include <chrono>
 #include <thread>
 #include <future>
+#include <fstream>
 
 
 class AStar {

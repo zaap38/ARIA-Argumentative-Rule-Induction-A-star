@@ -20,7 +20,7 @@ void Dataset::loadBalloons() {
 
 void Dataset::loadCar() {
     setAttributes({"buying", "maint", "doors", "persons", "lug_boot", "safety", "acceptability"});  // set attributes
-    load("../src/datasets/car/car.data.txt", "acc");  // load data
+    load("../src/datasets/car/car.data.txt", "vgood");  // load data
 }
 
 void Dataset::loadMushroom() {
@@ -83,7 +83,7 @@ void Dataset::load(const std::string & filename,
     std::string line;
 
     Ranges ranges = getRanges(filename, floatingValues);
-
+    _ignoredIndexes = ignoredIndexes;
     _arguments.clear();
     _data.clear();
     std::vector<std::string> argumentNames;
@@ -153,7 +153,7 @@ void Dataset::load(const std::string & filename,
         dataline.setLabel(label);
         _data.push_back(dataline);
     }
-    // printVector(argumentNames);
+     printVector(argumentNames);
 }
 
 Ranges Dataset::getRanges(const std::string & filename, const std::vector<int> & floatingValues) const {
