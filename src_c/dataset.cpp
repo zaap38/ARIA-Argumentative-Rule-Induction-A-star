@@ -20,7 +20,12 @@ void Dataset::loadBalloons() {
 
 void Dataset::loadCar() {
     setAttributes({"buying", "maint", "doors", "persons", "lug_boot", "safety", "acceptability"});  // set attributes
-    load("../src/datasets/car/car.data.txt", "acc");  // load data
+    load("../src/datasets/car/car.data.txt", "vgood");  // load data
+}
+
+void Dataset::loadCarBB() {
+    setAttributes({"buying", "maint", "doors", "persons", "lug_boot", "safety", "acceptability"});  // set attributes
+    load("../src/datasets/car/car.data_gen.txt", "T");  // load data
 }
 
 void Dataset::loadMushroom() {
@@ -61,6 +66,13 @@ void Dataset::loadHeartDisease() {
         {0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});  // load data
 }
 
+void Dataset::loadHeartDiseaseBB() {
+    setAttributes({"age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach",
+                    "exang", "oldpeak", "slope", "ca", "thal", "class"});  // set attributes
+    load("../src/datasets/heart-disease/processed.cleveland.data_gen.txt", "T", -1,
+        {0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});  // load data
+}
+
 void Dataset::loadIris() {
     setAttributes({"sepal-length", "sepal-width", "petal-length", "petal-width", "class"});  // set attributes
     load("../src/datasets/iris/iris.data.txt", "Iris-virginica", 4,
@@ -71,6 +83,25 @@ void Dataset::loadFake() {
     setAttributes({"a", "b", "c", "label"});  // set attributes
     load("../src/datasets/fake/fake.data.txt", "T");  // load data
 
+}
+
+void Dataset::loadBlackjack() {
+    setAttributes({"player_sum",
+                "dealer_sum",
+                "player_less_dealer",
+                "dealer_above_11",
+                "player_above_11",
+                "player_ace",
+                "dealer_ace",
+                "action"});  // set attributes
+    /*setAttributes({"player_above_15",
+                "dealer_below_11",
+                "dealer_above_6",
+                "player_less_dealer",
+                "player_ace",
+                "dealer_ace",
+                "action"});*/
+    load("../data.txt", "STAND", -1);  // load data
 }
 
 void Dataset::load(const std::string & filename,
@@ -153,7 +184,7 @@ void Dataset::load(const std::string & filename,
         dataline.setLabel(label);
         _data.push_back(dataline);
     }
-    // printVector(argumentNames);
+    printVector(argumentNames);
 }
 
 Ranges Dataset::getRanges(const std::string & filename, const std::vector<int> & floatingValues) const {
