@@ -5,15 +5,15 @@ This project contains early-stage research code for learning argumentation-based
 C++ compiler - MinGW32 was used.
 
 ## Run
-Edit `main.cpp` to:
+Edit `./src_c/main.cpp` to:
 - Change the maximum number of iterations.
 - Change the dataset.
 
-Edit `dataset.h` and `dataset.cpp` if you wish to add a new dataset by:
+Edit `./src_c/dataset.h` and `./src_c/dataset.cpp` if you wish to add a new dataset by:
 - Setting the path to your data (all in one file).
 - Setting your attribute names, as well as the label position, and ignored attributes.
   
-Compile using `./makefile make` then run the generated .exe
+Compile using `./src_c/makefile make` then run the generated .exe
 
 ## Authors
 B. Alcaraz<br>
