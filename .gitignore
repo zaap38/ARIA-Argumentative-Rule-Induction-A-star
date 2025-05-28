@@ -133,7 +133,6 @@ token.txt
 *.png
 */results/
 */result/
-*.csv
 */output/
 
 # C++ stuffs
