@@ -63,16 +63,13 @@ class Dataset {
 
         void loadBalloons();
         void loadCar();
-        void loadCarBB();
         void loadMushroom();
         void loadVoting();
         void loadBreastCancer();
         void loadFake();
         void loadHeartDisease();
-        void loadHeartDiseaseBB();
         void loadBreastCancerWisconsin();
         void loadIris();
-        void loadBlackjack();
         void loadMoralMachine();
         void loadMoralMachineExt();
         void loadMoralMachineBBTest();

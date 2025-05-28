@@ -25,7 +25,7 @@ int main(int argc, char * argv[]) {
         // config
         float ratio = 0.7;
         float minBalanceRatio = 0.4;  // should be < 0.5
-        int maxIterations = 50;  // -1 for no limit
+        int maxIterations = -1;  // -1 for no limit
         int datasetId = 0;
         int seed = 11 + runIndex;//10;
         float samplingInterval = 3;
@@ -39,13 +39,11 @@ int main(int argc, char * argv[]) {
         d.setSeed(seed);
         //d.loadBalloons();
         //d.loadCar();
-        //d.loadCarBB();
         //d.loadMushroom();
         //d.loadVoting();
         //d.loadBreastCancer();
         //d.loadBreastCancerWisconsin();
         //d.loadHeartDisease();
-        //d.loadHeartDiseaseBB();
         //d.loadIris();
         //d.loadFake();
         //d.loadMoralMachine();

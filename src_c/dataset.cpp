@@ -61,13 +61,6 @@ void Dataset::loadHeartDisease() {
         {0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});  // load data
 }
 
-void Dataset::loadHeartDiseaseBB() {
-    setAttributes({"age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach",
-                    "exang", "oldpeak", "slope", "ca", "thal", "class"});  // set attributes
-    load("../src/datasets/heart-disease/processed.cleveland.data_gen.txt", "T", -1,
-        {0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});  // load data
-}
-
 void Dataset::loadIris() {
     setAttributes({"sepal-length", "sepal-width", "petal-length", "petal-width", "class"});  // set attributes
     load("./datasets/iris/iris.data.txt", "Iris-virginica", 4,
@@ -92,25 +85,6 @@ void Dataset::loadMoralMachineExt() {
 void Dataset::loadMoralMachineBBTest() {
     setAttributes({"persons", "kids", "animals", "criminals", "pregnants", "legal", "legal_alt", "saved"});  // set attributes
     load("./datasets/moral-machine/mm_predictions_test.csv", "yes");  // load data
-}
-
-void Dataset::loadBlackjack() {
-    setAttributes({"player_sum",
-                "dealer_sum",
-                "player_less_dealer",
-                "dealer_above_11",
-                "player_above_11",
-                "player_ace",
-                "dealer_ace",
-                "action"});  // set attributes
-    /*setAttributes({"player_above_15",
-                "dealer_below_11",
-                "dealer_above_6",
-                "player_less_dealer",
-                "player_ace",
-                "dealer_ace",
-                "action"});*/
-    load("../data.txt", "STAND", -1);  // load data
 }
 
 void Dataset::load(const std::string & filename,
