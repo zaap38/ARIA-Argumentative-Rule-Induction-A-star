@@ -34,7 +34,7 @@ int main(int argc, char * argv[]) {
 
         // init dataset
         Dataset d;
-        d.setSamplingInterval(samplingInterval);
+        //d.setSamplingInterval(samplingInterval);
         
         d.setSeed(seed);
         //d.loadBalloons();
@@ -48,7 +48,10 @@ int main(int argc, char * argv[]) {
         //d.loadHeartDiseaseBB();
         //d.loadIris();
         //d.loadFake();
-        d.loadBlackjack();
+        //d.loadMoralMachine();
+        //d.loadMoralMachineExt();
+        d.loadMoralMachineBBTest();
+
         Dataset train;
         Dataset test;
         

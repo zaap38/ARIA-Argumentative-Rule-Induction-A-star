@@ -73,6 +73,9 @@ class Dataset {
         void loadBreastCancerWisconsin();
         void loadIris();
         void loadBlackjack();
+        void loadMoralMachine();
+        void loadMoralMachineExt();
+        void loadMoralMachineBBTest();
 
     private:
         int _labelIndex;
