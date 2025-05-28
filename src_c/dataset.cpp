@@ -15,12 +15,12 @@ Dataset::~Dataset() {
 
 void Dataset::loadBalloons() {
     setAttributes({"color", "size", "act", "age", "inflated"});  // set attributes
-    load("../src/datasets/balloons/yellow-small+adult-stretch.data.txt", "T");  // load data
+    load("./datasets/balloons/yellow-small+adult-stretch.data.txt", "T");  // load data
 }
 
 void Dataset::loadCar() {
     setAttributes({"buying", "maint", "doors", "persons", "lug_boot", "safety", "acceptability"});  // set attributes
-    load("../src/datasets/car/car.data.txt", "vgood");  // load data
+    load("./datasets/car/car.data.txt", "vgood");  // load data
 }
 
 void Dataset::loadMushroom() {
@@ -29,13 +29,13 @@ void Dataset::loadMushroom() {
                     "stalk-surface-above-ring", "stalk-surface-below-ring", "stalk-color-above-ring",
                     "stalk-color-below-ring", "veil-type", "veil-color", "ring-number", "ring-type",
                     "spore-print-color", "population", "habitat"});  // set attributes
-    load("../src/datasets/mushroom/agaricus-lepiota.data.txt", "e", 0);  // load data
+    load("./datasets/mushroom/agaricus-lepiota.data.txt", "e", 0);  // load data
 }
 
 void Dataset::loadBreastCancer() {
     setAttributes({"class", "age", "menopause", "tumor-size", "inv-nodes", "node-caps", "deg-malign",
                 "breast", "breast-quad", "irradiat"});  // set attributes
-    load("../src/datasets/breast-cancer/breast-cancer.data.txt", "recurrence-events", 0);  // load data
+    load("./datasets/breast-cancer/breast-cancer.data.txt", "recurrence-events", 0);  // load data
 }
 
 void Dataset::loadVoting() {
@@ -43,34 +43,48 @@ void Dataset::loadVoting() {
                     "physician-fee-freeze", "el-salvador-aid", "religious-groups-in-schools", "anti-satellite-test-ban",
                     "aid-to-nicaraguan-contras", "mx-missile", "immigration", "synfuels-corporation-cutback", "education-spending",
                     "superfund-right-to-sue", "crime", "duty-free-exports", "export-administration-act-south-africa"});  // set attributes
-    load("../src/datasets/voting/house-votes-84.data.txt", "republican", 0);  // load data
+    load("./datasets/voting/house-votes-84.data.txt", "republican", 0);  // load data
 }
 
 void Dataset::loadBreastCancerWisconsin() {
     setAttributes({"id", "clump-thickness", "uniformity-of-cell-size", "uniformity-of-cell-shape",
                     "marginal-adhesion", "single-epithelial-cell-size", "bare-nuclei", "bland-chromatin",
                     "normal-nucleoli", "mitoses", "class"});  // set attributes
-    load("../src/datasets/breast-cancer-wisconsin/breast-cancer-wisconsin.data.txt", "4", 10,
+    load("./datasets/breast-cancer-wisconsin/breast-cancer-wisconsin.data.txt", "4", 10,
         {1, 2, 3, 4, 5, 6, 7, 8, 9}, {0});  // load data
 }
 
 void Dataset::loadHeartDisease() {
     setAttributes({"age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach",
                     "exang", "oldpeak", "slope", "ca", "thal", "class"});  // set attributes
-    load("../src/datasets/heart-disease/processed.cleveland.data.txt", "0", -1,
+    load("./datasets/heart-disease/processed.cleveland.data.txt", "0", -1,
         {0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});  // load data
 }
 
 void Dataset::loadIris() {
     setAttributes({"sepal-length", "sepal-width", "petal-length", "petal-width", "class"});  // set attributes
-    load("../src/datasets/iris/iris.data.txt", "Iris-virginica", 4,
+    load("./datasets/iris/iris.data.txt", "Iris-virginica", 4,
     {0, 1, 2, 3});  // load data
 }
 
 void Dataset::loadFake() {
     setAttributes({"a", "b", "c", "label"});  // set attributes
-    load("../src/datasets/fake/fake.data.txt", "T");  // load data
+    load("./datasets/fake/fake.data.txt", "T");  // load data
+}
 
+void Dataset::loadMoralMachine() {
+    setAttributes({"persons", "kids", "animals", "legal", "legal_alt", "saved"});  // set attributes
+    load("./datasets/moral-machine/mm_delta_2000.csv", "yes");  // load data
+}
+
+void Dataset::loadMoralMachineExt() {
+    setAttributes({"persons", "kids", "animals", "criminals", "pregnants", "legal", "legal_alt", "saved"});  // set attributes
+    load("./datasets/moral-machine/mm_delta_2000_ext.csv", "yes");  // load data
+}
+
+void Dataset::loadMoralMachineBBTest() {
+    setAttributes({"persons", "kids", "animals", "criminals", "pregnants", "legal", "legal_alt", "saved"});  // set attributes
+    load("./datasets/moral-machine/mm_predictions_test.csv", "yes");  // load data
 }
 
 void Dataset::load(const std::string & filename,
@@ -78,12 +92,11 @@ void Dataset::load(const std::string & filename,
                    int labelIndex,
                    const std::vector<int> & floatingValues,
                    const std::vector<int> & ignoredIndexes) {
-
+    
     std::ifstream file(filename);
     std::string line;
 
     Ranges ranges = getRanges(filename, floatingValues);
-
     _arguments.clear();
     _data.clear();
     std::vector<std::string> argumentNames;
@@ -134,21 +147,21 @@ void Dataset::load(const std::string & filename,
                             a.setIsLabel(true);
                             _arguments.insert(_arguments.begin(), a);
                             argumentNames.push_back(full);
-                            Argument neg;
-                            neg.setAttribute(_negation);
-                            neg.setValue(full);
-                            neg.setIsNegation(true);
-                            argumentNames.push_back(neg.getName());
-                            _arguments.insert(_arguments.begin() + 1, neg);
+                            // Argument neg;
+                            // neg.setAttribute(_negation);
+                            // neg.setValue(full);
+                            // neg.setIsNegation(true);
+                            // argumentNames.push_back(neg.getName());
+                            // _arguments.insert(_arguments.begin() + 1, neg);
                         }
                     } else if (value != "?") {
                         _arguments.push_back(a);
                         argumentNames.push_back(full);
-                        Argument neg;
-                        neg.setAttribute('!' + attribute);
-                        neg.setValue(value);
-                        _arguments.push_back(neg);
-                        argumentNames.push_back(neg.getName());
+                        // Argument neg;
+                        // neg.setAttribute('!' + attribute);
+                        // neg.setValue(value);
+                        // _arguments.push_back(neg);
+                        // argumentNames.push_back(neg.getName());
                     }
                 }
                 if (i != _labelIndex) {
@@ -161,13 +174,18 @@ void Dataset::load(const std::string & filename,
         dataline.setLabel(label);
         _data.push_back(dataline);
     }
-    //printVector(argumentNames);
+    printVector(argumentNames);
 }
 
 Ranges Dataset::getRanges(const std::string & filename, const std::vector<int> & floatingValues) const {
 
     Ranges ranges;
-    std::ifstream file(filename);
+    std::cout << "in ranges" << std::endl;
+    //std::ifstream file(filename);
+    std::ifstream file;
+    std::cout << "init done" << std::endl;
+    file.open(filename);
+    std::cout << "opened filename" << std::endl;
     std::string line;
 
     while (std::getline(file, line)) {

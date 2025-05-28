@@ -1,0 +1,7 @@
+ca=0.0 cp=4.0
+cp=4.0 T
+oldpeak=2.48-2.1 ca=0.0
+thal=7.0 T
+slope=1.0 thal=7.0
+trestbps=147.0-156.6 ca=0.0
+trestbps=147.0-156.6 oldpeak=2.48-2.1
