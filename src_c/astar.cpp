@@ -26,9 +26,7 @@ Node AStar::run(int maxIterations) {
 
     high_resolution_clock::time_point startTime = high_resolution_clock::now();
     high_resolution_clock::time_point time = high_resolution_clock::now();
-
     while (iterations != maxIterations) {
-        //std::cout << "vvvvv" << std::endl;
         time = high_resolution_clock::now();
         Node * node = getNextNode();
         //std::cout << "getNextNode() = " << duration_cast<milliseconds>(high_resolution_clock::now() - time).count() << std::endl;
@@ -94,7 +92,7 @@ std::tuple<Node*, int> AStar::runOnQueue(int offset, int coreCount) {
     for (int i = offset; i < _queue.size(); i += coreCount) {
 
         if (_queue[i].getColor() == 1 &&  // grey node
-            _queue[i].changes() &&  // branch is having an impact
+            //_queue[i].changes() &&  // branch is having an impact
             (_queue[i].getAttackSize() <= _maxRsize)) {
             //++candidateCount;
 

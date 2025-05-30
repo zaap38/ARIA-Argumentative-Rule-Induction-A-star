@@ -18,9 +18,19 @@ void Dataset::loadBalloons() {
     load("./datasets/balloons/yellow-small+adult-stretch.data.txt", "T");  // load data
 }
 
+void Dataset::loadBalloonsMulti() {
+    setAttributes({"color", "size", "act", "age", "inflated"});  // set attributes
+    loadMulti("./datasets/balloons/yellow-small+adult-stretch.data.txt");  // load data
+}
+
 void Dataset::loadCar() {
     setAttributes({"buying", "maint", "doors", "persons", "lug_boot", "safety", "acceptability"});  // set attributes
     load("./datasets/car/car.data.txt", "vgood");  // load data
+}
+
+void Dataset::loadCarMulti() {
+    setAttributes({"buying", "maint", "doors", "persons", "lug_boot", "safety", "acceptability"});  // set attributes
+    loadMulti("./datasets/car/car.data.txt");  // load data
 }
 
 void Dataset::loadMushroom() {
@@ -61,6 +71,13 @@ void Dataset::loadHeartDisease() {
         {0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});  // load data
 }
 
+void Dataset::loadHeartDiseaseBB() {
+    setAttributes({"age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach",
+                    "exang", "oldpeak", "slope", "ca", "thal", "class"});  // set attributes
+    load("./datasets/heart-disease/bb_hdc.txt", "true", -1,
+        {0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});  // load data
+}
+
 void Dataset::loadIris() {
     setAttributes({"sepal-length", "sepal-width", "petal-length", "petal-width", "class"});  // set attributes
     load("./datasets/iris/iris.data.txt", "Iris-virginica", 4,
@@ -87,23 +104,28 @@ void Dataset::loadMoralMachineBBTest() {
     load("./datasets/moral-machine/mm_predictions_test.csv", "yes");  // load data
 }
 
-void Dataset::load(const std::string & filename,
-                   const std::string & labelValue,
+void Dataset::loadMulti(const std::string & filename,
                    int labelIndex,
                    const std::vector<int> & floatingValues,
                    const std::vector<int> & ignoredIndexes) {
     
     std::ifstream file(filename);
+    if (!file.is_open()) {
+        throw std::runtime_error("Error opening file: " + filename);
+    }
     std::string line;
+    
+    std::vector<std::string> labelValues;
 
     Ranges ranges = getRanges(filename, floatingValues);
+    _targets.clear();
     _arguments.clear();
     _data.clear();
     std::vector<std::string> argumentNames;
     while (std::getline(file, line)) {
         std::vector<std::string> elements = splitStr(line, _delim);
         std::vector<std::string> facts;
-        bool label;
+        int label = -1;
         _labelIndex = labelIndex;
         if (_labelIndex == -1) {
             _labelIndex = elements.size() - 1;
@@ -113,7 +135,17 @@ void Dataset::load(const std::string & filename,
         for (size_t i = 0; i < elements.size(); ++i) {
 
             if (i == _labelIndex) {
-                label = (elements[i] == labelValue)? true: false;
+                label = -1;
+                for (int j = 0; j < labelValues.size(); ++j) {
+                    if (elements[i] == labelValues[j]) {
+                        label = j;
+                        break;
+                    }
+                }
+                if (label == -1) {
+                    labelValues.push_back(elements[i]);
+                    label = labelValues.size() - 1;
+                }
             }
             
             if (!intIn(_ignoredIndexes, i)) {
@@ -143,10 +175,11 @@ void Dataset::load(const std::string & filename,
                     neg_arg.setAttribute(attribute);
                     neg_arg.setValue(value);*/
                     if (i == _labelIndex) {
-                        if (value == labelValue) {
+                        if (strIn(labelValues, value)) {
                             a.setIsLabel(true);
                             _arguments.insert(_arguments.begin(), a);
                             argumentNames.push_back(full);
+                            _targets.push_back(&_arguments[0]);
                             // Argument neg;
                             // neg.setAttribute(_negation);
                             // neg.setValue(full);
@@ -174,18 +207,36 @@ void Dataset::load(const std::string & filename,
         dataline.setLabel(label);
         _data.push_back(dataline);
     }
-    printVector(argumentNames);
+    
+    //printVector(argumentNames);
+    int targetIndex = 0;
+    for (int i = 0; i < _arguments.size(); ++i) {
+        std::cout << "Arg " << i << ": " << _arguments[i].getName();
+        if (_arguments[i].isLabel()) {
+            std::cout << " [target " << targetIndex++ << "]";
+        } else if (_arguments[i].isNegation()) {
+            std::cout << " [negation]";
+        }
+        std::cout << std::endl;
+    }
+    
+}
+
+void Dataset::load(const std::string & filename,
+                   const std::string & labelValue,
+                   int labelIndex,
+                   const std::vector<int> & floatingValues,
+                   const std::vector<int> & ignoredIndexes) {
+    
+    std::vector<std::string> targets = {labelValue};
+    //loadMulti(filename, targets, labelIndex, floatingValues, ignoredIndexes);
 }
 
 Ranges Dataset::getRanges(const std::string & filename, const std::vector<int> & floatingValues) const {
 
     Ranges ranges;
-    std::cout << "in ranges" << std::endl;
-    //std::ifstream file(filename);
     std::ifstream file;
-    std::cout << "init done" << std::endl;
     file.open(filename);
-    std::cout << "opened filename" << std::endl;
     std::string line;
 
     while (std::getline(file, line)) {
@@ -346,7 +397,7 @@ void Data::addFact(const std::string & fact) {
     _facts.push_back(fact);
 }
 
-void Data::setLabel(bool label) {
+void Data::setLabel(int label) {
     _label = label;
 }
 
@@ -354,8 +405,12 @@ const std::vector<std::string> & Data::getFacts() const {
     return _facts;
 }
 
-bool Data::getLabel() const {
+int Data::getLabel() const {
     return _label;
+}
+
+std::vector<Argument*> Dataset::getTargets() const {
+    return _targets;
 }
 
 std::vector<Argument> Dataset::getArguments() const {

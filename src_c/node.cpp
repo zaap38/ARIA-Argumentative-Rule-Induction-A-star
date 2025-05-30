@@ -65,18 +65,17 @@ int Node::runOnDataset(int offset, int coreCount) {
     AF * af = _value->convertToAF();
 
     int correctCount = 0;
-    /*for (int i = offset; i < _dataset->size(); i += coreCount) {
-        if (af->predict(_dataset->get(i).getFacts(), _dataset->getLabelAttribute()) == _dataset->get(i).getLabel()) {
-            ++correctCount;
-        }
-    }*/
+    
     int index = 0;
     _lock.lock();
     index = _sharedIndex;
     _sharedIndex += 1;
     _lock.unlock();
     while (index < _dataset->size()) {
-        if (af->predict(_dataset->get(index).getFacts(), _dataset->getLabelAttribute()) == _dataset->get(index).getLabel()) {
+
+        // std::cout << "Pred: " << af->predict(_dataset->get(index).getFacts()) <<
+        //  " | Label: " << _dataset->get(index).getLabel() << std::endl;
+        if (af->predict(_dataset->get(index).getFacts()) == _dataset->get(index).getLabel()) {
             ++correctCount;
         }
         _lock.lock();
@@ -109,7 +108,7 @@ void Node::computeDistance(bool ignoreRSize) {
         correct += corrects[i].get();
     }
     float addedSizeDistance = 0;
-    if (!ignoreRSize) {
+    if (!ignoreRSize && _value->getAttackSize() > 5) {  // ignore malus if attack relation is small
         addedSizeDistance = _value->getAttackSize() / 1000.0;
     }
     _distance = (total - correct) + addedSizeDistance;

@@ -27,16 +27,20 @@ class AF {
         std::vector<AttackPtr> getAttacks() const;
         std::vector<Argument*> getInAttackers(const Argument & a);
         std::vector<Argument*> getOutAttackers(const Argument & a);
+        void addTarget(Argument target);
         void setArguments(const std::vector<Argument> & a);
         void addArgument(const Argument & a);
         void addAttack(const std::string & name1, const std::string & name2);
         void addAttack(const Argument & a1, const Argument & a2);
         void updateAliveness(const std::vector<Fact> & facts);
-        bool predict(const std::vector<Fact> & facts, const std::string & target);
+        int predict(const std::vector<Fact> & facts);
         void printAttacks() const;
         void printArguments() const;
+        bool isTarget(const Argument & target) const;
+        int getTargetIndex(const Argument & target) const;
 
     private:
+        std::vector<Argument> _t;
         std::vector<Argument> _a;
         std::vector<AttackPtr> _r;
 
@@ -62,6 +66,7 @@ class EncodedAF {
         void initAttackRelation();
         void addAttack(const Attack & r);
         void removeAttack(const Attack & r);
+        std::vector<Argument> getTargets() const;
         std::vector<Argument> getArguments() const;
         std::vector<std::vector<int>> getAttacks() const;
         std::vector<Attack> getAttackTuples() const;
@@ -74,6 +79,7 @@ class EncodedAF {
         std::string getHash(const std::string & callFrom = "") const;
 
     private:
+        std::vector<Argument> _t;  // targets
         std::vector<Argument> _a;  // argument list
         std::vector<std::vector<int>> _r;  // 2D array of ints: encoded attack relation; 1: attack; 0: no attack; -1: invalid
 };

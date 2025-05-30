@@ -2,17 +2,31 @@
 
 
 EncodedAF::EncodedAF() {
+    _t = std::vector<Argument>();
     _a = std::vector<Argument>();
     _r = std::vector<std::vector<int>>();
 }
 
 EncodedAF::EncodedAF(const EncodedAF & af) {
+    //_t = af.getTargets();
     _a = af.getArguments();
+    _t = std::vector<Argument>();
+    for (int i = 0; i < _a.size(); ++i) {
+        if (_a[i].isLabel()) {
+            _t.push_back(_a[i]);
+        }
+    }
     _r = af.getAttacks();
 }
 
 EncodedAF::EncodedAF(const std::vector<Argument> & arguments) {
+    _t = std::vector<Argument>();
     _a = arguments;
+    for (int i = 0; i < _a.size(); ++i) {
+        if (_a[i].isLabel()) {
+            _t.push_back(_a[i]);
+        }
+    }
     initAttackRelation();
 }
 
@@ -39,8 +53,11 @@ AF * EncodedAF::convertToAF() const {
     AF * af = new AF();
     std::vector<Argument> args;
     for (int i = 0; i < _a.size(); ++i) {
-        if (isInAttack(_a[i])) {
+        if (i < _t.size() || isInAttack(_a[i])) {
             args.push_back(_a[i]);
+            if (i < _t.size()) {
+                af->addTarget(args.back());
+            }
         }
     }
     af->setArguments(args);
@@ -78,6 +95,10 @@ bool EncodedAF::isInAttack(const Argument & a) const {
         }
     }
     return false;
+}
+
+std::vector<Argument> EncodedAF::getTargets() const {
+    return _t;
 }
 
 std::vector<Argument> EncodedAF::getArguments() const {
@@ -192,10 +213,8 @@ std::vector<std::tuple<Argument, Argument>> EncodedAF::getPossibleAddons() const
             Attacked node is already attacking something, or is the label.
             Attacker and Attacked do not share the same attribute name.
             */
-            if (i != j && _r[i][j] == 0 && (j == 0 || intIn(_r[j], 1))  // not reflexive/forbidden/symmetric + connected
+            if (i != j && _r[i][j] == 0 && (j < _t.size() || intIn(_r[j], 1))  // not reflexive/forbidden/symmetric + connected
                     && _a[i].getAttribute() != _a[j].getAttribute()  // arguments of the same attribute cannot attack each other
-                    //&& !intIn(_r[i], 1)  // limit to one attack per argument
-                    && (_r[i][0] == 0)  // an argument attacking the target cannot attack something else
                     ) {
                 possibleAddons.push_back(std::make_tuple(_a[i], _a[j]));
             }
@@ -220,9 +239,9 @@ void EncodedAF::initAttackRelation() {
     for (int i = 0; i < _a.size(); ++i) {
         std::vector<int> row;
         for (int j = 0; j < _a.size(); ++j) {
-            if (i == j || i == 0 || i == 1 ||
+            if (i == j || i < _t.size() + 1 ||
                     _a[i].getAttribute() == _a[j].getAttribute()) {  // attack impossible if reflexive or from label or negation
-                if (i == 1 && j == 0) {
+                if (i == _t.size() && j < _t.size()) {
                     row.push_back(0);
                 } else {
                     row.push_back(-1);
@@ -292,6 +311,10 @@ std::vector<Argument*> AF::getOutAttackers(const Argument & a) {
     return outAttacks;
 }
 
+void AF::addTarget(Argument target) {
+    _t.push_back(target);
+}
+
 void AF::addArgument(const Argument & a) {
     _a.push_back(a);
 }
@@ -321,7 +344,6 @@ void AF::updateAliveness(const std::vector<Fact> & facts) {
     Set all arguments to undec if in facts, out otherwise.
     */
     //std::cout << "vvv" << std::endl;
-    //printVector(facts);
     for (int i = 0; i < _a.size(); ++i) {
         if (_a[i].isLabel() || _a[i].isNegation()) {
             _a[i].setUndec();
@@ -347,7 +369,29 @@ void AF::updateAliveness(const std::vector<Fact> & facts) {
     }
 }
 
-bool AF::predict(const std::vector<Fact> & facts, const std::string & target) {
+bool AF::isTarget(const Argument & target) const {
+    for (int i = 0; i < _t.size(); ++i) {
+        // std::cout << "isTarget: " << _t[i]->getName() << " == " << target.getName() << std::endl;
+        // std::cout << _t[i] << " is equal " << &target << std::endl;
+        if (_t[i].getName() == target.getName()) {
+        //if (&*_t[i] == &target) {
+            return true;
+        }
+    }
+    return false;
+}
+
+int AF::getTargetIndex(const Argument & target) const {
+    for (int i = 0; i < _t.size(); ++i) {
+        if (_t[i].getName() == target.getName()) {
+        //if (&*_t[i] == &target) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int AF::predict(const std::vector<Fact> & facts) {
     using namespace std::chrono;
     high_resolution_clock::time_point timepoint = high_resolution_clock::now();
     updateAliveness(facts);
@@ -356,8 +400,29 @@ bool AF::predict(const std::vector<Fact> & facts, const std::string & target) {
     computeExtension();
     //std::cout << "computeExtension() = " << duration_cast<nanoseconds>(high_resolution_clock::now() - timepoint).count() / 1000.0 << std::endl;
     timepoint = high_resolution_clock::now();
-    bool result = targetAlive(target);
-    //std::cout << "targetAlive() = " << duration_cast<nanoseconds>(high_resolution_clock::now() - timepoint).count() / 1000.0 << std::endl;
+    //bool result = targetAlive(target);
+    int result = -1;
+    std::vector<Argument> extension;
+    for (int i = 0; i < _a.size(); ++i) {
+        if (_a[i].in() && isTarget(_a[i])) {
+            extension.push_back(_a[i]);
+            break;  // more than one target IN is not allowed
+        }
+    }
+    if (extension.size() == 1) {
+        result = getTargetIndex(extension[0]);
+    }
+
+    // std::cout << "vvvvvvvvv" << std::endl;
+    // printVector(facts);
+    // printArguments();
+    // printAttacks();
+    // std::cout << "{";
+    // for (int i = 0; i < extension.size(); ++i) {
+    //     std::cout << extension[i].getName() << " ";
+    // }
+    // std::cout <<"}"<< std::endl;
+    // std::cout << "Extension size: " << extension.size() << std::endl;
 
     return result;
 }
@@ -396,10 +461,11 @@ void AF::computeExtension(const Fact & target) {
         if (root->getName() == target) doBreak = true;
         std::vector<Argument*> attacked = getOutAttackers(*root);
         for (int i = 0; i < attacked.size(); ++i) {
+            // std::cout << attacked[i]->getName() << " attacked by " << root->getName() << std::endl;
             attacked[i]->setOut();
             if (attacked[i]->getAttribute() == target) doBreak = true;
         }
-        if (doBreak) break;
+        //if (doBreak) break;
         root = getRootArgument();
     }
 }

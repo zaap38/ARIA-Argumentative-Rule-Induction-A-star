@@ -21,13 +21,13 @@ class Data {
 
         void addFact(const std::string & fact);
         void setFacts(const std::vector<std::string> & facts);
-        void setLabel(bool label);
+        void setLabel(int label);
         const std::vector<std::string> & getFacts() const;
-        bool getLabel() const;
+        int getLabel() const;
 
     private:
         std::vector<std::string> _facts;
-        bool _label;
+        int _label;
 
 };
 
@@ -43,6 +43,10 @@ class Dataset {
                   int labelIndex = -1,
                   const std::vector<int> & floatingValues = {},
                   const std::vector<int> & ignoredIndexes = {});
+        void loadMulti(const std::string & src,
+                  int labelIndex = -1,
+                  const std::vector<int> & floatingValues = {},
+                  const std::vector<int> & ignoredIndexes = {});
         std::tuple<Dataset, Dataset> split(double ratio = 0.7);  // ratio: train%, (1 - ratio): test%
         int size() const;
         Data & operator[](int i);
@@ -54,6 +58,7 @@ class Dataset {
         void setLabelIndex(int index);
         void setDelim(char delim);
         void addIgnoredIndex(int index);
+        std::vector<Argument*> getTargets() const;
         std::vector<Argument> getArguments() const;
         std::string getLabelAttribute() const;
         void setLabelAttribute(const std::string & labelAttribute);
@@ -62,12 +67,15 @@ class Dataset {
         void setSamplingInterval(float interval);
 
         void loadBalloons();
+        void loadBalloonsMulti();
         void loadCar();
+        void loadCarMulti();
         void loadMushroom();
         void loadVoting();
         void loadBreastCancer();
         void loadFake();
         void loadHeartDisease();
+        void loadHeartDiseaseBB();
         void loadBreastCancerWisconsin();
         void loadIris();
         void loadMoralMachine();
@@ -83,6 +91,7 @@ class Dataset {
         int _seed;
         std::vector<int> _ignoredIndexes;
         std::vector<Argument> _arguments;
+        std::vector<Argument*> _targets;  // target attributes
         std::vector<Data> _data;
         std::vector<std::string> _attributes;
 
