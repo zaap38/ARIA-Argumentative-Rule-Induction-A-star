@@ -6,6 +6,7 @@ AStar::AStar() {
     _dataset = nullptr;
     _maxRsize = 1000;
     _verbose = false;
+    _bipolar = false;  // if true, use bipolar relations (attacks and supports)
 }
 
 AStar::~AStar() {
@@ -16,11 +17,16 @@ void AStar::setMaxRsize(int maxRsize) {
     _maxRsize = maxRsize;
 }
 
+void AStar::setBipolar(bool bipolar) {
+    _bipolar = bipolar;
+}
+
 Node AStar::run(int maxIterations) {
     int iterations = 0;
     int distance = -1;
     addStartNodeToQueue();
     std::vector<std::string> visitedHashes;
+    float oldAcc = -1;
 
     using namespace std::chrono;
 
@@ -49,6 +55,12 @@ Node AStar::run(int maxIterations) {
             std::cout << "Train: " << accTrain << "% - Test: " << accTest << "%" << std::endl;
             //std::cout << "It: " << iterations << " - Best distance: " << distance << " - Data: " << _dataset->size() << std::endl;
             std::cout << "Rsize: " << node->getAttackSize() << std::endl;
+
+            // print current best when accuracy changes
+            if ((oldAcc == -1 || oldAcc != accTrain) && iterations > 10) {
+                oldAcc = accTrain;
+                node->print();
+            }
             //node->printArguments();
             //node->print();
             //node->getValue()->printMatrix();
@@ -94,7 +106,8 @@ std::tuple<Node*, int> AStar::runOnQueue(int offset, int coreCount) {
     for (int i = offset; i < _queue.size(); i += coreCount) {
 
         if (_queue[i].getColor() == 1 &&  // grey node
-            _queue[i].changes() &&  // branch is having an impact
+            //(_queue[i].changes() || _queue[i].addedSupportLast()) &&  // branch is having an impact
+            (_queue[i].changes()) &&
             (_queue[i].getAttackSize() <= _maxRsize)) {
             //++candidateCount;
 
@@ -167,6 +180,7 @@ void AStar::setTestData(Dataset * test) {
 
 void AStar::addStartNodeToQueue() {
     Node startNode = Node(0, _dataset, new EncodedAF(_dataset->getArguments()));
+    startNode.setBipolar(_bipolar);
     startNode.setColor(1);  // grey
     _queue.push_back(startNode);
 }

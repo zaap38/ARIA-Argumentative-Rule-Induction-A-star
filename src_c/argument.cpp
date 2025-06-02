@@ -81,6 +81,10 @@ bool Argument::in() const {
     return _status == 1;
 }
 
+bool Argument::inSup() const {
+    return _status == 3;
+}
+
 bool Argument::out() const {
     return _status == 2;
 }
@@ -91,6 +95,10 @@ bool Argument::undec() const {
 
 void Argument::setIn() {
     _status = 1;
+}
+
+void Argument::setInSup() {
+    _status = 3;
 }
 
 void Argument::setOut() {

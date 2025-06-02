@@ -39,7 +39,7 @@ AF * EncodedAF::convertToAF() const {
     AF * af = new AF();
     std::vector<Argument> args;
     for (int i = 0; i < _a.size(); ++i) {
-        if (isInAttack(_a[i])) {
+        if (isInAttackOrSupport(_a[i])) {
             args.push_back(_a[i]);
         }
     }
@@ -48,6 +48,8 @@ AF * EncodedAF::convertToAF() const {
         for (int j = 0; j < _r[i].size(); ++j) {
             if (_r[i][j] == 1) {
                 af->addAttack(_a[i], _a[j]);
+            } else if (_r[i][j] == 2) {
+                af->addSupport(_a[i], _a[j]);
             }
         }
     }
@@ -80,6 +82,38 @@ bool EncodedAF::isInAttack(const Argument & a) const {
     return false;
 }
 
+bool EncodedAF::isInSupport(const Argument & a) const {
+    int index = -1;
+    for (int i = 0; i < _a.size(); ++i) {
+        if (_a[i] == a) {
+            index = i;
+            break;
+        }
+    }
+    for (int i = 0; i < _r.size(); ++i) {
+        if (_r[index][i] == 2 || _r[i][index] == 2) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool EncodedAF::isInAttackOrSupport(const Argument & a) const {
+    int index = -1;
+    for (int i = 0; i < _a.size(); ++i) {
+        if (_a[i] == a) {
+            index = i;
+            break;
+        }
+    }
+    for (int i = 0; i < _r.size(); ++i) {
+        if (_r[index][i] >= 1 || _r[i][index] >= 1) {
+            return true;
+        }
+    }
+    return false;
+}
+
 std::vector<Argument> EncodedAF::getArguments() const {
     return _a;
 }
@@ -92,7 +126,7 @@ int EncodedAF::getAttackSize() const {
     int count = 0;
     for (int i = 0; i < _r.size(); ++i) {
         for (int j = 0; j < _r[i].size(); ++j) {
-            if (_r[i][j] == 1) {
+            if (_r[i][j] >= 1) {  // include supports
                 ++count;
             }
         }
@@ -144,12 +178,12 @@ std::vector<Attack> EncodedAF::getAttackTuples() const {
     return attackTuples;
 }
 
-void EncodedAF::addAttack(const Attack & r) {
+void EncodedAF::addAttack(const Attack & r, int type) {
     std::tuple<int, int> indexes = getAttackIndex(r);
     int i = std::get<0>(indexes);
     int j = std::get<1>(indexes);
     if (i != -1 && j != -1) {
-        _r[i][j] = 1;
+        _r[i][j] = type;
         _r[j][i] = -1;
     }
 }
@@ -238,22 +272,25 @@ void EncodedAF::initAttackRelation() {
 
 void EncodedAF::print() const {
     AF * af = convertToAF();
-    std::vector<AttackPtr> attacks = af->getAttacks();
-    for (int i = 0; i < attacks.size(); ++i) {
-        std::cout << std::get<0>(attacks[i])->getName() << " " << std::get<1>(attacks[i])->getName() << std::endl;
-    }
-    std::cout << "A size: " << af->getArguments().size() << " | R size: " << af->getAttacks().size() << std::endl;
+    // std::vector<AttackPtr> attacks = af->getAttacks();
+    // for (int i = 0; i < attacks.size(); ++i) {
+    //     std::cout << std::get<0>(attacks[i])->getName() << " " << std::get<1>(attacks[i])->getName() << std::endl;
+    // }
+    // std::cout << "A size: " << af->getArguments().size() << " | R size: " << af->getAttacks().size() << std::endl;
+    af->printAttacks();
     delete af;
 }
 
 AF::AF() {
     _a = std::vector<Argument>();
     _r = std::vector<AttackPtr>();
+    _s = std::vector<AttackPtr>();
 }
 
 AF::~AF() {
     _a.clear();
     _r.clear();
+    _s.clear();
 }
 
 void AF::setArguments(const std::vector<Argument> & a) {
@@ -272,6 +309,10 @@ std::vector<AttackPtr> AF::getAttacks() const {
     return _r;
 }
 
+std::vector<AttackPtr> AF::getSupports() const {
+    return _s;
+}
+
 std::vector<Argument*> AF::getInAttackers(const Argument & a) {
     std::vector<Argument*> inAttacks;
     for (int i = 0; i < _r.size(); ++i) {
@@ -282,6 +323,16 @@ std::vector<Argument*> AF::getInAttackers(const Argument & a) {
     return inAttacks;
 }
 
+std::vector<Argument*> AF::getInSupporters(const Argument & a) {
+    std::vector<Argument*> inSupports;
+    for (int i = 0; i < _s.size(); ++i) {
+        if (*std::get<1>(_s[i]) == a) {
+            inSupports.push_back(std::get<0>(_s[i]));
+        }
+    }
+    return inSupports;
+}
+
 std::vector<Argument*> AF::getOutAttackers(const Argument & a) {
     std::vector<Argument*> outAttacks;
     for (int i = 0; i < _r.size(); ++i) {
@@ -290,6 +341,16 @@ std::vector<Argument*> AF::getOutAttackers(const Argument & a) {
         }
     }
     return outAttacks;
+}
+
+std::vector<Argument*> AF::getOutSupporters(const Argument & a) {
+    std::vector<Argument*> outSupports;
+    for (int i = 0; i < _s.size(); ++i) {
+        if (*std::get<0>(_s[i]) == a) {
+            outSupports.push_back(std::get<1>(_s[i]));
+        }
+    }
+    return outSupports;
 }
 
 void AF::addArgument(const Argument & a) {
@@ -316,12 +377,27 @@ void AF::addAttack(const Argument & a1, const Argument & a2) {
     }
 }
 
+void AF::addSupport(const AttackPtr & r) {
+    _s.push_back(r);
+}
+
+void AF::addSupport(const Argument & a1, const Argument & a2) {
+    Argument * a1Ptr = getArgumentByName(a1.getName());
+    Argument * a2Ptr = getArgumentByName(a2.getName());
+    if (a1Ptr != nullptr && a2Ptr != nullptr) {
+        addSupport(std::make_tuple(a1Ptr, a2Ptr));
+    }
+}
+
+void AF::addSupport(const std::string & name1, const std::string & name2) {
+    Argument * a1 = getArgumentByName(name1);
+    Argument * a2 = getArgumentByName(name2);
+    if (a1 != nullptr && a2 != nullptr) {
+        addSupport(std::make_tuple(a1, a2));
+    }
+}
+
 void AF::updateAliveness(const std::vector<Fact> & facts) {
-    /*
-    Set all arguments to undec if in facts, out otherwise.
-    */
-    //std::cout << "vvv" << std::endl;
-    //printVector(facts);
     for (int i = 0; i < _a.size(); ++i) {
         if (_a[i].isLabel() || _a[i].isNegation()) {
             _a[i].setUndec();
@@ -342,8 +418,6 @@ void AF::updateAliveness(const std::vector<Fact> & facts) {
                 }
             }
         }
-        //std::cout << _a[i].getName() << "---" << _a[i].getStatus() << std::endl;
-        //std::cout << _a[i].getName() << " " << _a[i].getStatus() << std::endl;
     }
 }
 
@@ -353,7 +427,8 @@ bool AF::predict(const std::vector<Fact> & facts, const std::string & target) {
     updateAliveness(facts);
     //std::cout << "updateAliveness() = " << duration_cast<nanoseconds>(high_resolution_clock::now() - timepoint).count() / 1000.0 << std::endl;
     timepoint = high_resolution_clock::now();
-    computeExtension();
+    //computeExtension();
+    computeBipolarExtension();
     //std::cout << "computeExtension() = " << duration_cast<nanoseconds>(high_resolution_clock::now() - timepoint).count() / 1000.0 << std::endl;
     timepoint = high_resolution_clock::now();
     bool result = targetAlive(target);
@@ -383,6 +458,11 @@ void AF::printAttacks() const {
     for (int i = 0; i < _r.size(); ++i) {
         std::cout << std::get<0>(_r[i])->getName() << " " << std::get<1>(_r[i])->getName() << std::endl;
     }
+    if (_s.size() > 0) { // print supports if any
+        for (int i = 0; i < _s.size(); ++i) {
+            std::cout << std::get<0>(_s[i])->getName() << " " << std::get<1>(_s[i])->getName() << " +" << std::endl;
+        }
+    }
 }
 
 void AF::computeExtension(const Fact & target) {
@@ -401,6 +481,32 @@ void AF::computeExtension(const Fact & target) {
         }
         if (doBreak) break;
         root = getRootArgument();
+    }
+}
+
+void AF::computeBipolarExtension(const Fact & target) {
+    Argument * root = getRootArgument();
+    std::vector<Argument> extension;
+    while (root != nullptr) {
+        root->setIn();
+        extension.push_back(*root);
+        std::vector<Argument*> attacked = getOutAttackers(*root);
+        for (int i = 0; i < attacked.size(); ++i) {
+            if (!attacked[i]->inSup()) {
+                attacked[i]->setOut();
+            }
+        }
+        std::vector<Argument*> supported = getOutSupporters(*root);
+        for (int i = 0; i < supported.size(); ++i) {
+            supported[i]->setInSup();
+        }
+        root = getRootArgument();
+    }
+    // convert all IN-SUP to IN
+    for (int i = 0; i < _a.size(); ++i) {
+        if (_a[i].inSup()) {
+            _a[i].setIn();
+        }
     }
 }
 

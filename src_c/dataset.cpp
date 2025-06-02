@@ -64,8 +64,14 @@ void Dataset::loadHeartDisease() {
 void Dataset::loadHeartDiseaseBB() {
     setAttributes({"age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach",
                     "exang", "oldpeak", "slope", "ca", "thal", "class"});  // set attributes
-    load("../src/datasets/heart-disease/processed.cleveland.data_gen.txt", "T", -1,
+    load("./datasets/heart-disease/bb_hdc.txt", "T", -1,
         {0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});  // load data
+}
+
+void Dataset::loadTestBipolar() {
+    setAttributes({"a", "b", "x", "class"});  // set attributes
+    //load("./datasets/test-bipolar/test-bipolar.txt", "1");  // load data
+    load("./datasets/test-bipolar/test-bipolar-nozero.txt", "1");  // load data
 }
 
 void Dataset::loadIris() {
@@ -173,12 +179,12 @@ void Dataset::load(const std::string & filename,
                             a.setIsLabel(true);
                             _arguments.insert(_arguments.begin(), a);
                             argumentNames.push_back(full);
-                            // Argument neg;
-                            // neg.setAttribute(_negation);
-                            // neg.setValue(full);
-                            // neg.setIsNegation(true);
-                            // argumentNames.push_back(neg.getName());
-                            // _arguments.insert(_arguments.begin() + 1, neg);
+                            Argument neg;  // LAMBDA ARGUMENT - do not remove
+                            neg.setAttribute(_negation);
+                            neg.setValue(full);
+                            neg.setIsNegation(true);
+                            argumentNames.push_back(neg.getName());
+                            _arguments.insert(_arguments.begin() + 1, neg);
                         }
                     } else if (value != "?") {
                         _arguments.push_back(a);
@@ -206,12 +212,8 @@ void Dataset::load(const std::string & filename,
 Ranges Dataset::getRanges(const std::string & filename, const std::vector<int> & floatingValues) const {
 
     Ranges ranges;
-    std::cout << "in ranges" << std::endl;
-    //std::ifstream file(filename);
     std::ifstream file;
-    std::cout << "init done" << std::endl;
     file.open(filename);
-    std::cout << "opened filename" << std::endl;
     std::string line;
 
     while (std::getline(file, line)) {

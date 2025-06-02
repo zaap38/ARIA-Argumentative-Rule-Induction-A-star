@@ -21,6 +21,7 @@ class AStar {
         void isDatasetNullptr();
         void setMaxRsize(int maxRsize);
         void setVerbose(bool verbose);
+        void setBipolar(bool bipolar);
 
 
     private:
@@ -29,6 +30,7 @@ class AStar {
         Dataset * _testDataset;  // pointer to the test dataset
         int _maxRsize;
 
+        bool _bipolar;  // if true, use bipolar relations (attacks and supports)
         bool _verbose;
 
         std::vector<Node> getNeighbors(const Node & node);

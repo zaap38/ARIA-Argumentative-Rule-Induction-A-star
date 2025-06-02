@@ -16,10 +16,12 @@ class Argument {
         int getId() const;
         int getStatus() const;
         bool in() const;
+        bool inSup() const;
         bool out() const;
         bool undec() const;
         void setStatus(int status);
         void setIn();
+        void setInSup();
         void setOut();
         void setUndec();
         void setValue(const std::string & value);
@@ -38,7 +40,7 @@ class Argument {
         bool _isLabel;
         bool _isNegation;
         int _id;
-        int _status;  // 0: undec ; 1: in ; 2: out
+        int _status;  // 0: undec ; 1: in ; 2: out ; 3: in-sup
         int _degree;  // depth of the node - used to avoid cycles
 
 };

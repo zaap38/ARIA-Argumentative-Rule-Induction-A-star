@@ -2,6 +2,8 @@
 
 Node::Node() {
     _id = std::rand() % 100000000;  // fix that one day
+    _relationTypes = 1;
+    _lastAddedType = 0;  // no attack added yet
     _color = 0;
     _distance = -1;
     _predecessor = -1;
@@ -13,6 +15,8 @@ Node::Node() {
 
 Node::Node(int id) {
     _id = id;
+    _relationTypes = 1;
+    _lastAddedType = 0;  // no attack added yet
     _color = 0;
     _distance = -1;
     _predecessor = -1;
@@ -23,6 +27,8 @@ Node::Node(int id) {
 
 Node::Node(int id, Dataset * dataset, EncodedAF * value) {
     _dataset = dataset;
+    _relationTypes = 1;
+    _lastAddedType = 0;  // no attack added yet
     _id = id;
     _color = 0;
     _distance = -1;
@@ -33,6 +39,8 @@ Node::Node(int id, Dataset * dataset, EncodedAF * value) {
 
 Node::Node(const Node & node) {
     _id = std::rand() % 100000000;  // fix that one day
+    _relationTypes = node._relationTypes;
+    _lastAddedType = node._lastAddedType;
     _color = node._color;
     _distance = node._distance;
     _predecessor = node._predecessor;
@@ -45,6 +53,10 @@ Node::~Node() {
     if (_value != nullptr) {
         delete _value;
     }
+}
+
+void Node::setBipolar(bool bipolar) {
+    _relationTypes = bipolar? 2 : 1;
 }
 
 
@@ -153,12 +165,15 @@ std::vector<Node> Node::getNeighbors() const {
     std::vector<Node> neighbors;
     std::vector<Attack> possibleAddons = _value->getPossibleAddons();
     for (int i = 0; i < possibleAddons.size(); ++i) {
-        if (true || _neighbors[i].getColor() == 0) {
+        for (int j = 0; j < _relationTypes; ++j) {
+            int relationType = j + 1;  // relation type starts at 1
             Node neighborNode;
+            neighborNode.setBipolar(_relationTypes == 2);
             neighborNode._value = new EncodedAF(*_value);
             neighborNode._dataset = _dataset;
-            neighborNode._value->addAttack(possibleAddons[i]);
+            neighborNode._value->addAttack(possibleAddons[i], relationType);
             neighborNode._predDistance = _distance;
+            neighborNode._lastAddedType = relationType;
             neighbors.push_back(neighborNode);
         }
     }
@@ -167,6 +182,13 @@ std::vector<Node> Node::getNeighbors() const {
 
 bool Node::changes() {
     return _predDistance == -1 || (int) getDistance() != (int) _predDistance;
+}
+
+bool Node::addedSupportLast() const {
+    /*
+    Returns true if the last added attack was a support.
+    */
+    return _lastAddedType == 2;
 }
 
 void Node::print(const std::string & prefix) const {

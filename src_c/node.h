@@ -32,13 +32,17 @@ class Node {
         void print(const std::string & prefix = "") const;
         std::string getLabelAttribute() const;
 
+        void setBipolar(bool bipolar);
         void setDataset(Dataset * dataset);
         bool changes();
+        bool addedSupportLast() const;
 
         void printArguments() const;
 
     private:
         int _id;
+        int _relationTypes;  // number of attack types
+        int _lastAddedType;
         EncodedAF * _value;
         int _color;  // 0: white; 1: grey; 2: black
         float _distance;  // -1 means not initialized

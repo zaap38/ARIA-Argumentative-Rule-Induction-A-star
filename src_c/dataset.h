@@ -64,6 +64,7 @@ class Dataset {
         void loadBalloons();
         void loadCar();
         void loadCarBB();
+        void loadTestBipolar();
         void loadMushroom();
         void loadVoting();
         void loadBreastCancer();
