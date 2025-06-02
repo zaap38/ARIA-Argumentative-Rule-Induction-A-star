@@ -48,7 +48,9 @@ int main(int argc, char * argv[]) {
         //d.loadFake();
         //d.loadMoralMachine();
         //d.loadMoralMachineExt();
-        d.loadMoralMachineBBTest();
+        //d.loadMoralMachineBBTest();
+        d.loadMoralMachineComplete();
+        //d.loadMoralMachineCompleteBB();
 
         Dataset train;
         Dataset test;
