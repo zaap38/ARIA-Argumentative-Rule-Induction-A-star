@@ -96,7 +96,7 @@ void Dataset::loadMoralMachineComplete() {
 void Dataset::loadMoralMachineCompleteBB() {
     setAttributes({"person","person_alt","kid","kid_alt","animal","animal_alt","criminal","criminal_alt",
         "pregnant","pregnant_alt","legal","legal_alt","label"});  // set attributes
-    load("./datasets/moral-machine/bb_mm_delta_2000_complete.csv", "yes");  // load data
+    load("./datasets/moral-machine/bb_mm_delta_2000_complete.csv", "true");  // load data
 }
 
 void Dataset::load(const std::string & filename,
