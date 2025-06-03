@@ -85,6 +85,10 @@ bool Argument::inSup() const {
     return _status == 3;
 }
 
+bool Argument::tempInSup() const {
+    return _status == 4;  // temporary in support, used for bipartite AFs
+}
+
 bool Argument::out() const {
     return _status == 2;
 }
@@ -99,6 +103,10 @@ void Argument::setIn() {
 
 void Argument::setInSup() {
     _status = 3;
+}
+
+void Argument::setTempInSup() {
+    _status = 4;  // temporary in support, used for bipartite AFs
 }
 
 void Argument::setOut() {

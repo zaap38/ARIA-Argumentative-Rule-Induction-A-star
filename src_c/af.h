@@ -40,6 +40,7 @@ class AF {
         bool predict(const std::vector<Fact> & facts, const std::string & target);
         void printAttacks() const;
         void printArguments() const;
+        void printArgumentStatus() const;
 
     private:
         std::vector<Argument> _a;
@@ -49,7 +50,9 @@ class AF {
         void computeExtension(const Fact & target = "");
         void computeBipolarExtension(const Fact & target = "");
         Argument * getRootArgument();
+        Argument * getRootTempInSupArgument();
         bool isRoot(const Argument & a);
+        bool isTempInSupRoot(const Argument & a);
         bool targetAlive(const std::string & target) const;
         void addAttack(const AttackPtr & r);
         void addSupport(const AttackPtr & r);

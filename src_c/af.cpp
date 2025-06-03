@@ -28,7 +28,7 @@ void EncodedAF::printMatrix() const {
     std::cout << std::endl;
     for (int i = 0; i < _r.size(); ++i) {
         for (int j = 0; j < _r[i].size(); ++j) {
-            char value = _r[i][j] == 1? '1' : _r[i][j] == -1? 'x' : '0';
+            char value = _r[i][j] >= 1? '0' + _r[i][j] : _r[i][j] == -1? 'x' : '0';
             std::cout << value << " ";
         }
         std::cout << std::endl;
@@ -485,28 +485,54 @@ void AF::computeExtension(const Fact & target) {
 }
 
 void AF::computeBipolarExtension(const Fact & target) {
-    Argument * root = getRootArgument();
+    
+    Argument * root = getRootTempInSupArgument();
     std::vector<Argument> extension;
+
     while (root != nullptr) {
-        root->setIn();
+
+        if (root->tempInSup()) {
+            root->setInSup();
+        } else {
+            root->setIn();
+        }
         extension.push_back(*root);
         std::vector<Argument*> attacked = getOutAttackers(*root);
         for (int i = 0; i < attacked.size(); ++i) {
-            if (!attacked[i]->inSup()) {
+            if (!attacked[i]->inSup() && !attacked[i]->tempInSup()) {
                 attacked[i]->setOut();
             }
         }
         std::vector<Argument*> supported = getOutSupporters(*root);
         for (int i = 0; i < supported.size(); ++i) {
-            supported[i]->setInSup();
+            supported[i]->setTempInSup();
         }
         root = getRootArgument();
     }
     // convert all IN-SUP to IN
     for (int i = 0; i < _a.size(); ++i) {
-        if (_a[i].inSup()) {
+        if (_a[i].inSup() || _a[i].tempInSup()) {
             _a[i].setIn();
         }
+    }
+}
+
+void AF::printArgumentStatus() const {
+    std::cout << "Argument status:" << std::endl;
+    for (int i = 0; i < _a.size(); ++i) {
+        std::cout << _a[i].getName() << ": ";
+        if (_a[i].in()) {
+            std::cout << "IN";
+        } else if (_a[i].inSup()) {
+            std::cout << "IN-SUP";
+        } else if (_a[i].tempInSup()) {
+            std::cout << "TEMP-IN-SUP";
+        } else if (_a[i].out()) {
+            std::cout << "OUT";
+        } else if (_a[i].undec()) {
+            std::cout << "UNDEC";
+        }
+        std::cout << std::endl;
     }
 }
 
@@ -519,11 +545,35 @@ Argument * AF::getRootArgument() {
     return nullptr;
 }
 
+Argument * AF::getRootTempInSupArgument() {
+    for (int i = 0; i < _a.size(); ++i) {
+        if (isTempInSupRoot(_a[i])) {
+            return &_a[i];
+        }
+    }
+    return nullptr;
+}
+
 bool AF::isRoot(const Argument & a) {
     /*
     Is a root if all attackers are dead and node _status is 0 (i.e., TBD).
     */
     std::vector<Argument*> inAttacks = getInAttackers(a);
+    if (!a.undec()) return false;
+    for (int i = 0; i < inAttacks.size(); ++i) {
+        if (!inAttacks[i]->out()) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool AF::isTempInSupRoot(const Argument & a) {
+    /*
+    Is a root if all attackers are dead and node _status is 4 (i.e., TEMP-IN-SUP).
+    */
+    std::vector<Argument*> inAttacks = getInAttackers(a);
+    if (a.tempInSup()) return true;
     if (!a.undec()) return false;
     for (int i = 0; i < inAttacks.size(); ++i) {
         if (!inAttacks[i]->out()) {

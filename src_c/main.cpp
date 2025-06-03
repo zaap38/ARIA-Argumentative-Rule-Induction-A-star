@@ -38,7 +38,7 @@ int main(int argc, char * argv[]) {
         
         d.setSeed(seed);
         //d.loadBalloons();
-        d.loadCar();
+        //d.loadCar();
         //d.loadCarBB();
         //d.loadMushroom();
         //d.loadVoting();
@@ -51,7 +51,7 @@ int main(int argc, char * argv[]) {
         //d.loadMoralMachine();
         //d.loadMoralMachineExt();
         //d.loadMoralMachineBBTest();
-        //d.loadTestBipolar();
+        d.loadTestBipolar();
 
         Dataset train;
         Dataset test;
