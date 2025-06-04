@@ -25,8 +25,7 @@ int main(int argc, char * argv[]) {
         // config
         float ratio = 0.7;
         float minBalanceRatio = 0.4;  // should be < 0.5
-        int maxIterations = -1;  // -1 for no limit
-        int datasetId = 0;
+        int maxIterations = 15;  // -1 for no limit
         int seed = 11 + runIndex;//10;
         float samplingInterval = 3;
 
@@ -48,7 +47,9 @@ int main(int argc, char * argv[]) {
         //d.loadFake();
         //d.loadMoralMachine();
         //d.loadMoralMachineExt();
-        d.loadMoralMachineBBTest();
+        //d.loadMoralMachineBBTest();
+        d.loadMoralMachineComplete();
+        //d.loadMoralMachineCompleteBB();
 
         Dataset train;
         Dataset test;

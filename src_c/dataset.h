@@ -73,6 +73,8 @@ class Dataset {
         void loadMoralMachine();
         void loadMoralMachineExt();
         void loadMoralMachineBBTest();
+        void loadMoralMachineComplete();
+        void loadMoralMachineCompleteBB();
 
     private:
         int _labelIndex;
