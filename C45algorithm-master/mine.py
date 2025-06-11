@@ -194,7 +194,7 @@ def multiple_run(file, names_param, reverse=False, ratio=0.7, agg=None, num=[]):
     t_start = time.time()
     avg_size = 0
 
-    count = 20
+    count = 1#20
 
     for i in tqdm(range(count)):
         names_param = cp.deepcopy(orig_name)
@@ -242,7 +242,6 @@ if __name__ == "__main__":
                "thalach",
                "oldpeak"]
     #print(multiple_run(filename, names, False, 0.7, aggregate, num))
-
     filename = "datasets/breast-cancer-wisconsin/breast-cancer-wisconsin.data.txt"
     names = ["clump-thickness", "uniformity-of-cell-size", "uniformity-of-cell-shape", "marginal-adhesion", "single-epithelial-cell-size", "bare-nuclei", "bland-chromatin",
              "normal-nucleoli", "mitoses", "benign(2)"]
@@ -264,4 +263,17 @@ if __name__ == "__main__":
              "breast-quad", "irradiat"]
     #print(multiple_run(filename, names, True, 0.7))  # not working
 
+    filename = "datasets/iris/iris.data"
+    names = ["sepal-length", "sepal-width", "petal-length", "petal-width", "class"]
+
+    aggregate["Iris-virginica"] = "Iris-virginica"
+    aggregate["Iris-versicolor"] = "other"
+    aggregate["Iris-setosa"] = "other"
+    num = ["sepal-length", "sepal-width", "petal-length", "petal-width"]
+    #print(multiple_run(filename, names, False, 0.7, aggregate, num))
+
+    filename = "datasets/wine/wine.data"
+    names = ["class", "alcohol", "malic-acid", "ash", "alcalinity-of-ash", "magnesium", "total-phenols", "flavanoids", "nonflavanoid-phenols", "proanthocyanins", "color-intensity", "hue", "od280/od315-of-diluted-wines", "proline"]
+    num = ["alcohol", "malic-acid", "ash", "alcalinity-of-ash", "magnesium", "total-phenols", "flavanoids", "nonflavanoid-phenols", "proanthocyanins", "color-intensity", "hue", "od280/od315-of-diluted-wines", "proline"]
+    print(multiple_run(filename, names, True, 0.7, None, num))
 

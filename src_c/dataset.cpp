@@ -63,7 +63,7 @@ void Dataset::loadHeartDisease() {
 
 void Dataset::loadIris() {
     setAttributes({"sepal-length", "sepal-width", "petal-length", "petal-width", "class"});  // set attributes
-    load("./datasets/iris/iris.data.txt", "Iris-virginica", 4,
+    load("./datasets/iris/iris.data", "Iris-virginica", 4,
     {0, 1, 2, 3});  // load data
 }
 
@@ -99,6 +99,12 @@ void Dataset::loadMoralMachineCompleteBB() {
     load("./datasets/moral-machine/bb_mm_delta_2000_complete.csv", "true");  // load data
 }
 
+void Dataset::loadWine() {
+    setAttributes({"class", "alcohol", "malic-acid", "ash", "alcalinity-of-ash", "magnesium",
+                    "total-phenols", "flavanoids", "nonflavanoid-phenols", "proanthocyanins",
+                    "color-intensity", "hue", "od280/od315-of-diluted-wines", "proline"});  // set attributes
+    load("./datasets/wine/wine.data", "1", 0, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13});  // load data
+}
 void Dataset::load(const std::string & filename,
                    const std::string & labelValue,
                    int labelIndex,
@@ -192,12 +198,10 @@ void Dataset::load(const std::string & filename,
 Ranges Dataset::getRanges(const std::string & filename, const std::vector<int> & floatingValues) const {
 
     Ranges ranges;
-    std::cout << "in ranges" << std::endl;
-    //std::ifstream file(filename);
-    std::ifstream file;
-    std::cout << "init done" << std::endl;
-    file.open(filename);
-    std::cout << "opened filename" << std::endl;
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        throw std::runtime_error("File not found: " + filename);
+    }
     std::string line;
 
     while (std::getline(file, line)) {
