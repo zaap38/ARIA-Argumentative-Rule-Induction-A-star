@@ -76,6 +76,7 @@ class Dataset {
         void loadMoralMachineComplete();
         void loadMoralMachineCompleteBB();
         void loadWine();
+        void loadThyroid();
 
     private:
         int _labelIndex;

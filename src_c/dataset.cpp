@@ -38,6 +38,13 @@ void Dataset::loadBreastCancer() {
     load("./datasets/breast-cancer/breast-cancer.data.txt", "recurrence-events", 0);  // load data
 }
 
+/*
+XGboost: 92.7
+SVM: 92.7
+Random Forest: 93.6
+NN: 96.3
+Logistic: 93.6
+*/
 void Dataset::loadVoting() {
     setAttributes({"party", "handicapped-infants", "water-project-cost-sharing", "adoption-of-the-budget-resolution",
                     "physician-fee-freeze", "el-salvador-aid", "religious-groups-in-schools", "anti-satellite-test-ban",
@@ -46,6 +53,13 @@ void Dataset::loadVoting() {
     load("./datasets/voting/house-votes-84.data.txt", "republican", 0);  // load data
 }
 
+/*
+XGboost: 97.2
+SVM: 94.4
+Random Forest: 97.9
+NN: 92.3
+Logistic: 95.8
+*/
 void Dataset::loadBreastCancerWisconsin() {
     setAttributes({"id", "clump-thickness", "uniformity-of-cell-size", "uniformity-of-cell-shape",
                     "marginal-adhesion", "single-epithelial-cell-size", "bare-nuclei", "bland-chromatin",
@@ -54,6 +68,13 @@ void Dataset::loadBreastCancerWisconsin() {
         {1, 2, 3, 4, 5, 6, 7, 8, 9}, {0});  // load data
 }
 
+/*
+XGboost: 81.6
+SVM: 65.8
+Random Forest: 80.3
+NN: 78.9
+Logistic: 81.6
+*/
 void Dataset::loadHeartDisease() {
     setAttributes({"age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach",
                     "exang", "oldpeak", "slope", "ca", "thal", "class"});  // set attributes
@@ -61,6 +82,13 @@ void Dataset::loadHeartDisease() {
         {0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});  // load data
 }
 
+/*
+XGboost: 92.1
+SVM: 94.7
+Random Forest: 89.5
+NN: 97.4
+Logistic: 94.7
+*/
 void Dataset::loadIris() {
     setAttributes({"sepal-length", "sepal-width", "petal-length", "petal-width", "class"});  // set attributes
     load("./datasets/iris/iris.data", "Iris-virginica", 4,
@@ -99,12 +127,36 @@ void Dataset::loadMoralMachineCompleteBB() {
     load("./datasets/moral-machine/bb_mm_delta_2000_complete.csv", "true");  // load data
 }
 
+
+/*
+XGboost: 97.8
+SVM: 80.0
+Random Forest: 100.0
+NN: 97.8
+Logistic: 93.3
+*/
 void Dataset::loadWine() {
     setAttributes({"class", "alcohol", "malic-acid", "ash", "alcalinity-of-ash", "magnesium",
                     "total-phenols", "flavanoids", "nonflavanoid-phenols", "proanthocyanins",
                     "color-intensity", "hue", "od280/od315-of-diluted-wines", "proline"});  // set attributes
     load("./datasets/wine/wine.data", "1", 0, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13});  // load data
 }
+
+/*
+Literature accuracies (see https://link.springer.com/article/10.1007/s00405-023-08299-w):
+KNN: 93.0
+SVM: 96.0
+Decision Tree: 96.0
+Random Forest: 95.0
+ANN: 96.0
+*/
+void Dataset::loadThyroid() {
+    setAttributes({"Age", "Gender", "Smoking", "Hx Smoking", "Hx Radiothreapy", "Thyroid Function",
+                "Physical Examination", "Adenopathy", "Pathology", "Focality", "Risk", "T", "N", "M",
+                "Stage", "Response", "Recurred"});
+    load("./datasets/thyroid/data.csv", "Yes", -1, {0});  // load data
+}
+
 void Dataset::load(const std::string & filename,
                    const std::string & labelValue,
                    int labelIndex,

@@ -18,7 +18,7 @@ int main(int argc, char * argv[]) {
     test();
     timestamps.push_back(high_resolution_clock::now());
 
-    int runCount = 10;
+    int runCount = 1;
     bool verbose = true;
 
     std::vector<float> train_accuracies, test_accuracies;
@@ -28,7 +28,7 @@ int main(int argc, char * argv[]) {
         // config
         float ratio = 0.7;
         float minBalanceRatio = 0.4;  // should be < 0.5
-        int maxIterations = 10;  // -1 for no limit
+        int maxIterations = 30;  // -1 for no limit
         int seed = 11 + runIndex;//10;
         float samplingInterval = 3;
 
@@ -54,6 +54,7 @@ int main(int argc, char * argv[]) {
         //d.loadMoralMachineComplete();
         //d.loadMoralMachineCompleteBB();
         d.loadWine();
+        //d.loadThyroid();
 
         Dataset train;
         Dataset test;
