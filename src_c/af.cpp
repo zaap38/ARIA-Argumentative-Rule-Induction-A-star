@@ -507,7 +507,8 @@ void AF::computeBipolarExtension(const Fact & target) {
         for (int i = 0; i < supported.size(); ++i) {
             supported[i]->setTempInSup();
         }
-        root = getRootArgument();
+        //root = getRootArgument();
+        root = getRootTempInSupArgument();
     }
     // convert all IN-SUP to IN
     for (int i = 0; i < _a.size(); ++i) {
