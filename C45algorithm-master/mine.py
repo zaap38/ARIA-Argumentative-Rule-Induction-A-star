@@ -20,8 +20,12 @@ def mine_c45(table, result):
 
         _result_: a string representing a name of column indicating a result.
     """
-    col = max([(k, gain(table, k, result)) for k in table.keys() if k != result],
-              key=lambda x: x[1])[0]
+    table_bis = [(k, gain(table, k, result)) for k in table.keys() if k != result]
+    if len(table_bis) > 0:
+        col = max(table_bis, key=lambda x: x[1])[0]
+    else:
+        pass
+        return []
     tree = []
     for subt in get_subtables(table, col):
         v = subt[col][0]
@@ -30,7 +34,8 @@ def mine_c45(table, result):
                          '%s=%s' % (result, subt[result][0])])
         else:
             del subt[col]
-            tree.append(['%s=%s' % (col, v)] + mine_c45(subt, result))
+            if len(subt) > 0:
+                tree.append(['%s=%s' % (col, v)] + mine_c45(subt, result))
     return tree
 
 def tree_to_rules(tree):
@@ -98,6 +103,8 @@ def rearrange_numerical_values(values, num):
 
 def predict(tree, names, values):
     node = None
+    if type(tree[-1]) == list and len(tree) == 1 and type(tree[-1][-1]) == str:
+        tree = tree[-1]
     if type(tree[-1]) == str:
         return tree[0]
     else:
@@ -242,7 +249,6 @@ if __name__ == "__main__":
                "thalach",
                "oldpeak"]
     #print(multiple_run(filename, names, False, 0.7, aggregate, num))
-
     filename = "datasets/breast-cancer-wisconsin/breast-cancer-wisconsin.data.txt"
     names = ["clump-thickness", "uniformity-of-cell-size", "uniformity-of-cell-shape", "marginal-adhesion", "single-epithelial-cell-size", "bare-nuclei", "bland-chromatin",
              "normal-nucleoli", "mitoses", "benign(2)"]
@@ -257,11 +263,21 @@ if __name__ == "__main__":
            "mitoses"]
     #print(multiple_run(filename, names, False, 0.7, None, num))
 
-    filename = "datasets/breast-cancer/breast-cancer.data.txt"
-    names = ["class", "age", "menopause",
-             "tumor-size", "inv-nodes",
-             "node-caps", "deg-malig", "breast",
-             "breast-quad", "irradiat"]
-    #print(multiple_run(filename, names, True, 0.7))  # not working
+    filename = "datasets/iris/iris.data"
+    names = ["sepal-length", "sepal-width", "petal-length", "petal-width", "class"]
+    aggregate["Iris-virginica"] = "Iris-virginica"
+    aggregate["Iris-versicolor"] = "other"
+    aggregate["Iris-setosa"] = "other"
+    num = ["sepal-length", "sepal-width", "petal-length", "petal-width"]
+    #print(multiple_run(filename, names, False, 0.7, aggregate, num))
 
+    filename = "datasets/wine/wine.data"
+    names = ["class", "alcohol", "malic-acid", "ash", "alcalinity-of-ash", "magnesium", "total-phenols", "flavanoids", "nonflavanoid-phenols", "proanthocyanins", "color-intensity", "hue", "od280/od315-of-diluted-wines", "proline"]
+    num = ["alcohol", "malic-acid", "ash", "alcalinity-of-ash", "magnesium", "total-phenols", "flavanoids", "nonflavanoid-phenols", "proanthocyanins", "color-intensity", "hue", "od280/od315-of-diluted-wines", "proline"]
+    print(multiple_run(filename, names, True, 0.7, None, num))
+
+    filename = "datasets/thyroid/data.csv"
+    names = ["Age", "Gender", "Smoking", "Hx Smoking", "Hx Radiothreapy", "Thyroid Function", "Physical Examination", "Adenopathy", "Pathology", "Focality", "Risk", "T", "N", "M", "Stage", "Response", "Recurred"]
+    num = ["Age"]
+    #print(multiple_run(filename, names, True, 0.7, None, num))
 

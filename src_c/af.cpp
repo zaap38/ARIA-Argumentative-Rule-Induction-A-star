@@ -272,12 +272,11 @@ void EncodedAF::initAttackRelation() {
 
 void EncodedAF::print() const {
     AF * af = convertToAF();
-    // std::vector<AttackPtr> attacks = af->getAttacks();
-    // for (int i = 0; i < attacks.size(); ++i) {
-    //     std::cout << std::get<0>(attacks[i])->getName() << " " << std::get<1>(attacks[i])->getName() << std::endl;
-    // }
-    // std::cout << "A size: " << af->getArguments().size() << " | R size: " << af->getAttacks().size() << std::endl;
-    af->printAttacks();
+    std::vector<AttackPtr> attacks = af->getAttacks();
+    for (int i = 0; i < attacks.size(); ++i) {
+        std::cout << std::get<0>(attacks[i])->getName() << " " << std::get<1>(attacks[i])->getName() << std::endl;
+    }
+    std::cout << "A size: " << af->getArguments().size() << " | R size: " << attacks.size() << std::endl;
     delete af;
 }
 
