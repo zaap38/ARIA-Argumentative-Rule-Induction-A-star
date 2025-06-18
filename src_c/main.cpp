@@ -18,7 +18,7 @@ int main(int argc, char * argv[]) {
     test();
     timestamps.push_back(high_resolution_clock::now());
 
-    int runCount = 1;
+    int runCount = 10;
     bool verbose = true;
 
     std::vector<float> train_accuracies, test_accuracies;
@@ -48,13 +48,14 @@ int main(int argc, char * argv[]) {
         //d.loadHeartDisease();
         //d.loadIris();
         //d.loadFake();
-        //d.loadMoralMachine();
+        d.loadMoralMachine();
         //d.loadMoralMachineExt();
         //d.loadMoralMachineBBTest();
         //d.loadMoralMachineComplete();
         //d.loadMoralMachineCompleteBB();
+        //d.loadAnnotatedMM();
         // d.loadWine();
-        d.loadThyroid();
+        //d.loadThyroid();
 
         Dataset train;
         Dataset test;

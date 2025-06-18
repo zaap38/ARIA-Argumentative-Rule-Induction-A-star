@@ -75,6 +75,7 @@ class Dataset {
         void loadMoralMachineBBTest();
         void loadMoralMachineComplete();
         void loadMoralMachineCompleteBB();
+        void loadAnnotatedMM();
         void loadWine();
         void loadThyroid();
 

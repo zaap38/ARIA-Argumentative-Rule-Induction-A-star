@@ -101,8 +101,8 @@ void Dataset::loadFake() {
 }
 
 void Dataset::loadMoralMachine() {
-    setAttributes({"persons", "kids", "animals", "legal", "legal_alt", "saved"});  // set attributes
-    load("./datasets/moral-machine/mm_delta_2000.csv", "yes");  // load data
+    setAttributes({"persons", "kids", "animals", "legal", "legal_alt", "saved"});
+    load("./datasets/moral-machine/annotated_delta.csv", "yes");  // load data
 }
 
 void Dataset::loadMoralMachineExt() {
@@ -125,6 +125,12 @@ void Dataset::loadMoralMachineCompleteBB() {
     setAttributes({"person","person_alt","kid","kid_alt","animal","animal_alt","criminal","criminal_alt",
         "pregnant","pregnant_alt","legal","legal_alt","label"});  // set attributes
     load("./datasets/moral-machine/bb_mm_delta_2000_complete.csv", "true");  // load data
+}
+
+void Dataset::loadAnnotatedMM() {
+    setAttributes({"person","person_alt","kid","kid_alt","animal","animal_alt","criminal","criminal_alt",
+        "pregnant","pregnant_alt","legal","legal_alt","label"});  // set attributes
+    load("./datasets/moral-machine/annotated.csv", "yes");  // load data
 }
 
 
