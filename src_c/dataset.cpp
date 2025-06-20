@@ -143,7 +143,7 @@ void Dataset::loadMoralMachineCompleteBB() {
 void Dataset::loadAnnotatedMM() {
     setAttributes({"person","person_alt","kid","kid_alt","animal","animal_alt","criminal","criminal_alt",
         "pregnant","pregnant_alt","legal","legal_alt","label"});  // set attributes
-    load("./datasets/moral-machine/annotated.csv", "yes");  // load data
+    load("./datasets/moral-machine/annotated.csv", "yes", -1, {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});  // load data
 }
 
 
@@ -188,12 +188,13 @@ void Dataset::load(const std::string & filename,
     Ranges ranges = getRanges(filename, floatingValues);
     _arguments.clear();
     _data.clear();
+    _labelIndex = labelIndex;
+    _ignoredIndexes = ignoredIndexes;
     std::vector<std::string> argumentNames;
     while (std::getline(file, line)) {
         std::vector<std::string> elements = splitStr(line, _delim);
         std::vector<std::string> facts;
         bool label;
-        _labelIndex = labelIndex;
         if (_labelIndex == -1) {
             _labelIndex = elements.size() - 1;
         }

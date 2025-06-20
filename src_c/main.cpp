@@ -18,7 +18,7 @@ int main(int argc, char * argv[]) {
     test();
     timestamps.push_back(high_resolution_clock::now());
 
-    int runCount = 1;
+    int runCount = 10;
     bool verbose = true;
 
     std::vector<float> train_accuracies, test_accuracies;
@@ -26,9 +26,9 @@ int main(int argc, char * argv[]) {
     for (int runIndex = 0; runIndex < runCount; ++runIndex) {
     
         // config
-        float ratio = 0.95;
+        float ratio = 0.7;
         float minBalanceRatio = 0.4;  // should be < 0.5
-        int maxIterations = -1;  // -1 for no limit
+        int maxIterations = 30;  // -1 for no limit
         int seed = 11 + runIndex;//10;
         float samplingInterval = 3;
 
@@ -45,14 +45,14 @@ int main(int argc, char * argv[]) {
         //d.loadMushroom();
         //d.loadVoting();
         //d.loadBreastCancer();
-        //d.loadBreastCancerWisconsin();
+        d.loadBreastCancerWisconsin();
         //d.loadHeartDisease();
         //d.loadIris();
         //d.loadFake();
         //d.loadMoralMachine();
         //d.loadMoralMachineExt();
         //d.loadMoralMachineBBTest();
-        d.loadTestBipolar();
+        //d.loadTestBipolar();
         //d.loadMoralMachineComplete();
         //d.loadMoralMachineCompleteBB();
         //d.loadAnnotatedMM();
@@ -76,7 +76,7 @@ int main(int argc, char * argv[]) {
         //std::cout << "Init AStar" << std::endl;
         // init astar graph
         AStar a;
-        a.setBipolar(true);  // use bipolar relations (attacks and supports)
+        a.setBipolar(1);  // use bipolar relations (attacks and supports)
         a.setVerbose(verbose);
         a.setData(&train);  // set dataset to compute distance
         a.setTestData(&test);  // set test dataset
